@@ -1,0 +1,3792 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>La Ludobox de Vivi 🎮</title>
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#09082a">
+<link rel="icon" href="./icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="./icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Ludobox">
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap');
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  font-family: 'Nunito', sans-serif;
+  color: white;
+  overflow-x: hidden;
+  overflow-y: auto;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  background: #09082a;
+  min-height: 100vh;
+  margin: 0;
+  -webkit-overflow-scrolling: touch;
+}
+
+.page {
+  display: none;
+  min-height: 100vh;
+  width: 100%;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 20px;
+  box-sizing: border-box;
+}
+.page.on {
+  display: flex;
+  justify-content: flex-start;
+}
+
+#page-home.page.on,
+#page-game.page.on,
+#page-bravo.page.on,
+#page-draw.page.on,
+#page-stickers.page.on {
+  padding-top: max(20px, env(safe-area-inset-top));
+  padding-bottom: max(40px, env(safe-area-inset-bottom));
+}
+
+button {
+  font-family: inherit;
+}
+
+/* Twinkling Canvas BG */
+#bg-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: auto;
+}
+
+/* Claymorphic custom styling for child-friendly feel */
+.clay-btn {
+  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.25), 
+              0 8px 0 #0e1335, 
+              0 16px 24px rgba(0, 0, 0, 0.3);
+  transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
+}
+
+#home-mascot-slot {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  width: 82px !important;
+  height: 82px !important;
+}
+
+#home-mascot-sidebar {
+  width: clamp(220px, 24vw, 300px) !important;
+  height: clamp(220px, 24vw, 300px) !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#splash-mascot-container {
+  width: clamp(250px, 25vw, 340px);
+  height: clamp(250px, 25vw, 340px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.home-activity-shell {
+  width: min(1180px, 94vw);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 820px) minmax(230px, 310px);
+  gap: clamp(28px, 4vw, 58px);
+  align-items: center;
+  justify-content: center;
+}
+
+.home-activity-grid {
+  justify-content: center;
+}
+
+.home-mascot-panel {
+  align-items: center;
+  justify-content: center;
+  min-height: 520px;
+}
+
+.home-mascot-bubble {
+  width: min(270px, 86vw);
+  margin-top: 10px;
+}
+
+@media (max-width: 900px) {
+  .home-activity-shell {
+    grid-template-columns: 1fr;
+    gap: 22px;
+  }
+  .home-mascot-panel {
+    min-height: auto;
+  }
+  #home-mascot-sidebar {
+    width: 190px !important;
+    height: 190px !important;
+  }
+}
+
+#game-mascot-slot {
+  background: rgba(255,255,255,0.08);
+  border-radius: 20px;
+  padding: 5px;
+}
+
+.mod-btn img {
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.mod-btn:hover img {
+  transform: scale(1.15) rotate(3deg);
+}
+
+/* Highlight doré quand la voix lit une carte */
+.clay-card.speaking, .rounded-2xl.speaking {
+  outline: 6px solid #fbbf24 !important;
+  outline-offset: 2px;
+  background: rgba(251, 191, 36, 0.25) !important;
+  transform: scale(1.08) !important;
+  box-shadow: 0 0 35px rgba(251, 191, 36, 0.5) !important;
+  transition: all 0.2s ease;
+  z-index: 50;
+  position: relative;
+}
+
+.asset-missing {
+  position: relative;
+  min-height: 64px;
+}
+.asset-missing::after {
+  content: "image absente";
+  position: absolute;
+  inset: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px dashed rgba(255,255,255,.35);
+  border-radius: 18px;
+  color: rgba(255,255,255,.7);
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+}
+.clay-btn:active {
+  transform: translateY(6px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 
+              0 2px 0 #0e1335, 
+              0 6px 12px rgba(0, 0, 0, 0.25);
+}
+
+.clay-card {
+  border-radius: 28px;
+  background: linear-gradient(180deg, #232b5d, #14183d);
+  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.12),
+              0 10px 0 #090a22,
+              0 18px 26px rgba(0, 0, 0, 0.24);
+  transition: transform 0.16s ease, filter 0.16s ease, box-shadow 0.16s ease;
+}
+.clay-card:not(.disabled):hover {
+  transform: translateY(-4px);
+  filter: brightness(1.08);
+}
+.clay-card:active {
+  transform: translateY(5px) scale(0.98);
+  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.1),
+              0 5px 0 #090a22,
+              0 10px 18px rgba(0, 0, 0, 0.22);
+}
+
+/* Splash Screen style */
+#splash {
+  min-height: 100vh;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  z-index: 10;
+}
+
+.splash-title {
+  font-family: 'Fredoka', sans-serif;
+  font-size: clamp(40px, 8.5vw, 78px);
+  font-weight: 700;
+  line-height: 1;
+  color: #ffbe3b;
+  text-shadow: 0 6px 0 #ff7a00, 0 12px 20px rgba(0,0,0,0.4);
+}
+.splash-title span {
+  display: block;
+  font-size: clamp(32px, 7.2vw, 64px);
+  color: white;
+  text-shadow: 0 6px 0 #7c4dff, 0 12px 20px rgba(0,0,0,0.4);
+}
+
+/* Memory Module CSS Flipping */
+.memory-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  max-width: 580px;
+  width: 100%;
+}
+
+.memory-card {
+  perspective: 1000px;
+  aspect-ratio: 1;
+  cursor: pointer;
+}
+.memory-card-inner {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  border-radius: 20px;
+}
+.memory-card.flipped .memory-card-inner {
+  transform: rotateY(180deg);
+}
+.memory-card-front, .memory-card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.15), 0 6px 12px rgba(0,0,0,0.2);
+}
+.memory-card-back {
+  background: linear-gradient(135deg, #4a3bcf, #271a8f);
+  border: 3px solid #7c4dff;
+}
+.memory-card-front {
+  background: linear-gradient(135deg, #232b5d, #14183d);
+  border: 3px solid #4ecca3;
+  transform: rotateY(180deg);
+}
+.memory-card.matched .memory-card-front {
+  border-color: #ffbe3b;
+  background: linear-gradient(135deg, #30386e, #1e224d);
+  animation: matchPulse 0.6s ease-in-out alternate;
+}
+
+@keyframes matchPulse {
+  0% { transform: rotateY(180deg) scale(1); }
+  50% { transform: rotateY(180deg) scale(1.1); }
+  100% { transform: rotateY(180deg) scale(1); }
+}
+
+/* Sticker Drawer styles */
+.sticker-el {
+  position: absolute;
+  cursor: move;
+  user-select: none;
+  touch-action: none;
+}
+
+.sticker-control {
+  display: none;
+  position: absolute;
+  top: -28px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(15, 15, 35, 0.9);
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+  border-radius: 30px;
+  padding: 2px 8px;
+  gap: 6px;
+  align-items: center;
+  z-index: 999;
+  box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+}
+
+.sticker-el:hover .sticker-control,
+.sticker-el.active .sticker-control {
+  display: flex;
+}
+
+/* Drawing Canvas responsive */
+#drawing-board {
+  touch-action: none;
+  background: #ffffff;
+  border-radius: 24px;
+  box-shadow: inset 0 4px 12px rgba(0,0,0,0.15), 0 8px 24px rgba(0,0,0,0.3);
+}
+
+/* Bedtime lock screen override */
+#bedtime-screen {
+  background: radial-gradient(circle at center, #11143d 0%, #06071c 100%);
+}
+
+/* Parents Gate Overlay */
+#parents-gate {
+  backdrop-filter: blur(8px);
+}
+
+/* Floating Confetti */
+.conf {
+  position: fixed;
+  top: -30px;
+  font-size: 28px;
+  pointer-events: none;
+  z-index: 9999;
+  animation: confFall linear forwards;
+}
+@keyframes confFall {
+  to {
+    top: 110vh;
+    transform: rotate(720deg);
+    opacity: 0;
+  }
+}
+
+/* Animation shake for error */
+.shake-card {
+  animation: shakeCard 0.4s ease;
+}
+@keyframes shakeCard {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-10px); }
+  40%, 80% { transform: translateX(10px); }
+}
+
+/* Bouncing idle mascot */
+.mascot-bounce {
+  animation: mascotBob 2.4s ease-in-out infinite;
+}
+@keyframes mascotBob {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-12px) scale(1.02); }
+}
+
+/* Chest rewards shaking */
+.shake-chest {
+  animation: shakeChest 0.8s infinite;
+}
+@keyframes shakeChest {
+  0%, 100% { transform: rotate(0) scale(1); }
+  10%, 30%, 50%, 70%, 90% { transform: rotate(-6deg) scale(1.05); }
+  20%, 40%, 60%, 80% { transform: rotate(6deg) scale(1.05); }
+}
+
+/* Overlay Feedback - Centrage parfait */
+#overlay:not(.hidden) {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* === SPLASH VIDÉO ANIMÉE (plein écran, sans découpe) === */
+
+#splash-video-container {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100dvh !important;
+  overflow: hidden !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  z-index: 9999 !important;
+  background: #0d0d2f !important;
+}
+
+#splash-gif {
+  width: 100vw !important;
+  height: 100dvh !important;
+  max-width: none !important;
+  max-height: none !important;
+  transform: scale(1.1) !important;
+  object-fit: contain !important;
+  object-position: center center !important;
+  display: block !important;
+}
+
+#btn-skip-splash {
+  position: absolute !important;
+  left: 50% !important;
+  top: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  width: min(460px, 70vw) !important;
+  height: min(120px, 20vh) !important;
+  background: transparent !important;
+  border: none !important;
+  cursor: pointer !important;
+  color: transparent !important;
+  font-size: 0 !important;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+
+.copyright,
+#copyright,
+footer {
+  position: fixed !important;
+  bottom: 8px !important;
+  left: 0 !important;
+  width: 100% !important;
+  text-align: center !important;
+  font-size: 11px !important;
+  opacity: 0.65 !important;
+  z-index: 10000 !important;
+}
+
+
+</style>
+</head>
+<body class="relative min-h-screen overflow-hidden">
+
+<!-- Interactive Twinkling background -->
+<canvas id="bg-canvas"></canvas>
+
+<!-- ==================== PAGE: SPLASH SCREEN ==================== -->
+<div id="splash-video-container">
+  <video id="splash-gif" autoplay muted loop playsinline webkit-playsinline preload="auto" poster="./splash.png">
+    <source src="./splash.mp4" type="video/mp4">
+  </video>
+
+  <!-- Bouton invisible placé par-dessus le bouton "Appuie pour jouer" du visuel -->
+  <button id="btn-skip-splash" aria-label="Appuie pour jouer"></button>
+</div>
+
+<!-- ==================== PAGE: HOME PAGE ==================== -->
+<div id="page-home" class="page relative z-10">
+  
+  <!-- Home Top bar -->
+  <div class="w-full max-w-5xl mx-auto flex flex-wrap items-center justify-between gap-4 bg-slate-950/50 backdrop-blur-md rounded-3xl p-4 mb-8 border border-white/10 shadow-2xl">
+    
+    <!-- Interactive Mascot Status Widget -->
+    <div class="flex items-center gap-4 cursor-pointer group" onclick="homeMascotSpeak()">
+      <div id="home-mascot-slot" class="w-16 h-16 bg-gradient-to-b from-white/15 to-white/5 border-2 border-white/20 rounded-full overflow-hidden flex items-center justify-center shadow-lg"></div>
+      <div class="relative bg-gradient-to-r from-indigo-950/90 to-slate-900/90 text-white text-xs md:text-sm font-bold py-2 px-4 rounded-2xl border border-white/10 max-w-xs hidden sm:block shadow-inner">
+        <div class="absolute -left-2 top-1/2 -translate-y-1/2 w-0 h-0 border-t-8 border-t-transparent border-b-8 border-b-transparent border-r-8 border-r-indigo-950/90"></div>
+        <span id="home-speech-text">Coucou ! Prêt pour apprendre ? Tapote-moi ! 🦁</span>
+      </div>
+    </div>
+
+    <!-- Header Options Button Tray -->
+    <div class="flex items-center gap-2 md:gap-3">
+      <!-- Switch Mascot -->
+      <button onclick="openMascotSelector()" class="clay-btn bg-gradient-to-b from-amber-400 to-amber-500 text-indigo-950 font-extrabold text-xs md:text-sm rounded-2xl px-4 py-2 border-b-4 border-amber-700 cursor-pointer hover:brightness-110">
+        🎭 Mascotte
+      </button>
+
+      <!-- Sticker Book Badge -->
+      <button onclick="openStickerBook()" class="clay-btn bg-gradient-to-b from-violet-400 to-indigo-500 text-white font-extrabold text-xs md:text-sm rounded-2xl px-4 py-2 border-b-4 border-violet-700 flex items-center gap-2 cursor-pointer hover:brightness-110">
+        🏆 Album <span id="sticker-badge" class="bg-pink-500 text-white font-black rounded-full px-2 py-0.5 text-xs">0/16</span>
+      </button>
+
+      <!-- Parents Settings Gate -->
+      <button onclick="triggerParentsGate()" class="clay-btn bg-gradient-to-b from-slate-600 to-slate-700 text-white font-extrabold text-xs md:text-sm rounded-2xl px-4 py-2 border-b-4 border-slate-900 cursor-pointer hover:brightness-110">
+        ⚙️ Parents
+      </button>
+    </div>
+  </div>
+
+  <!-- Home Grid of Modules -->
+  <div class="w-full mx-auto flex flex-col items-center justify-center my-8">
+      
+        <div class="home-activity-shell flex flex-col md:flex-row items-center justify-center gap-8">
+
+        <!-- Home Grid of Modules (Main Left) -->
+        <div class="flex flex-col items-center gap-6 order-2 md:order-1">
+          <h2 class="text-xl md:text-3xl font-black text-amber-400 text-center uppercase tracking-widest drop-shadow-md">
+            🌟 CHOISIS UNE ACTIVITÉ 🌟
+          </h2>
+
+          <div class="home-activity-grid grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 w-full">
+            <!-- Core modules -->
+            <div class="mod-btn clay-card p-4 md:p-6 flex flex-col items-center justify-center text-center gap-3 cursor-pointer" data-mod="alphabet">
+              <img src="./iconalphabet.png" class="w-16 h-16 md:w-24 md:h-24 object-contain drop-shadow-lg" alt="Alphabet">
+              <h3 class="font-black text-sm md:text-lg">Alphabet</h3>
+              <p class="text-white/60 text-xs">Les lettres et mots</p>
+            </div>
+
+            <div class="mod-btn clay-card p-4 md:p-6 flex flex-col items-center justify-center text-center gap-3 cursor-pointer" data-mod="chiffres">
+              <img src="./iconchiffres.png" class="w-16 h-16 md:w-24 md:h-24 object-contain drop-shadow-lg" alt="Chiffres">
+              <h3 class="font-black text-sm md:text-lg">Chiffres</h3>
+              <p class="text-white/60 text-xs">Compter en s'amusant</p>
+            </div>
+
+            <div class="mod-btn clay-card p-4 md:p-6 flex flex-col items-center justify-center text-center gap-3 cursor-pointer" data-mod="couleurs">
+              <img src="./iconcouleurs.png" class="w-16 h-16 md:w-24 md:h-24 object-contain drop-shadow-lg" alt="Couleurs">
+              <h3 class="font-black text-sm md:text-lg">Couleurs</h3>
+              <p class="text-white/60 text-xs">Associer les teintes</p>
+            </div>
+
+            <div class="mod-btn clay-card p-4 md:p-6 flex flex-col items-center justify-center text-center gap-3 cursor-pointer" data-mod="formes">
+              <img src="./iconformes.png" class="w-16 h-16 md:w-24 md:h-24 object-contain drop-shadow-lg" alt="Formes">
+              <h3 class="font-black text-sm md:text-lg">Formes</h3>
+              <p class="text-white/60 text-xs">Carrés, ronds, étoiles</p>
+            </div>
+
+            <div class="mod-btn clay-card p-4 md:p-6 flex flex-col items-center justify-center text-center gap-3 cursor-pointer" data-mod="animaux">
+              <img src="./iconanimaux.png" class="w-16 h-16 md:w-24 md:h-24 object-contain drop-shadow-lg" alt="Animaux">
+              <h3 class="font-black text-sm md:text-lg">Animaux</h3>
+              <p class="text-white/60 text-xs">Animaux et leurs bébés</p>
+            </div>
+
+            <div class="mod-btn clay-card p-4 md:p-6 flex flex-col items-center justify-center text-center gap-3 cursor-pointer" data-mod="nourriture">
+              <img src="./iconnourriture.png" class="w-16 h-16 md:w-24 md:h-24 object-contain drop-shadow-lg" alt="Nourriture">
+              <h3 class="font-black text-sm md:text-lg">Nourriture</h3>
+              <p class="text-white/60 text-xs">Fruits et légumes</p>
+            </div>
+
+            <div class="mod-btn clay-card p-4 md:p-6 flex flex-col items-center justify-center text-center gap-3 cursor-pointer" data-mod="lecture">
+              <img src="./iconlecture.png" class="w-16 h-16 md:w-24 md:h-24 object-contain drop-shadow-lg" alt="Lecture">
+              <h3 class="font-black text-sm md:text-lg">Je lis</h3>
+              <p class="text-white/60 text-xs">Syllabes et mots simples</p>
+            </div>
+
+            <div class="mod-btn clay-card p-4 md:p-6 flex flex-col items-center justify-center text-center gap-3 cursor-pointer" data-mod="regles">
+              <img src="./iconregles.png" class="w-16 h-16 md:w-24 md:h-24 object-contain drop-shadow-lg" alt="Vivre ensemble">
+              <h3 class="font-black text-sm md:text-lg">Vivre ensemble</h3>
+              <p class="text-white/60 text-xs">Bonnes manières</p>
+            </div>
+
+            <div class="mod-btn clay-card p-4 md:p-6 flex flex-col items-center justify-center text-center gap-3 cursor-pointer" data-mod="contraires">
+              <img src="./iconcontraires.png" class="w-16 h-16 md:w-24 md:h-24 object-contain drop-shadow-lg" alt="Contraires">
+              <h3 class="font-black text-sm md:text-lg">Contraires</h3>
+              <p class="text-white/60 text-xs">Grand, petit, chaud, froid</p>
+            </div>
+
+            <!-- NEW MODULES -->
+            <div class="mod-btn clay-card p-4 md:p-6 flex flex-col items-center justify-center text-center gap-3 cursor-pointer border-2 border-amber-500/30" data-mod="anglais">
+              <img src="./iconanglais.png" class="w-16 h-16 md:w-24 md:h-24 object-contain drop-shadow-lg" alt="Anglais">
+              <h3 class="font-black text-sm md:text-lg text-amber-400">Mon premier Anglais</h3>
+              <p class="text-white/60 text-xs">S'initier à l'anglais</p>
+            </div>
+
+            <div class="mod-btn clay-card p-4 md:p-6 flex flex-col items-center justify-center text-center gap-3 cursor-pointer border-2 border-pink-500/30" data-mod="memory">
+              <img src="./iconmemoire.png" class="w-16 h-16 md:w-24 md:h-24 object-contain drop-shadow-lg" alt="Mémoire">
+              <h3 class="font-black text-sm md:text-lg text-pink-400">Jeu de Mémoire</h3>
+              <p class="text-white/60 text-xs">Associer les cartes 3D</p>
+            </div>
+
+            <div class="mod-btn clay-card p-4 md:p-6 flex flex-col items-center justify-center text-center gap-3 cursor-pointer border-2 border-emerald-500/30" data-mod="tableau">
+              <img src="./iconartiste.png" class="w-16 h-16 md:w-24 md:h-24 object-contain drop-shadow-lg" alt="Artiste">
+              <h3 class="font-black text-sm md:text-lg text-emerald-400">Tableau Créatif</h3>
+              <p class="text-white/60 text-xs">Dessin et stickers stickers</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sidebar Mascot (Right) -->
+        <div class="home-mascot-panel flex flex-col pt-2 md:pt-0 order-1 md:order-2">
+          <div id="home-mascot-sidebar" class="mb-4">
+             <!-- Rendered dynamically -->
+          </div>
+          <div class="home-mascot-bubble relative bg-indigo-950/90 text-white text-sm font-bold py-3 px-4 rounded-2xl border border-white/10 shadow-xl text-center">
+            <div class="absolute -top-2 left-1/2 -translate-x-1/2 w-0 h-0 border-l-8 border-l-transparent border-r-8 border-r-transparent border-b-8 border-b-indigo-950/90"></div>
+            <span id="sidebar-speech-text">On joue à quoi ? 🦁</span>
+          </div>
+        </div>
+      </div>
+  </div>
+
+  <div class="w-full text-center text-white/50 text-xs font-semibold mt-8 pb-4 copyright" id="copyright">
+    La Ludobox de Vivi &copy; 2026
+  </div>
+</div>
+
+<!-- ==================== PAGE: GAMEPLAY ==================== -->
+<div id="page-game" class="page relative z-10 p-4">
+  
+  <!-- Game Header -->
+  <div class="w-full max-w-4xl mx-auto flex items-center justify-between bg-slate-950/60 backdrop-blur-md rounded-2xl p-3 mb-4 border border-white/10 shadow-xl">
+    <button id="btn-game-back" class="clay-btn bg-gradient-to-b from-pink-500 to-rose-600 text-white font-black text-xs md:text-sm rounded-xl px-4 py-2 border-b-4 border-rose-800 cursor-pointer hover:scale-105 flex items-center gap-2">
+      ⬅️ Menu
+    </button>
+
+    <div id="game-modname" class="font-black text-sm md:text-xl text-amber-400 uppercase tracking-wide max-w-xs truncate">
+      Alphabet
+    </div>
+
+    <div class="flex items-center gap-2">
+      <!-- Audio Mute Toggle -->
+      <button onclick="toggleMuteAudio()" id="btn-mute-toggle" class="clay-btn bg-slate-800/80 text-lg p-2 rounded-xl border-b-4 border-slate-950 cursor-pointer">
+        🔊
+      </button>
+      
+      <!-- Hearts Lives -->
+      <div id="game-chances" class="text-lg md:text-2xl tracking-tight mr-2">❤️❤️</div>
+      
+      <!-- Score Badge -->
+      <div id="game-score" class="clay-btn bg-gradient-to-b from-yellow-400 to-amber-500 text-indigo-950 font-black text-xs md:text-sm rounded-xl px-3 py-1.5 border-b-4 border-amber-700">
+        ⭐ 0
+      </div>
+    </div>
+  </div>
+
+  <!-- Game Progress bar -->
+  <div class="w-full max-w-4xl mx-auto mt-3 h-4 bg-slate-950/80 rounded-full overflow-hidden p-0.5 border border-white/5">
+    <div id="game-progress" class="h-full bg-gradient-to-r from-emerald-400 via-yellow-400 to-pink-500 rounded-full transition-all duration-500" style="width: 0%"></div>
+  </div>
+
+  <!-- Dynamic Mascot Instruction Bubble -->
+  <div class="w-full max-w-4xl mx-auto mt-4 bg-gradient-to-b from-indigo-950/80 to-slate-950/80 backdrop-blur-lg border border-white/10 rounded-3xl p-4 flex items-center gap-4 shadow-2xl relative cursor-pointer hover:brightness-105 transition-all" id="game-bubble">
+    <div id="game-mascot-slot" class="w-20 h-20 flex-shrink-0 overflow-hidden bg-white/5 rounded-2xl flex items-center justify-center shadow-inner border border-white/10">
+      <!-- Live SVG Mascot -->
+    </div>
+    <div class="flex-1 flex flex-col justify-center">
+      <div class="text-white/55 text-xs uppercase font-extrabold tracking-wider mb-0.5">Consigne :</div>
+      <div id="game-consigne" class="text-white font-bold text-sm md:text-2xl leading-tight">
+        Clique sur la lettre qui commence le mot Araignée !
+      </div>
+    </div>
+    <!-- Audio Repeat Icon Button -->
+    <div class="w-12 h-12 bg-gradient-to-b from-amber-400 to-amber-500 text-indigo-950 rounded-2xl flex items-center justify-center text-2xl font-bold shadow-lg border-b-4 border-amber-700 animate-pulse flex-shrink-0">
+      📢
+    </div>
+  </div>
+
+  <!-- Answers Grid Area -->
+  <div class="flex-1 w-full max-w-4xl mx-auto flex items-center justify-center py-6">
+    
+    <!-- Dynamic Answers Grid Container -->
+    <div class="w-full" id="game-interaction-zone">
+      <div class="answers-grid grid grid-cols-2 gap-4" id="game-answers-grid">
+        <!-- Filled by Javascript dynamically -->
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Mascot Footer Encouragement Tip -->
+  <div class="w-full text-center text-amber-400/80 text-xs font-bold">
+    Besoin d'aide ? Tapote la grande bulle jaune pour répéter la question ! 💡
+  </div>
+</div>
+
+<!-- ==================== PAGE: TABLEAU CRÉATIF (DRAWING CANVAS) ==================== -->
+<div id="page-draw" class="page relative min-h-screen w-full flex flex-col justify-between p-3 z-10">
+  <!-- Header toolbar -->
+  <div class="w-full max-w-5xl mx-auto flex items-center justify-between bg-slate-950/60 backdrop-blur-md rounded-2xl p-3 border border-white/10 shadow-xl">
+    <button onclick="exitCreative()" class="clay-btn bg-gradient-to-b from-pink-500 to-rose-600 text-white font-black text-xs md:text-sm rounded-xl px-4 py-2 border-b-4 border-rose-800 cursor-pointer flex items-center gap-2">
+      ⬅️ Quitter
+    </button>
+    <h2 class="font-black text-amber-400 text-sm md:text-xl tracking-wider">🖌️ TABLEAU CRÉATIF</h2>
+    <button onclick="clearCanvas()" class="clay-btn bg-gradient-to-b from-amber-500 to-orange-600 text-white font-black text-xs md:text-sm rounded-xl px-4 py-2 border-b-4 border-orange-800 cursor-pointer">
+      🧼 Nettoyer
+    </button>
+  </div>
+
+  <!-- Creative workspace -->
+  <div class="flex-1 w-full max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-4 my-4 items-stretch">
+    
+    <!-- Control board left: brush colors and modes -->
+    <div class="lg:col-span-3 bg-slate-900/95 backdrop-blur-md border border-white/10 rounded-3xl p-4 flex flex-col justify-between gap-4 shadow-2xl">
+      
+      <!-- Colors palette -->
+      <div>
+        <h3 class="text-xs font-bold text-white/65 mb-2 uppercase tracking-wider">Couleurs 🎨</h3>
+        <div class="grid grid-cols-4 gap-2" id="canvas-palette">
+          <!-- Colored bubbles -->
+        </div>
+        
+        <!-- Rainbow Brush trigger -->
+        <button id="btn-rainbow-brush" onclick="toggleRainbowBrush()" class="w-full mt-3 py-2 rounded-xl text-xs font-extrabold text-indigo-950 border-b-4 border-amber-600 bg-gradient-to-r from-red-400 via-yellow-400 via-green-400 via-blue-400 to-pink-500 shadow-md transform hover:scale-102 transition-all cursor-pointer">
+          🌈 PINCEAU ARC-EN-CIEL
+        </button>
+      </div>
+
+      <!-- Brush Sizes -->
+      <div>
+        <h3 class="text-xs font-bold text-white/65 mb-2 uppercase tracking-wider">Taille du pinceau 🟢</h3>
+        <div class="flex items-center justify-around bg-slate-950/50 p-2 rounded-2xl border border-white/5">
+          <button onclick="setBrushSize(6, this)" class="brush-size-btn w-8 h-8 rounded-full flex items-center justify-center bg-white/15 text-xs font-black border-2 border-transparent hover:bg-white/30 cursor-pointer">●</button>
+          <button onclick="setBrushSize(16, this)" class="brush-size-btn w-10 h-10 rounded-full flex items-center justify-center bg-white/15 text-lg font-black border-2 border-transparent hover:bg-white/30 cursor-pointer">●</button>
+          <button onclick="setBrushSize(32, this)" class="brush-size-btn w-12 h-12 rounded-full flex items-center justify-center bg-white/25 text-2xl font-black border-2 border-amber-400 hover:bg-white/30 cursor-pointer">●</button>
+        </div>
+      </div>
+
+      <!-- Stamp stickers tool -->
+      <div>
+        <h3 class="text-xs font-bold text-white/65 mb-2 uppercase tracking-wider">Tampons Autocollants 🧸</h3>
+        <div class="max-h-36 overflow-y-auto bg-slate-950/50 p-2 rounded-2xl border border-white/5 grid grid-cols-4 gap-2" id="canvas-stamps-container">
+          <!-- Sticker stamps rendered here based on collection -->
+        </div>
+        <p class="text-[10px] text-white/40 mt-1 text-center italic">Sélectionne un sticker puis touche le tableau pour le tamponner !</p>
+      </div>
+
+      <!-- Eraser -->
+      <button id="btn-eraser" onclick="activateEraser()" class="w-full py-3 rounded-2xl bg-slate-800 text-white font-extrabold border-b-4 border-slate-950 flex items-center justify-center gap-2 shadow-md cursor-pointer transition-all">
+        🧽 MODE GOMME
+      </button>
+    </div>
+
+    <!-- Drawing Canvas container -->
+    <div class="lg:col-span-9 flex flex-col items-stretch justify-center relative">
+      <canvas id="drawing-board" class="w-full h-full min-h-[45vh] lg:min-h-0 cursor-crosshair"></canvas>
+      
+      <!-- Floating creative support banner from active mascot -->
+      <div class="absolute bottom-3 right-3 bg-slate-950/90 border border-white/10 px-4 py-2 rounded-2xl flex items-center gap-3 shadow-lg">
+        <div id="creative-mascot-avatar" class="w-10 h-10 rounded-full overflow-hidden bg-white/10 flex items-center justify-center"></div>
+        <span class="text-xs font-extrabold text-white">Superbe chef d'œuvre ! continue ! 🎨</span>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="w-full text-center text-white/30 text-xs">
+    Tes dessins restent sur ton tableau tant que tu ne le nettoies pas ! ✨
+  </div>
+</div>
+
+<!-- ==================== PAGE: STICKER BOOK ==================== -->
+<div id="page-stickers" class="page relative min-h-screen w-full flex flex-col justify-between p-3 z-10">
+  
+  <!-- Header toolbar -->
+  <div class="w-full max-w-5xl mx-auto flex items-center justify-between bg-slate-950/60 backdrop-blur-md rounded-2xl p-3 border border-white/10 shadow-xl z-20">
+    <button onclick="exitCreative()" class="clay-btn bg-gradient-to-b from-pink-500 to-rose-600 text-white font-black text-xs md:text-sm rounded-xl px-4 py-2 border-b-4 border-rose-800 cursor-pointer flex items-center gap-2">
+      ⬅️ Menu
+    </button>
+    <h2 class="font-black text-amber-400 text-sm md:text-xl tracking-wider">🏆 ALBUM D'AUTOCOLLANTS</h2>
+    
+    <div class="flex items-center gap-2">
+      <button onclick="clearStickerBookScenery()" class="clay-btn bg-slate-800 text-white font-bold text-xs rounded-xl px-3 py-2 border-b-4 border-slate-950 cursor-pointer">
+        🗑️ Vider la scène
+      </button>
+    </div>
+  </div>
+
+  <!-- Landscape Playboard area -->
+  <div class="flex-1 w-full max-w-5xl mx-auto my-4 rounded-[32px] relative overflow-hidden border-4 border-white/10 shadow-inner" id="sticker-landscape-board" style="background: linear-gradient(to bottom, #dff9fb 0%, #95afc0 60%, #130f40 100%);">
+    
+    <!-- Rendered background objects (clouds, sun, sky depending on style) -->
+    <div class="absolute inset-0 pointer-events-none" id="sticker-landscape-decor">
+      <!-- Built dynamically via JS -->
+    </div>
+
+    <!-- Draggable Stickers will be appended here dynamically -->
+    <div id="stickers-scenery-root" class="absolute inset-0 z-10"></div>
+    
+    <!-- Background Selection Widget -->
+    <div class="absolute top-3 right-3 bg-slate-950/70 border border-white/10 rounded-2xl p-2 flex flex-col gap-2 shadow-lg z-20">
+      <span class="text-[9px] font-bold uppercase text-white/60 text-center tracking-wider">Décors</span>
+      <div class="flex gap-2">
+        <button onclick="setStickerBackground('meadow')" class="w-8 h-8 rounded-full bg-emerald-400 border border-white shadow hover:scale-110 transition-all cursor-pointer" title="La Prairie"></button>
+        <button onclick="setStickerBackground('space')" class="w-8 h-8 rounded-full bg-indigo-950 border border-white shadow hover:scale-110 transition-all cursor-pointer" title="L'Espace"></button>
+        <button onclick="setStickerBackground('sunset')" class="w-8 h-8 rounded-full bg-orange-400 border border-white shadow hover:scale-110 transition-all cursor-pointer" title="Le Coucher de Soleil"></button>
+      </div>
+    </div>
+
+    <!-- Trash bin dropzone inside the scene -->
+    <div id="sticker-trash-zone" class="absolute bottom-4 left-4 bg-rose-500/80 border border-rose-400 text-white p-3 rounded-full flex items-center justify-center text-xl shadow-lg opacity-30 transition-all z-20">
+      🗑️
+    </div>
+  </div>
+
+  <!-- Stickers tray drawer at the bottom -->
+  <div class="w-full max-w-5xl mx-auto bg-slate-950/70 backdrop-blur-md border border-white/10 rounded-3xl p-4 shadow-2xl z-20">
+    <h3 class="text-xs font-bold text-white/60 mb-2 uppercase tracking-widest text-center">
+      🎨 Tes Stickers débloqués — Tapote pour les coller sur la scène ! 🦖
+    </h3>
+    
+    <div id="sticker-drawer-container" class="flex items-center gap-3 overflow-x-auto pb-2 px-2">
+      <!-- Rendered dynamically. Inactive/Locked stickers are greyed out -->
+    </div>
+  </div>
+</div>
+
+<!-- ==================== PAGE: BRAVO SCREEN (FINAL REWARD) ==================== -->
+<div id="page-bravo" class="page relative min-h-screen w-full flex flex-col items-center justify-center gap-6 p-6 z-10">
+  <div class="bravo-char text-7xl md:text-9xl drop-shadow-lg animate-bounce">🏆</div>
+  <h2 class="bravo-title text-3xl md:text-6xl text-amber-400 text-center font-black tracking-widest uppercase drop-shadow-md">
+    BRAVO CHAMPION !
+  </h2>
+  <p id="bravo-info" class="text-lg md:text-3xl text-white/90 text-center font-bold max-w-md leading-relaxed">
+    Tu as eu 10 bonnes réponses sur 10 ! Tu es incroyable ! 🌟
+  </p>
+  
+  <div id="bravo-stars" class="text-2xl md:text-4xl tracking-wide text-center text-yellow-400 my-2"></div>
+
+  <!-- Sticker Chest Box Reward Animation Wrapper -->
+  <div id="sticker-reward-chest-wrapper" class="w-full max-w-sm bg-indigo-950/50 border border-white/10 rounded-3xl p-6 flex flex-col items-center justify-center shadow-2xl relative my-4 hidden">
+    <span class="text-xs font-bold text-amber-400 uppercase tracking-widest mb-2">🏆 CADEAU BONUS DE VICTOIRE 🏆</span>
+    <div id="chest-box" onclick="unlockVictoryGift()" class="text-7xl md:text-9xl cursor-pointer shake-chest filter drop-shadow-2xl select-none">
+      🎁
+    </div>
+    <p id="chest-instructions" class="text-white/80 font-bold text-xs md:text-sm text-center mt-4 animate-pulse">
+      Tapote le paquet surprise pour découvrir ton cadeau ! 😍
+    </p>
+  </div>
+
+  <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mt-2">
+    <button id="btn-bravo-menu" class="clay-btn bg-gradient-to-b from-amber-400 to-orange-500 text-indigo-950 font-extrabold text-lg md:text-2xl rounded-full px-10 py-4 border-b-8 border-orange-700 cursor-pointer hover:scale-105 flex items-center gap-3 transition-all">
+      ⬅️ MENU
+    </button>
+    <button id="btn-bravo-replay" class="clay-btn bg-gradient-to-b from-emerald-400 to-teal-500 text-white font-extrabold text-lg md:text-2xl rounded-full px-10 py-4 border-b-8 border-emerald-700 cursor-pointer hover:scale-105 flex items-center gap-3 transition-all">
+      🔄 REJOUER !
+    </button>
+  </div>
+</div>
+
+<!-- ==================== OVERLAY: SUCCESS / ERROR ==================== -->
+<div id="overlay" class="fixed inset-0 z-[999] bg-slate-950/80 backdrop-blur-sm hidden p-4" style="align-items: center; justify-content: center;">
+  <div id="ov-box" class="clay-card border-0 w-full max-w-md p-8 text-center flex flex-col items-center gap-4 transform scale-95 transition-all duration-300">
+    <div id="ov-em" class="text-7xl md:text-9xl drop-shadow-md animate-bounce">🎉</div>
+    <div id="ov-tx" class="font-black text-lg md:text-2xl text-white leading-snug">
+      Super ! Tu es vraiment fort !
+    </div>
+  </div>
+</div>
+
+<!-- ==================== MODAL: PARENTS CONTROLS GATE ==================== -->
+<div id="parents-gate" class="fixed inset-0 z-[1000] bg-slate-950/80 backdrop-blur-md hidden items-center justify-center p-4">
+  <div class="clay-card w-full max-w-md p-8 flex flex-col gap-6 border-2 border-slate-600/40 bg-slate-950">
+    <div class="text-center">
+      <span class="text-4xl">🔐</span>
+      <h3 class="font-black text-2xl text-amber-400 mt-2">ESPACE PARENTS</h3>
+      <p class="text-white/70 text-xs md:text-sm mt-1">
+        Pour prouver que vous êtes un adulte, s'il vous plaît résolvez cette équation simple :
+      </p>
+    </div>
+
+    <!-- Math Puzzle -->
+    <div class="bg-slate-900 p-4 rounded-2xl border border-white/5 text-center">
+      <span id="parents-math-challenge" class="text-2xl md:text-3xl font-black text-white tracking-wider">
+        4 + 3 = ?
+      </span>
+    </div>
+
+    <!-- Selection grid -->
+    <div class="grid grid-cols-2 gap-3" id="parents-gate-choices">
+      <!-- Filled dynamic options buttons -->
+    </div>
+
+    <!-- Cancel Button -->
+    <button onclick="closeParentsGate()" class="w-full py-3 rounded-2xl bg-slate-800 text-white font-bold border-b-4 border-slate-950 hover:bg-slate-700 cursor-pointer">
+      Retourner jouer
+    </button>
+  </div>
+</div>
+
+<!-- ==================== MODAL: PARENTS DASHBOARD PANEL ==================== -->
+<div id="parents-dashboard" class="fixed inset-0 z-[1000] bg-slate-950/75 backdrop-blur-md hidden items-center justify-center p-4">
+  <div class="clay-card w-full max-w-lg p-6 flex flex-col gap-5 bg-slate-900 border border-white/10 max-h-[90vh] overflow-y-auto">
+    <div class="flex justify-between items-center border-b border-white/10 pb-3">
+      <h3 class="font-black text-xl text-amber-400 flex items-center gap-2">⚙️ CONFIGURATION DU LION VIVI</h3>
+      <button onclick="closeParentsDashboard()" class="text-white/60 hover:text-white text-2xl font-bold cursor-pointer">✕</button>
+    </div>
+
+    <!-- Play Timer Limit -->
+    <div class="flex flex-col gap-1.5">
+      <label class="text-xs font-bold text-white/60 uppercase tracking-wider">⏳ Limiter le temps de jeu de l'enfant :</label>
+      <div class="grid grid-cols-4 gap-2">
+        <button onclick="setPlayTimerLimit(0, this)" class="timer-btn py-2 rounded-xl text-xs font-extrabold border-b-4 bg-amber-400 text-indigo-950 border-amber-600 cursor-pointer">Infini</button>
+        <button onclick="setPlayTimerLimit(10, this)" class="timer-btn py-2 rounded-xl text-xs font-extrabold border-b-4 bg-slate-800 text-white border-slate-950 cursor-pointer">10 Min</button>
+        <button onclick="setPlayTimerLimit(20, this)" class="timer-btn py-2 rounded-xl text-xs font-extrabold border-b-4 bg-slate-800 text-white border-slate-950 cursor-pointer">20 Min</button>
+        <button onclick="setPlayTimerLimit(30, this)" class="timer-btn py-2 rounded-xl text-xs font-extrabold border-b-4 bg-slate-800 text-white border-slate-950 cursor-pointer">30 Min</button>
+      </div>
+      <p id="timer-status-txt" class="text-[10px] text-amber-400 italic mt-0.5"></p>
+    </div>
+
+    <!-- Difficulty Level selector -->
+    <div class="flex flex-col gap-1.5">
+      <label class="text-xs font-bold text-white/60 uppercase tracking-wider">🎯 Niveau de difficulté :</label>
+      <div class="grid grid-cols-3 gap-2">
+        <button onclick="setDifficulty('easy', this)" class="diff-btn py-2 rounded-xl text-xs font-extrabold border-b-4 bg-slate-800 text-white border-slate-950 cursor-pointer">Facile (2 choix)</button>
+        <button onclick="setDifficulty('medium', this)" class="diff-btn py-2 rounded-xl text-xs font-extrabold border-b-4 bg-amber-400 text-indigo-950 border-amber-600 cursor-pointer">Moyen (3 choix)</button>
+        <button onclick="setDifficulty('hard', this)" class="diff-btn py-2 rounded-xl text-xs font-extrabold border-b-4 bg-slate-800 text-white border-slate-950 cursor-pointer">Difficile (4 choix)</button>
+      </div>
+    </div>
+
+    <!-- TTS Voice adjustments -->
+    <div class="flex flex-col gap-3 bg-slate-950/40 p-3 rounded-2xl border border-white/5">
+      <h4 class="text-xs font-bold text-white/70 uppercase tracking-wider">🔊 Paramètres de la Synthèse Vocale</h4>
+      
+      <div class="flex flex-col gap-1">
+        <div class="flex justify-between text-xs text-white/70 font-bold">
+          <span>Vitesse de lecture :</span>
+          <span id="txt-speed-val">Normal</span>
+        </div>
+        <input type="range" min="0.5" max="1.3" step="0.1" value="0.85" id="tts-speed-slider" oninput="adjustTtsParams()" class="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-amber-400">
+      </div>
+
+      <div class="flex flex-col gap-1">
+        <div class="flex justify-between text-xs text-white/70 font-bold">
+          <span>Aigu/Grave (Pitch) :</span>
+          <span id="txt-pitch-val">Normal</span>
+        </div>
+        <input type="range" min="0.7" max="2.0" step="0.1" value="1.55" id="tts-pitch-slider" oninput="adjustTtsParams()" class="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-amber-400">
+      </div>
+    </div>
+
+    <!-- Clear/Reset stats -->
+    <div class="flex flex-col gap-2 border-t border-white/10 pt-3">
+      <div class="flex justify-between items-center">
+        <div class="flex flex-col">
+          <span class="text-xs font-bold text-white">Réinitialiser la progression</span>
+          <span class="text-[10px] text-white/40">Supprime tous les stickers débloqués</span>
+        </div>
+        <button onclick="resetChildProgress()" class="py-2 px-4 rounded-xl text-xs font-extrabold bg-rose-600 border-b-4 border-rose-950 hover:bg-rose-700 text-white cursor-pointer">
+          Tout Effacer 🚨
+        </button>
+      </div>
+    </div>
+
+    <!-- Close Button -->
+    <button onclick="closeParentsDashboard()" class="w-full py-3 rounded-2xl bg-emerald-500 text-white font-extrabold border-b-4 border-emerald-800 hover:bg-emerald-400 cursor-pointer text-sm">
+      SAUVEGARDER ET FERMER
+    </button>
+  </div>
+</div>
+
+<!-- ==================== SCREEN: BEDTIME / TIMER OUT ==================== -->
+<div id="bedtime-screen" class="fixed inset-0 z-[2000] hidden flex-col items-center justify-center text-center p-6">
+  <div class="text-8xl animate-pulse mb-4">💤</div>
+  <h2 class="text-3xl md:text-5xl font-black text-pink-400 mb-2 tracking-wider uppercase">C'EST L'HEURE D'UNE PAUSE !</h2>
+  <div class="w-24 h-24 my-4 mx-auto overflow-hidden bg-white/5 rounded-full flex items-center justify-center border border-white/10" id="bedtime-mascot-slot"></div>
+  <p class="text-sm md:text-lg text-white/80 max-w-md mx-auto leading-relaxed mb-8">
+    Vivi et ses amis te disent : Tu as bien travaillé aujourd'hui ! 🥰 Repose un peu tes yeux et on se retrouve très bientôt pour s'amuser encore plus !
+  </p>
+  
+  <!-- Unlock Button for Parents -->
+  <button onclick="triggerBedtimeUnlock()" class="clay-btn bg-gradient-to-b from-amber-400 to-amber-500 text-indigo-950 font-black px-8 py-3 rounded-full border-b-6 border-amber-700 cursor-pointer">
+    🔓 Espace Parents
+  </button>
+</div>
+
+<!-- ==================== MODAL: MASCOT SELECTOR ==================== -->
+<div id="mascot-selector-modal" class="fixed inset-0 z-[1000] bg-slate-950/80 backdrop-blur-md hidden items-center justify-center p-4">
+  <div class="clay-card w-full max-w-md p-6 flex flex-col gap-5 bg-slate-900 border border-white/10">
+    <div class="text-center pb-2 border-b border-white/10">
+      <span class="text-3xl">🎭</span>
+      <h3 class="font-black text-xl text-amber-400 mt-1 uppercase tracking-wider">CHOISIS TON COMPAGNON !</h3>
+      <p class="text-white/70 text-xs mt-1">Il te guidera tout au long des petits jeux !</p>
+    </div>
+
+    <div class="grid grid-cols-2 gap-4" id="mascot-selection-grid">
+      <!-- Lion -->
+      <div onclick="selectMascot('lion')" class="mascot-sel-card bg-slate-950 border-2 border-white/10 p-4 rounded-2xl flex flex-col items-center justify-center cursor-pointer hover:border-amber-400 transition-all">
+        <img src="./lionentier.png" class="w-20 h-20 mb-2 object-contain" alt="Lion">
+        <span class="font-extrabold text-sm text-white">Lion 🦁</span>
+      </div>
+      <!-- Girafe -->
+      <div onclick="selectMascot('girafe')" class="mascot-sel-card bg-slate-950 border-2 border-white/10 p-4 rounded-2xl flex flex-col items-center justify-center cursor-pointer hover:border-amber-400 transition-all">
+        <img src="./girafeentier.png" class="w-20 h-20 mb-2 object-contain" alt="Girafe">
+        <span class="font-extrabold text-sm text-white">Girafe 🦒</span>
+      </div>
+      <!-- Panthere -->
+      <div onclick="selectMascot('panthere')" class="mascot-sel-card bg-slate-950 border-2 border-white/10 p-4 rounded-2xl flex flex-col items-center justify-center cursor-pointer hover:border-amber-400 transition-all">
+        <img src="./panthereentier.png" class="w-20 h-20 mb-2 object-contain" alt="Panthere">
+        <span class="font-extrabold text-sm text-white">Panthère 🐆</span>
+      </div>
+      <!-- Koala -->
+      <div onclick="selectMascot('koala')" class="mascot-sel-card bg-slate-950 border-2 border-white/10 p-4 rounded-2xl flex flex-col items-center justify-center cursor-pointer hover:border-amber-400 transition-all">
+        <img src="./koalaentier.png" class="w-20 h-20 mb-2 object-contain" alt="Koala">
+        <span class="font-extrabold text-sm text-white">Koala 🐨</span>
+      </div>
+    </div>
+
+    <button onclick="closeMascotSelector()" class="w-full py-3 rounded-2xl bg-slate-800 text-white font-bold border-b-4 border-slate-950 cursor-pointer text-sm">
+      Continuer avec ce compagnon
+    </button>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+function assetPath(fileName) {
+  return './' + fileName;
+}
+
+function handleAssetError(img) {
+  const missing = img.getAttribute('src') || 'image';
+  console.warn('Visuel introuvable:', missing);
+  img.style.display = 'none';
+  const parent = img.parentElement;
+  if (parent) {
+    parent.classList.add('asset-missing');
+    parent.setAttribute('data-missing-asset', missing);
+  }
+}
+
+window.addEventListener('error', function(e) {
+  if (e.target && e.target.tagName === 'IMG') handleAssetError(e.target);
+}, true);
+
+/* ══════════ MASCOTS IMAGES MAPPING ══════════ */
+const MASCOTS = {
+  lion:     { label: 'Vivi le lion',     entier: 'lionentier.png',     tete: 'lionblanc.png' },
+  girafe:   { label: 'Gigi la girafe',   entier: 'girafeentier.png',   tete: 'girafejaune.png' },
+  panthere: { label: 'Paty la panthere', entier: 'panthereentier.png', tete: 'pantherenoire.png' },
+  koala:    { label: 'Koko le koala',    entier: 'koalaentier.png',    tete: 'koalagris.png' }
+};
+
+const MASCOT_QUOTES = {
+  lion: [
+    { text: "Grr ! Bonjour, je suis Vivi le lion ! On va s'amuser aujourd'hui !", key: 'lion_quote_1' },
+    { text: "Je suis Vivi le lion, et je suis prêt à apprendre avec toi !", key: 'lion_quote_2' },
+    { text: "Tu es plus fort que tu ne le penses ! Choisis un jeu !", key: 'lion_quote_3' },
+    { text: "Génial ! On fait une super activité ensemble ?", key: 'lion_quote_4' }
+  ],
+  girafe: [
+    { text: "Coucou ! Je suis Gigi la girafe ! J'ai le cou très long pour regarder les étoiles ! Hop ! Allons faire travailler notre matière grise ! Les girafes adorent lire et compter ! Et toi ?", key: 'girafe_quote_1' },
+    { text: "Mon activité préférée, c'est les jolies couleurs ! Et la tienne ?", key: 'girafe_quote_2' }
+  ],
+  panthere: [
+    { text: "Salut ! Je suis Paty la panthère ! Je suis agile et rapide ! Prêt pour une belle activité pleine de découvertes ?", key: 'panthere_quote_1' },
+    { text: "Chut... écoute bien la consigne, tu vas y arriver !", key: 'panthere_quote_2' },
+    { text: "Magnifique ! Tu es aussi précis qu'une panthère !", key: 'panthere_quote_3' }
+  ],
+  koala: [
+    { text: "Mmmh... Je suis Koko le koala ! J'adore faire des câlins ! Sais-tu que les koalas dorment beaucoup ? Mais là, je suis en pleine forme !", key: 'koala_quote_1' },
+    { text: "Prends tout ton temps petit champion, l'important c'est d'essayer !", key: 'koala_quote_2' },
+    { text: "Viens vite, j'ai préparé un jeu super rigolo pour toi !", key: 'koala_quote_3' }
+  ]
+};
+
+const MASCOT_PRESENTATIONS = {
+  lion:     { text: "Bonjour, je suis Vivi le lion ! Je suis courageux et je vais t'aider à choisir une activité.", key: 'lion_presentation' },
+  girafe:   { text: "Bonjour, je suis Gigi la girafe, l'amie de Vivi le lion ! J'aime observer, réfléchir et apprendre avec toi.", key: 'girafe_presentation' },
+  panthere: { text: "Bonjour, je suis Paty la panthère, l'amie de Vivi le lion ! Je suis rapide, attentive et prête à t'accompagner.", key: 'panthere_presentation' },
+  koala:    { text: "Bonjour, je suis Koko le koala, l'ami de Vivi le lion ! Je suis calme, doux et je vais t'encourager pendant les activités.", key: 'koala_presentation' }
+};
+
+function updateMascotRendering(containerId, mascot, expression, size=140) {
+  const target = document.getElementById(containerId);
+  if (!target) return;
+  
+  const m = MASCOTS[mascot] || MASCOTS.lion;
+  // entier images for: splash, home sidebar, and mascot selector
+  const isEntier = (containerId === 'home-mascot-sidebar' || containerId === 'splash-mascot-container' || containerId.startsWith('sel-slot-'));
+  const imgUrl = assetPath(isEntier ? m.entier : m.tete);
+  
+  let filter = "";
+  if (expression === 'wrong') filter = "sepia(1) saturate(3) hue-rotate(-50deg)"; 
+  if (expression === 'correct') filter = "brightness(1.1) drop-shadow(0 0 8px gold)";
+  
+  target.classList.remove('asset-missing');
+  target.innerHTML = `<img src="${imgUrl}" class="object-contain w-full h-full mascot-bounce" style="max-width:100%; max-height:100%; width:${size}px; height:${size}px; filter:${filter}" alt="${m.label}" onerror="handleAssetError(this)">`;
+}
+
+/* ══════════ PREMIUM SYNTHESIS AUDIO ══════════ */
+let audioCtx = null;
+let voixFR = null;
+let voixEN = null;
+let soundMuted = false;
+
+function initAudio() {
+  if (audioCtx) return;
+  try {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  } catch(e) {
+    console.warn('AudioContext unsupported:', e);
+  }
+  chargerVoix();
+}
+
+function chargerVoix() {
+  if (!window.speechSynthesis) return;
+  const load = () => {
+    const vv = window.speechSynthesis.getVoices();
+    // Préférer une voix féminine en français
+    voixFR = vv.find(v => v.lang === 'fr-FR' && /female|femme|marie|amelie|audrey|virginie|julie/i.test(v.name))
+          || vv.find(v => v.lang === 'fr-FR')
+          || vv.find(v => v.lang && v.lang.startsWith('fr'))
+          || vv[0] || null;
+    // Préférer une voix féminine claire en anglais (pas trop accent britannique)
+    voixEN = vv.find(v => v.lang === 'en-US' && /female|samantha|karen|allison|susan|victoria|zira/i.test(v.name))
+          || vv.find(v => v.lang === 'en-US')
+          || vv.find(v => v.lang === 'en-GB' && /female|kate|serena|fiona/i.test(v.name))
+          || vv.find(v => v.lang === 'en-GB')
+          || vv.find(v => v.lang && v.lang.startsWith('en'))
+          || null;
+  };
+  load();
+  window.speechSynthesis.onvoiceschanged = load;
+}
+
+function playSynthSound(type) {
+  if (soundMuted) return;
+  if (!audioCtx) {
+    try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) { return; }
+  }
+  if (audioCtx.state === 'suspended') {
+    audioCtx.resume();
+  }
+  
+  const now = audioCtx.currentTime;
+  
+  if (type === 'pop') {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(200, now);
+    osc.frequency.exponentialRampToValueAtTime(900, now + 0.08);
+    
+    gain.gain.setValueAtTime(0.15, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+    
+    osc.start(now);
+    osc.stop(now + 0.08);
+  } else if (type === 'success') {
+    const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+    notes.forEach((freq, i) => {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(freq, now + i * 0.08);
+      
+      gain.gain.setValueAtTime(0, now + i * 0.08);
+      gain.gain.linearRampToValueAtTime(0.2, now + i * 0.08 + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.08 + 0.3);
+      
+      osc.start(now + i * 0.08);
+      osc.stop(now + i * 0.08 + 0.3);
+    });
+  } else if (type === 'error') {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(280, now);
+    osc.frequency.linearRampToValueAtTime(110, now + 0.32);
+    
+    gain.gain.setValueAtTime(0.15, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.32);
+    
+    osc.start(now);
+    osc.stop(now + 0.32);
+  } else if (type === 'sparkle') {
+    for (let i = 0; i < 7; i++) {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      
+      const freq = 700 + Math.random() * 1000;
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, now + i * 0.05);
+      
+      gain.gain.setValueAtTime(0, now + i * 0.05);
+      gain.gain.linearRampToValueAtTime(0.12, now + i * 0.05 + 0.03);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.05 + 0.4);
+      
+      osc.start(now + i * 0.05);
+      osc.stop(now + i * 0.05 + 0.4);
+    }
+  }
+}
+
+// Table de conversion phonétique des syllabes pour la synthèse vocale française
+// Le moteur TTS lit "MA" comme "M-A" (lettres), mais "ma" minuscule comme un son.
+// On ajoute aussi des cas spéciaux pour les combinaisons difficiles.
+const SYLLABE_PHONETIQUE = {
+  // Syllabes avec E muet ou combinaisons complexes
+  'TEAU': 'to', 'TON': 'ton', 'TER': 'té',
+  'LEIL': 'leille', 'LEIL': 'leille',
+  'SON': 'son', 'SON': 'son',
+  'MAI': 'mè', 'MAI': 'mè',
+  'PIN': 'pin',
+  'LI': 'li', 'ON': 'on',
+  'SO': 'so', 'BA': 'ba', 'PA': 'pa', 'MA': 'ma',
+  'LA': 'la', 'SA': 'sa', 'CA': 'ca', 'TA': 'ta',
+  'BO': 'bo', 'PO': 'po', 'MO': 'mo', 'LO': 'lo',
+  'BU': 'bu', 'PU': 'pu', 'MU': 'mu', 'LU': 'lu',
+  'BI': 'bi', 'PI': 'pi', 'MI': 'mi',
+  'BE': 'bé', 'PE': 'pé', 'ME': 'mé', 'LE': 'lé',
+  'SE': 'sé', 'TE': 'té', 'DE': 'dé', 'RE': 'ré',
+  'FE': 'fé', 'VE': 'vé', 'NE': 'né', 'CE': 'cé',
+  'DU': 'du', 'TU': 'tu', 'NU': 'nu', 'RU': 'ru',
+  'DO': 'do', 'TO': 'to', 'NO': 'no', 'RO': 'ro',
+  'GÂ': 'ga',
+  'CH': 'ch', // ne pas épeler
+};
+
+function syllabesToSpeech(texte) {
+  // Si le texte est entièrement en majuscules et court (1-5 lettres), c'est une syllabe
+  const cleaned = texte.trim();
+  if (/^[A-ZÀÂÄÉÈÊËÎÏÔÙÛÜÇŒÆ\-]{1,6}$/.test(cleaned)) {
+    // Chercher dans la table de conversion
+    const upper = cleaned.toUpperCase();
+    if (SYLLABE_PHONETIQUE[upper]) {
+      return SYLLABE_PHONETIQUE[upper];
+    }
+    // Sinon, mettre en minuscules pour que la synthèse prononce comme un son
+    return cleaned.toLowerCase();
+  }
+  return texte;
+}
+
+function cleanTextForSpeech(texte) {
+  // Supprimer tous les emojis et symboles spéciaux pour éviter que la voix les lise
+  return texte
+    .replace(/[\u{1F300}-\u{1FAFF}]/gu, '') // Emoticons et pictogrammes
+    .replace(/[\u{2600}-\u{27BF}]/gu, '') // Symboles divers
+    .replace(/[\u{1F900}-\u{1F9FF}]/gu, '') // Symboles supplémentaires
+    .replace(/[\u{1F680}-\u{1F6FF}]/gu, '') // Transport
+    .replace(/[✨⭐🌟🎉🎊💫💡🔊🎮🚀👏💪✋🤝🙏]/g, '') // Emojis courants
+    .replace(/\s{2,}/g, ' ')
+    .trim();
+}
+
+function dire(texte, delaiMs = 0, isEnglish = false) {
+  return new Promise(resolve => {
+    // Conversion phonétique des syllabes avant nettoyage des emojis
+    const textePhon = syllabesToSpeech(texte);
+    const texteNettoye = cleanTextForSpeech(textePhon);
+    
+    if (soundMuted) {
+      // Safeguard simulation duration for muted gameplay
+      setTimeout(resolve, Math.min(2200, texteNettoye.length * 60));
+      return;
+    }
+    if (!window.speechSynthesis) {
+      setTimeout(resolve, 500);
+      return;
+    }
+    
+    let resolved = false;
+    const done = () => {
+      if (resolved) return;
+      resolved = true;
+      clearTimeout(safeguard);
+      resolve();
+    };
+    // Safety safeguard so the game doesn't freeze if synth events miss
+    const safeguard = setTimeout(done, Math.max(3500, texteNettoye.length * 130));
+
+    const go = () => {
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(texteNettoye);
+      u.lang = isEnglish ? 'en-US' : 'fr-FR';
+      u.rate = parseFloat(parentSettings.speed) || 0.85;
+      u.pitch = parseFloat(parentSettings.pitch) || 1.1;
+      u.volume = 1;
+      
+      if (isEnglish && voixEN) {
+        u.voice = voixEN;
+      } else if (voixFR) {
+        u.voice = voixFR;
+      }
+      
+      u.onend = done;
+      u.onerror = done;
+      window.speechSynthesis.speak(u);
+    };
+
+    if (delaiMs) setTimeout(go, delaiMs); else go();
+  });
+}
+
+function stopVoix() {
+  if (window.speechSynthesis) {
+    try { window.speechSynthesis.cancel(); } catch(e) {}
+  }
+  if (currentAudioEl) {
+    try { currentAudioEl.pause(); } catch(e) {}
+    currentAudioEl = null;
+  }
+}
+
+/* ══════════ BANQUE AUDIO ENREGISTRÉE (vraie voix) ══════════
+   Si un fichier existe pour une clé, il est joué en priorité.
+   Sinon, on bascule automatiquement sur la voix de synthèse (dire()). */
+const AUDIO_BANK = {
+  bienvenue:       './audio/bienvenue.mp3',
+  choisis:         './audio/choisis.mp3',
+  ecoute_choix:    './audio/ecoute_choix.mp3',
+  repete_consigne: './audio/repete_consigne.mp3',
+  bravo_1:         './audio/bravo_1.mp3',
+  bravo_2:         './audio/bravo_2.mp3',
+  bravo_3:         './audio/bravo_3.mp3',
+  bravo_4:         './audio/bravo_4.mp3',
+  bravo_5:         './audio/bravo_5.mp3',
+  oups:            './audio/oups.mp3',
+  encourage_1:     './audio/encourage_1.mp3',
+  encourage_2:     './audio/encourage_2.mp3',
+  fin_super:       './audio/fin_super.mp3',
+  fin_bien:        './audio/fin_bien.mp3',
+  fin_courage:     './audio/fin_courage.mp3',
+  memoire_bienvenue: './audio/memoire_bienvenue.mp3',
+  memoire_consigne:  './audio/memoire_consigne.mp3',
+  sticker_gagne:     './audio/sticker_gagne.mp3',
+  sticker_vivi:    './audio/sticker_vivi.mp3',
+  sticker_gigi:    './audio/sticker_gigi.mp3',
+  sticker_koko:    './audio/sticker_koko.mp3',
+  sticker_lili:    './audio/sticker_lili.mp3',
+  sticker_rocket:  './audio/sticker_rocket.mp3',
+  sticker_dino:    './audio/sticker_dino.mp3',
+  sticker_pizza:   './audio/sticker_pizza.mp3',
+  sticker_ice:     './audio/sticker_ice.mp3',
+  sticker_panda:   './audio/sticker_panda.mp3',
+  sticker_dolph:   './audio/sticker_dolph.mp3',
+  sticker_ballon:  './audio/sticker_ballon.mp3',
+  sticker_palette: './audio/sticker_palette.mp3',
+  sticker_teddy:   './audio/sticker_teddy.mp3',
+  sticker_car:     './audio/sticker_car.mp3',
+  sticker_rainbow: './audio/sticker_rainbow.mp3',
+  sticker_bee:     './audio/sticker_bee.mp3',
+  sticker_apple:   './audio/sticker_apple.mp3',
+  sticker_banana:  './audio/sticker_banana.mp3',
+  sticker_straw:   './audio/sticker_straw.mp3',
+  sticker_grape:   './audio/sticker_grape.mp3',
+  sticker_dog:     './audio/sticker_dog.mp3',
+  sticker_cat:     './audio/sticker_cat.mp3',
+  // Alphabet — "Clique sur la lettre qui commence le mot X !"
+  alpha_q1_A: './audio/alpha_q1_A.mp3',
+  alpha_q1_B: './audio/alpha_q1_B.mp3',
+  alpha_q1_C: './audio/alpha_q1_C.mp3',
+  alpha_q1_D: './audio/alpha_q1_D.mp3',
+  alpha_q1_E: './audio/alpha_q1_E.mp3',
+  alpha_q1_F: './audio/alpha_q1_F.mp3',
+  alpha_q1_G: './audio/alpha_q1_G.mp3',
+  alpha_q1_H: './audio/alpha_q1_H.mp3',
+  alpha_q1_J: './audio/alpha_q1_J.mp3',
+  alpha_q1_K: './audio/alpha_q1_K.mp3',
+  alpha_q1_L: './audio/alpha_q1_L.mp3',
+  alpha_q1_M: './audio/alpha_q1_M.mp3',
+  alpha_q1_N: './audio/alpha_q1_N.mp3',
+  alpha_q1_O: './audio/alpha_q1_O.mp3',
+  alpha_q1_P: './audio/alpha_q1_P.mp3',
+  alpha_q1_R: './audio/alpha_q1_R.mp3',
+  alpha_q1_S: './audio/alpha_q1_S.mp3',
+  alpha_q1_T: './audio/alpha_q1_T.mp3',
+  alpha_q1_V: './audio/alpha_q1_V.mp3',
+  alpha_q1_Z: './audio/alpha_q1_Z.mp3',
+  // Alphabet — "Quelle image commence par la lettre X ?"
+  alpha_q2_A: './audio/alpha_q2_A.mp3',
+  alpha_q2_B: './audio/alpha_q2_B.mp3',
+  alpha_q2_C: './audio/alpha_q2_C.mp3',
+  alpha_q2_D: './audio/alpha_q2_D.mp3',
+  alpha_q2_E: './audio/alpha_q2_E.mp3',
+  alpha_q2_F: './audio/alpha_q2_F.mp3',
+  alpha_q2_G: './audio/alpha_q2_G.mp3',
+  alpha_q2_H: './audio/alpha_q2_H.mp3',
+  alpha_q2_J: './audio/alpha_q2_J.mp3',
+  alpha_q2_K: './audio/alpha_q2_K.mp3',
+  alpha_q2_L: './audio/alpha_q2_L.mp3',
+  alpha_q2_M: './audio/alpha_q2_M.mp3',
+  alpha_q2_N: './audio/alpha_q2_N.mp3',
+  alpha_q2_O: './audio/alpha_q2_O.mp3',
+  alpha_q2_P: './audio/alpha_q2_P.mp3',
+  alpha_q2_R: './audio/alpha_q2_R.mp3',
+  alpha_q2_S: './audio/alpha_q2_S.mp3',
+  alpha_q2_T: './audio/alpha_q2_T.mp3',
+  alpha_q2_V: './audio/alpha_q2_V.mp3',
+  alpha_q2_Z: './audio/alpha_q2_Z.mp3',
+  // Nouvelles lettres alphabet I, Q, U, W, X, Y
+  alpha_q1_I: './audio/alpha_q1_I.mp3',
+  alpha_q1_Q: './audio/alpha_q1_Q.mp3',
+  alpha_q1_U: './audio/alpha_q1_U.mp3',
+  alpha_q1_W: './audio/alpha_q1_W.mp3',
+  alpha_q1_X: './audio/alpha_q1_X.mp3',
+  alpha_q1_Y: './audio/alpha_q1_Y.mp3',
+  alpha_q2_I: './audio/alpha_q2_I.mp3',
+  alpha_q2_Q: './audio/alpha_q2_Q.mp3',
+  alpha_q2_U: './audio/alpha_q2_U.mp3',
+  alpha_q2_W: './audio/alpha_q2_W.mp3',
+  alpha_q2_X: './audio/alpha_q2_X.mp3',
+  alpha_q2_Y: './audio/alpha_q2_Y.mp3',
+  // Mascottes
+  lion_bienvenue:        './audio/lion_bienvenue.mp3',
+  lion_presentation:     './audio/lion_presentation.mp3',
+  lion_quote_1:          './audio/lion_quote_1.mp3',
+  lion_quote_2:          './audio/lion_quote_2.mp3',
+  lion_quote_3:          './audio/lion_quote_3.mp3',
+  lion_quote_4:          './audio/lion_quote_4.mp3',
+  girafe_bienvenue:      './audio/girafe_bienvenue.mp3',
+  girafe_presentation:   './audio/girafe_presentation.mp3',
+  girafe_quote_1:        './audio/girafe_quote_1.mp3',
+  girafe_quote_2:        './audio/girafe_quote_2.mp3',
+  panthere_bienvenue:    './audio/panthere_bienvenue.mp3',
+  panthere_presentation: './audio/panthere_presentation.mp3',
+  panthere_quote_1:      './audio/panthere_quote_1.mp3',
+  panthere_quote_2:      './audio/panthere_quote_2.mp3',
+  panthere_quote_3:      './audio/panthere_quote_3.mp3',
+  koala_bienvenue:       './audio/koala_bienvenue.mp3',
+  koala_presentation:    './audio/koala_presentation.mp3',
+  koala_quote_1:         './audio/koala_quote_1.mp3',
+  koala_quote_2:         './audio/koala_quote_2.mp3',
+  koala_quote_3:         './audio/koala_quote_3.mp3',
+  // Chiffres
+  chiffres_q1_1:         './audio/chiffres_q1_1.mp3',
+  chiffres_q1_2:         './audio/chiffres_q1_2.mp3',
+  chiffres_q1_3:         './audio/chiffres_q1_3.mp3',
+  chiffres_q1_4:         './audio/chiffres_q1_4.mp3',
+  chiffres_q1_5:         './audio/chiffres_q1_5.mp3',
+  chiffres_q1_6:         './audio/chiffres_q1_6.mp3',
+  chiffres_q1_7:         './audio/chiffres_q1_7.mp3',
+  chiffres_q1_8:         './audio/chiffres_q1_8.mp3',
+  chiffres_q1_9:         './audio/chiffres_q1_9.mp3',
+  chiffres_q1_10:        './audio/chiffres_q1_10.mp3',
+  chiffres_compte_points:'./audio/chiffres_compte_points.mp3',
+  // Couleurs
+  couleurs_q1_rouge:     './audio/couleurs_q1_rouge.mp3',
+  couleurs_q1_bleu:      './audio/couleurs_q1_bleu.mp3',
+  couleurs_q1_jaune:     './audio/couleurs_q1_jaune.mp3',
+  couleurs_q1_vert:      './audio/couleurs_q1_vert.mp3',
+  couleurs_q1_orange:    './audio/couleurs_q1_orange.mp3',
+  couleurs_q1_violette:  './audio/couleurs_q1_violette.mp3',
+  couleurs_q1_rose:      './audio/couleurs_q1_rose.mp3',
+  couleurs_q1_blanche:   './audio/couleurs_q1_blanche.mp3',
+  couleurs_q1_noire:     './audio/couleurs_q1_noire.mp3',
+  couleurs_q1_marron:    './audio/couleurs_q1_marron.mp3',
+  couleurs_q1_grise:     './audio/couleurs_q1_grise.mp3',
+  couleurs_q1_turquoise: './audio/couleurs_q1_turquoise.mp3',
+  // Formes
+  formes_q1_cercle:      './audio/formes_q1_cercle.mp3',
+  formes_q1_carre:       './audio/formes_q1_carre.mp3',
+  formes_q1_triangle:    './audio/formes_q1_triangle.mp3',
+  formes_q1_rectangle:   './audio/formes_q1_rectangle.mp3',
+  formes_q1_etoile:      './audio/formes_q1_etoile.mp3',
+  formes_q1_coeur:       './audio/formes_q1_coeur.mp3',
+  formes_q1_losange:     './audio/formes_q1_losange.mp3',
+  formes_q1_ovale:       './audio/formes_q1_ovale.mp3',
+  // Animaux
+  animaux_quel_animal:   './audio/animaux_quel_animal.mp3',
+  animaux_bebe_chat:     './audio/animaux_bebe_chat.mp3',
+  animaux_bebe_chien:    './audio/animaux_bebe_chien.mp3',
+  animaux_bebe_vache:    './audio/animaux_bebe_vache.mp3',
+  animaux_bebe_cheval:   './audio/animaux_bebe_cheval.mp3',
+  animaux_bebe_lion:     './audio/animaux_bebe_lion.mp3',
+  animaux_bebe_elephant: './audio/animaux_bebe_elephant.mp3',
+  animaux_bebe_ours:     './audio/animaux_bebe_ours.mp3',
+  animaux_bebe_canard:   './audio/animaux_bebe_canard.mp3',
+  animaux_bebe_poule:    './audio/animaux_bebe_poule.mp3',
+  animaux_bebe_cochon:   './audio/animaux_bebe_cochon.mp3',
+  animaux_bebe_mouton:   './audio/animaux_bebe_mouton.mp3',
+  animaux_bebe_lapin:    './audio/animaux_bebe_lapin.mp3',
+  animal_chat:           './audio/animal_chat.mp3',
+  animal_chien:          './audio/animal_chien.mp3',
+  animal_vache:          './audio/animal_vache.mp3',
+  animal_cheval:         './audio/animal_cheval.mp3',
+  animal_lion:           './audio/animal_lion.mp3',
+  animal_elephant:       './audio/animal_elephant.mp3',
+  animal_ours:           './audio/animal_ours.mp3',
+  animal_canard:         './audio/animal_canard.mp3',
+  animal_poule:          './audio/animal_poule.mp3',
+  animal_cochon:         './audio/animal_cochon.mp3',
+  animal_mouton:         './audio/animal_mouton.mp3',
+  animal_lapin:          './audio/animal_lapin.mp3',
+  bebe_chaton:           './audio/bebe_chaton.mp3',
+  bebe_chiot:            './audio/bebe_chiot.mp3',
+  bebe_veau:             './audio/bebe_veau.mp3',
+  bebe_poulain:          './audio/bebe_poulain.mp3',
+  bebe_lionceau:         './audio/bebe_lionceau.mp3',
+  bebe_elephanteau:      './audio/bebe_elephanteau.mp3',
+  bebe_ourson:           './audio/bebe_ourson.mp3',
+  bebe_caneton:          './audio/bebe_caneton.mp3',
+  bebe_poussin:          './audio/bebe_poussin.mp3',
+  bebe_porcelet:         './audio/bebe_porcelet.mp3',
+  bebe_agneau:           './audio/bebe_agneau.mp3',
+  bebe_lapereau:         './audio/bebe_lapereau.mp3',
+  // Nourriture
+  nourr_q1_pomme:        './audio/nourr_q1_pomme.mp3',
+  nourr_q1_banane:       './audio/nourr_q1_banane.mp3',
+  nourr_q1_fraise:       './audio/nourr_q1_fraise.mp3',
+  nourr_q1_raisin:       './audio/nourr_q1_raisin.mp3',
+  nourr_q1_carotte:      './audio/nourr_q1_carotte.mp3',
+  nourr_q1_brocoli:      './audio/nourr_q1_brocoli.mp3',
+  nourr_q1_mais:         './audio/nourr_q1_mais.mp3',
+  nourr_q1_tomate:       './audio/nourr_q1_tomate.mp3',
+  nourr_q1_pain:         './audio/nourr_q1_pain.mp3',
+  nourr_q1_fromage:      './audio/nourr_q1_fromage.mp3',
+  nourr_q1_pizza:        './audio/nourr_q1_pizza.mp3',
+  nourr_q1_pates:        './audio/nourr_q1_pates.mp3',
+  nourr_q1_gateau:       './audio/nourr_q1_gateau.mp3',
+  nourr_q1_glace:        './audio/nourr_q1_glace.mp3',
+  nourr_q1_fruit:        './audio/nourr_q1_fruit.mp3',
+  // Lecture
+  lect_q1_maman:        './audio/lect_q1_maman.mp3',
+  lect_q1_papa:          './audio/lect_q1_papa.mp3',
+  lect_q1_chat:         './audio/lect_q1_chat.mp3',
+  lect_q1_lion:          './audio/lect_q1_lion.mp3',
+  lect_q1_maison:        './audio/lect_q1_maison.mp3',
+  lect_q1_lapin:         './audio/lect_q1_lapin.mp3',
+  lect_q1_bateau:       './audio/lect_q1_bateau.mp3',
+  lect_q1_gateau:        './audio/lect_q1_gateau.mp3',
+  lect_q1_soleil:        './audio/lect_q1_soleil.mp3',
+  // Règles de vie
+  regles_q1_bonjour:     './audio/regles_q1_bonjour.mp3',
+  regles_q2_cadeau:      './audio/regles_q2_cadeau.mp3',
+  regles_q2_jouet:       './audio/regles_q2_jouet.mp3',
+  regles_q2_classe:      './audio/regles_q2_classe.mp3',
+  regles_q2_papier:      './audio/regles_q2_papier.mp3',
+  regles_q2_pleure:      './audio/regles_q2_pleure.mp3',
+  regles_rep_bonjour:    './audio/regles_rep_bonjour.mp3',
+  regles_rep_merci:      './audio/regles_rep_merci.mp3',
+  regles_rep_main:       './audio/regles_rep_main.mp3',
+  regles_rep_poubelle:   './audio/regles_rep_poubelle.mp3',
+  regles_rep_ami_triste: './audio/regles_rep_ami_triste.mp3',
+  // Contraires
+  contr_q1_grand:        './audio/contr_q1_grand.mp3',
+  contr_q1_chaud:        './audio/contr_q1_chaud.mp3',
+  contr_q1_rapide:       './audio/contr_q1_rapide.mp3',
+  contr_q1_long:         './audio/contr_q1_long.mp3',
+  contr_q1_lourd:        './audio/contr_q1_lourd.mp3',
+  contr_q1_mouille:      './audio/contr_q1_mouille.mp3',
+  contr_q1_doux:         './audio/contr_q1_doux.mp3',
+  contr_q1_fier:         './audio/contr_q1_fier.mp3',
+  contr_q1_heureux:      './audio/contr_q1_heureux.mp3',
+  contr_q1_allume:       './audio/contr_q1_allume.mp3',
+  contr_rep_elephant_souris: './audio/contr_rep_elephant_souris.mp3',
+  contr_rep_guepard_chaud:   './audio/contr_rep_guepard_chaud.mp3',
+  contr_rep_guepard_tortue:  './audio/contr_rep_guepard_tortue.mp3',
+  contr_rep_rhinoceros_oiseau:'./audio/contr_rep_rhinoceros_oiseau.mp3',
+  contr_rep_pluie_desert:    './audio/contr_rep_pluie_desert.mp3',
+  contr_rep_lapin_herisson:  './audio/contr_rep_lapin_herisson.mp3',
+  contr_rep_sourire_pleurer: './audio/contr_rep_sourire_pleurer.mp3',
+  contr_rep_lampe:           './audio/contr_rep_lampe.mp3',
+  contr_mot_la_lampe_allumee:'./audio/contr_mot_la_lampe_allumee.mp3',
+  contr_mot_la_bougie_eteinte:'./audio/contr_mot_la_bougie_eteinte.mp3',
+  // Anglais
+  anglais_q1_chat:       './audio/anglais_q1_chat.mp3',
+  anglais_q1_chien:      './audio/anglais_q1_chien.mp3',
+  anglais_q1_rouge:      './audio/anglais_q1_rouge.mp3',
+  anglais_q1_bleu:       './audio/anglais_q1_bleu.mp3',
+  anglais_q1_pomme:      './audio/anglais_q1_pomme.mp3',
+  anglais_q1_soleil:     './audio/anglais_q1_soleil.mp3',
+  anglais_q1_bonjour:    './audio/anglais_q1_bonjour.mp3',
+  anglais_q1_aurevoir:   './audio/anglais_q1_aurevoir.mp3',
+  anglais_q1_un:         './audio/anglais_q1_un.mp3',
+  anglais_q1_deux:       './audio/anglais_q1_deux.mp3',
+  anglais_q1_trois:      './audio/anglais_q1_trois.mp3',
+};
+
+let currentAudioEl = null;
+
+// Joue un fichier audio préenregistré (clé dans AUDIO_BANK).
+// Si le fichier n'existe pas / erreur de lecture, bascule sur dire(fallbackText).
+function direAudio(key, fallbackText, delaiMs = 0, isEnglish = false) {
+  return new Promise(resolve => {
+    if (soundMuted) {
+      setTimeout(resolve, Math.min(2200, (fallbackText || '').length * 60));
+      return;
+    }
+
+    const src = AUDIO_BANK[key];
+
+    const go = () => {
+      if (!src) {
+        dire(fallbackText, 0, isEnglish).then(resolve);
+        return;
+      }
+
+      stopVoix();
+      const audio = new Audio(src);
+      currentAudioEl = audio;
+      let done = false;
+
+      const finish = () => {
+        if (done) return;
+        done = true;
+        clearTimeout(safeguard);
+        if (currentAudioEl === audio) currentAudioEl = null;
+        resolve();
+      };
+
+      const fallback = () => {
+        if (done) return;
+        done = true;
+        clearTimeout(safeguard);
+        if (currentAudioEl === audio) currentAudioEl = null;
+        dire(fallbackText, 0, isEnglish).then(resolve);
+      };
+
+      // Sécurité : si le fichier audio est trop long ou bloqué, on libère après 10s
+      const safeguard = setTimeout(finish, 10000);
+
+      audio.onended = finish;
+      audio.onpause = finish;
+      audio.onerror = fallback;
+
+      const p = audio.play();
+      if (p && p.catch) p.catch(fallback);
+    };
+
+    if (delaiMs) setTimeout(go, delaiMs); else go();
+  });
+}
+
+/* ══════════ MESSAGES DE FEEDBACK AVEC VOIX ENREGISTRÉE ══════════ */
+const BRAVO_FEEDBACK = [
+  { text: "Bravo, c'est exactement ça !",   key: 'bravo_1' },
+  { text: "Super, tu as trouvé !",          key: 'bravo_2' },
+  { text: "Excellent, tu es trop fort !",   key: 'bravo_3' },
+  { text: "Parfait, bien joué !",           key: 'bravo_4' },
+  { text: "Ouais ! T'es un champion !",     key: 'bravo_5' },
+];
+
+function bravoFeedback() {
+  return BRAVO_FEEDBACK[Math.floor(Math.random() * BRAVO_FEEDBACK.length)];
+}
+
+const ENCOURAGE_FEEDBACK = [
+  { text: "Pas tout à fait... Mais tu progresses, on continue !", key: 'encourage_1' },
+  { text: "Ce n'est pas grave, on continue !",                    key: 'encourage_2' },
+];
+
+function encourageFeedback() {
+  return ENCOURAGE_FEEDBACK[Math.floor(Math.random() * ENCOURAGE_FEEDBACK.length)];
+}
+
+// Dit la consigne d'une question : utilise l'audio enregistré (q.audioKey)
+// si disponible, sinon bascule sur la voix de synthèse.
+function direQ(q, delaiMs = 0) {
+  if (q.audioKey) {
+    return direAudio(q.audioKey, q.consigne, delaiMs, q.isEnglishSpeech || false);
+  }
+  return dire(q.consigne, delaiMs, q.isEnglishSpeech || false);
+}
+
+function toggleMuteAudio() {
+  soundMuted = !soundMuted;
+  const btn = document.getElementById('btn-mute-toggle');
+  if (btn) btn.textContent = soundMuted ? '🔇' : '🔊';
+  playSynthSound('pop');
+}
+
+/* ══════════ SYSTEM STATE & PERSISTENCE ══════════ */
+const STICKERS = [
+  { id: 'vivi',  name: 'Vivi le lion', emoji: '🦁', voice: 'Vivi le lion ! Raaaoooow !', audioKey: 'sticker_vivi' },
+  { id: 'gigi',  name: 'Gigi la girafe', emoji: '🦒', voice: 'Gigi la girafe !', audioKey: 'sticker_gigi' },
+  { id: 'koko',  name: 'Koko le koala', emoji: '🐨', voice: 'Koko le koala ! Coucou !', audioKey: 'sticker_koko' },
+  { id: 'lili',  name: 'Lili la licorne', emoji: '🦄', voice: 'Lili la jolie licorne !', audioKey: 'sticker_lili' },
+  { id: 'rocket',name: 'La fusée', emoji: '🚀', voice: 'La fusée spatiale ! Vers les étoiles !', audioKey: 'sticker_rocket' },
+  { id: 'dino',  name: 'Le dinosaure', emoji: '🦖', voice: 'Le petit dinosaure ! Grrr !', audioKey: 'sticker_dino' },
+  { id: 'pizza', name: 'La pizza', emoji: '🍕', voice: 'Une délicieuse pizza ! Miam miam !', audioKey: 'sticker_pizza' },
+  { id: 'ice',   name: 'La glace', emoji: '🍦', voice: 'Une bonne glace parfum fraise !', audioKey: 'sticker_ice' },
+  { id: 'panda', name: 'Le panda', emoji: '🐼', voice: 'Un adorable petit bébé panda !', audioKey: 'sticker_panda' },
+  { id: 'dolph', name: 'Le dauphin', emoji: '🐬', voice: 'Le dauphin joyeux ! Splash !', audioKey: 'sticker_dolph' },
+  { id: 'ballon',name: 'Le ballon', emoji: '🎈', voice: 'Un joli ballon de baudruche rouge !', audioKey: 'sticker_ballon' },
+  { id: 'palette',name:'La palette', emoji: '🎨', voice: 'La belle palette de peinture !', audioKey: 'sticker_palette' },
+  { id: 'teddy', name: 'L\'ourson', emoji: '🧸', voice: 'Un nounours doux pour faire des câlins !', audioKey: 'sticker_teddy' },
+  { id: 'car',   name: 'La voiture', emoji: '🚗', voice: 'Vroum vroum ! La voiture de course !', audioKey: 'sticker_car' },
+  { id: 'rainbow',name:'L\'arc-en-ciel', emoji: '🌈', voice: 'Un magnifique arc-en-ciel coloré !', audioKey: 'sticker_rainbow' },
+  { id: 'bee',   name: 'L\'abeille', emoji: '🐝', voice: 'Bzzz ! La petite abeille ouvrière !', audioKey: 'sticker_bee' },
+  { id: 'apple', name: 'La pomme', emoji: '🍎', voice: 'Une belle pomme bien croquante !', audioKey: 'sticker_apple' },
+  { id: 'banana',name: 'La banane', emoji: '🍌', voice: 'Une banane toute jaune et sucrée !', audioKey: 'sticker_banana' },
+  { id: 'straw', name: 'La fraise', emoji: '🍓', voice: 'Une fraise bien juteuse, miam !', audioKey: 'sticker_straw' },
+  { id: 'grape', name: 'Le raisin', emoji: '🍇', voice: 'Une belle grappe de raisin !', audioKey: 'sticker_grape' },
+  { id: 'dog',   name: 'Le chien', emoji: '🐶', voice: 'Ouaf ouaf ! Le gentil chien !', audioKey: 'sticker_dog' },
+  { id: 'cat',   name: 'Le chat', emoji: '🐱', voice: 'Miaou ! Le petit chat curieux !', audioKey: 'sticker_cat' },
+];
+
+let userProgress = {
+  unlockedStickers: ['vivi'],
+  activeMascot: 'lion'
+};
+
+let parentSettings = {
+  speed: 0.82,
+  pitch: 1.55,
+  difficulty: 'medium', // easy (2), medium (3), hard (4)
+  timerMinutes: 0, // 0 = infinite
+  timerStartedAt: null,
+  timerInterval: null
+};
+
+function loadProgressAndSettings() {
+  const savedProg = localStorage.getItem('ludobox_prog');
+  if (savedProg) {
+    try {
+      userProgress = JSON.parse(savedProg);
+      if (!userProgress.unlockedStickers || userProgress.unlockedStickers.length === 0) {
+        userProgress.unlockedStickers = ['vivi'];
+      }
+    } catch(e) {}
+  }
+
+  // Migration depuis les anciens noms de mascottes sauvegardes dans le navigateur.
+  const oldMascotMap = { vivi: 'lion', gigi: 'girafe', koko: 'koala', lili: 'lion' };
+  if (oldMascotMap[userProgress.activeMascot]) {
+    userProgress.activeMascot = oldMascotMap[userProgress.activeMascot];
+    saveProgress();
+  }
+  if (!MASCOTS[userProgress.activeMascot]) {
+    userProgress.activeMascot = 'lion';
+    saveProgress();
+  }
+  
+  const savedSet = localStorage.getItem('ludobox_settings');
+  if (savedSet) {
+    try { parentSettings = JSON.parse(savedSet); } catch(e) {}
+  }
+  
+  updateStickerBadgeCount();
+}
+
+function saveProgress() {
+  localStorage.setItem('ludobox_prog', JSON.stringify(userProgress));
+  updateStickerBadgeCount();
+}
+
+function saveSettings() {
+  localStorage.setItem('ludobox_settings', JSON.stringify(parentSettings));
+}
+
+function updateStickerBadgeCount() {
+  const badge = document.getElementById('sticker-badge');
+  if (badge) {
+    badge.textContent = `${userProgress.unlockedStickers.length}/${STICKERS.length}`;
+  }
+}
+
+/* ══════════ TWINKLING STARS & BUBBLES BACKGROUND ══════════ */
+const bgCanvas = document.getElementById('bg-canvas');
+const bgCtx = bgCanvas.getContext('2d');
+let stars = [];
+let bubbles = [];
+let popParticles = [];
+
+function initBgEffects() {
+  resizeBgCanvas();
+  stars = [];
+  for (let i = 0; i < 45; i++) {
+    stars.push({
+      x: Math.random() * bgCanvas.width,
+      y: Math.random() * bgCanvas.height,
+      size: 0.8 + Math.random() * 1.5,
+      opacity: 0.2 + Math.random() * 0.6,
+      speed: 0.005 + Math.random() * 0.015,
+      dir: Math.random() > 0.5 ? 1 : -1
+    });
+  }
+  
+  bubbles = [];
+  for (let i = 0; i < 6; i++) {
+    bubbles.push(spawnBubble(true));
+  }
+}
+
+function spawnBubble(initial = false) {
+  return {
+    x: Math.random() * bgCanvas.width,
+    y: initial ? Math.random() * bgCanvas.height : bgCanvas.height + 50,
+    r: 20 + Math.random() * 25,
+    speed: 0.4 + Math.random() * 0.8,
+    hue: Math.random() * 360,
+    pulse: Math.random() * 100
+  };
+}
+
+function resizeBgCanvas() {
+  bgCanvas.width = window.innerWidth;
+  bgCanvas.height = window.innerHeight;
+}
+
+window.addEventListener('resize', () => {
+  resizeBgCanvas();
+});
+
+function drawBgEffects() {
+  bgCtx.fillStyle = '#09082a';
+  bgCtx.fillRect(0, 0, bgCanvas.width, bgCanvas.height);
+  
+  // Draw Twinkles
+  stars.forEach(s => {
+    s.opacity += s.speed * s.dir;
+    if (s.opacity > 0.9) { s.opacity = 0.9; s.dir = -1; }
+    if (s.opacity < 0.15) { s.opacity = 0.15; s.dir = 1; }
+    
+    bgCtx.fillStyle = `rgba(255, 255, 255, ${s.opacity})`;
+    bgCtx.beginPath();
+    bgCtx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+    bgCtx.fill();
+  });
+  
+  // Update & Draw Bubbles
+  bubbles.forEach(b => {
+    b.y -= b.speed;
+    b.x += Math.sin(b.y / 40 + b.pulse) * 0.4;
+    
+    if (b.y < -b.r) {
+      Object.assign(b, spawnBubble(false));
+    }
+    
+    const grad = bgCtx.createRadialGradient(b.x - b.r*0.2, b.y - b.r*0.2, b.r * 0.05, b.x, b.y, b.r);
+    grad.addColorStop(0, 'rgba(255, 255, 255, 0.6)');
+    grad.addColorStop(0.4, `hsla(${b.hue}, 85%, 70%, 0.25)`);
+    grad.addColorStop(1, 'rgba(255, 255, 255, 0.03)');
+    
+    bgCtx.fillStyle = grad;
+    bgCtx.beginPath();
+    bgCtx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+    bgCtx.fill();
+    
+    bgCtx.strokeStyle = 'rgba(255, 255, 255, 0.18)';
+    bgCtx.lineWidth = 1;
+    bgCtx.stroke();
+  });
+
+  // Update & Draw Pop Particles
+  for (let i = popParticles.length - 1; i >= 0; i--) {
+    const p = popParticles[i];
+    p.x += p.vx;
+    p.y += p.vy;
+    p.alpha -= p.decay;
+    if (p.alpha <= 0) {
+      popParticles.splice(i, 1);
+    } else {
+      bgCtx.fillStyle = `hsla(${p.hue}, 90%, 70%, ${p.alpha})`;
+      bgCtx.beginPath();
+      bgCtx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      bgCtx.fill();
+    }
+  }
+  
+  requestAnimationFrame(drawBgEffects);
+}
+
+function popBubbleEffect(b) {
+  playSynthSound('pop');
+  for (let i = 0; i < 8; i++) {
+    popParticles.push({
+      x: b.x,
+      y: b.y,
+      vx: (Math.random() - 0.5) * 5,
+      vy: (Math.random() - 0.5) * 5,
+      r: 2 + Math.random() * 3,
+      hue: b.hue,
+      alpha: 1,
+      decay: 0.04 + Math.random() * 0.04
+    });
+  }
+}
+
+// Interactive popping click listener
+window.addEventListener('mousedown', handleBubbleTaps);
+window.addEventListener('touchstart', handleBubbleTaps);
+
+function handleBubbleTaps(e) {
+  const clientX = e.clientX || (e.touches && e.touches[0] ? e.touches[0].clientX : 0);
+  const clientY = e.clientY || (e.touches && e.touches[0] ? e.touches[0].clientY : 0);
+  if (!clientX && !clientY) return;
+  
+  for (let i = 0; i < bubbles.length; i++) {
+    const b = bubbles[i];
+    const dist = Math.hypot(clientX - b.x, clientY - b.y);
+    if (dist < b.r + 20) { // cushion for kids
+      popBubbleEffect(b);
+      Object.assign(b, spawnBubble(false));
+      break;
+    }
+  }
+}
+
+/* ══════════ PLAY TIMERS & PARENT SECURITY GATE ══════════ */
+let parentsGateCorrectAns = 0;
+
+function triggerParentsGate() {
+  playSynthSound('pop');
+  const a = 2 + Math.floor(Math.random() * 6);
+  const b = 2 + Math.floor(Math.random() * 4);
+  parentsGateCorrectAns = a + b;
+  
+  document.getElementById('parents-math-challenge').textContent = `${a} + ${b} = ?`;
+  
+  const choices = [parentsGateCorrectAns];
+  while (choices.length < 4) {
+    const fake = 4 + Math.floor(Math.random() * 10);
+    if (!choices.includes(fake)) choices.push(fake);
+  }
+  choices.sort(() => Math.random() - 0.5);
+  
+  const grid = document.getElementById('parents-gate-choices');
+  grid.innerHTML = '';
+  choices.forEach(ch => {
+    const btn = document.createElement('button');
+    btn.className = "py-3 rounded-xl bg-slate-800 text-white font-black border-b-4 border-slate-950 text-lg hover:bg-slate-700 cursor-pointer";
+    btn.textContent = ch;
+    btn.onclick = () => {
+      if (ch === parentsGateCorrectAns) {
+        playSynthSound('success');
+        document.getElementById('parents-gate').classList.add('hidden');
+        openParentsDashboard();
+      } else {
+        playSynthSound('error');
+        // Close gate to prevent brute-force
+        document.getElementById('parents-gate').classList.add('hidden');
+      }
+    };
+    grid.appendChild(btn);
+  });
+  
+  document.getElementById('parents-gate').classList.remove('hidden');
+}
+
+function closeParentsGate() {
+  playSynthSound('pop');
+  document.getElementById('parents-gate').classList.add('hidden');
+}
+
+function triggerBedtimeUnlock() {
+  const a = 3 + Math.floor(Math.random() * 5);
+  const b = 2 + Math.floor(Math.random() * 5);
+  parentsGateCorrectAns = a + b;
+  
+  document.getElementById('parents-math-challenge').textContent = `${a} + ${b} = ?`;
+  
+  const choices = [parentsGateCorrectAns];
+  while (choices.length < 4) {
+    const fake = 5 + Math.floor(Math.random() * 10);
+    if (!choices.includes(fake)) choices.push(fake);
+  }
+  choices.sort(() => Math.random() - 0.5);
+  
+  const grid = document.getElementById('parents-gate-choices');
+  grid.innerHTML = '';
+  choices.forEach(ch => {
+    const btn = document.createElement('button');
+    btn.className = "py-3 rounded-xl bg-slate-800 text-white font-black border-b-4 border-slate-950 text-lg hover:bg-slate-700 cursor-pointer";
+    btn.textContent = ch;
+    btn.onclick = () => {
+      if (ch === parentsGateCorrectAns) {
+        playSynthSound('success');
+        // Reset timer and dismiss bedtime lock screen
+        document.getElementById('parents-gate').classList.add('hidden');
+        document.getElementById('bedtime-screen').classList.add('hidden');
+        parentSettings.timerMinutes = 0; // set to infinite
+        saveSettings();
+        stopPlayTimer();
+        showPage('page-home');
+      } else {
+        playSynthSound('error');
+        document.getElementById('parents-gate').classList.add('hidden');
+      }
+    };
+    grid.appendChild(btn);
+  });
+  document.getElementById('parents-gate').classList.remove('hidden');
+}
+
+function startPlayTimer(minutes) {
+  stopPlayTimer();
+  if (minutes <= 0) {
+    document.getElementById('timer-status-txt').textContent = "Pas de limite active. Jouez tranquille !";
+    return;
+  }
+  
+  parentSettings.timerMinutes = minutes;
+  parentSettings.timerStartedAt = Date.now();
+  saveSettings();
+  
+  let totalMs = minutes * 60 * 1000;
+  
+  document.getElementById('timer-status-txt').textContent = `Limite active : ${minutes} minutes`;
+  
+  parentSettings.timerInterval = setInterval(() => {
+    const elapsed = Date.now() - parentSettings.timerStartedAt;
+    if (elapsed >= totalMs) {
+      triggerBedtimeLock();
+    }
+  }, 10000); // check every 10s
+}
+
+function stopPlayTimer() {
+  if (parentSettings.timerInterval) {
+    clearInterval(parentSettings.timerInterval);
+    parentSettings.timerInterval = null;
+  }
+  parentSettings.timerMinutes = 0;
+  parentSettings.timerStartedAt = null;
+  saveSettings();
+  document.getElementById('timer-status-txt').textContent = "";
+}
+
+function triggerBedtimeLock() {
+  stopVoix();
+  stopPlayTimer();
+  updateMascotRendering('bedtime-mascot-slot', userProgress.activeMascot, 'neutral', 96);
+  document.getElementById('bedtime-screen').classList.remove('hidden');
+  
+  dire("Coucou champion ! C'est l'heure de faire une petite pause. Repose tes yeux et on revient jouer très bientôt ! Bisous !");
+}
+
+/* ══════════ PARENTS DASHBOARD CONTROLS ══════════ */
+function openParentsDashboard() {
+  document.getElementById('tts-speed-slider').value = parentSettings.speed;
+  document.getElementById('tts-pitch-slider').value = parentSettings.pitch;
+  adjustTtsParams();
+  
+  // highlight timer status
+  const timerBtns = document.querySelectorAll('.timer-btn');
+  timerBtns.forEach(btn => {
+    const val = parseInt(btn.textContent);
+    if ((isNaN(val) && parentSettings.timerMinutes === 0) || (val === parentSettings.timerMinutes)) {
+      btn.className = "timer-btn py-2 rounded-xl text-xs font-extrabold border-b-4 bg-amber-400 text-indigo-950 border-amber-600 cursor-pointer";
+    } else {
+      btn.className = "timer-btn py-2 rounded-xl text-xs font-extrabold border-b-4 bg-slate-800 text-white border-slate-950 cursor-pointer";
+    }
+  });
+
+  // highlight difficulty status
+  const diffBtns = document.querySelectorAll('.diff-btn');
+  diffBtns.forEach(btn => {
+    const val = btn.getAttribute('onclick').includes(parentSettings.difficulty);
+    if (val) {
+      btn.className = "diff-btn py-2 rounded-xl text-xs font-extrabold border-b-4 bg-amber-400 text-indigo-950 border-amber-600 cursor-pointer";
+    } else {
+      btn.className = "diff-btn py-2 rounded-xl text-xs font-extrabold border-b-4 bg-slate-800 text-white border-slate-950 cursor-pointer";
+    }
+  });
+
+  document.getElementById('parents-dashboard').classList.remove('hidden');
+}
+
+function closeParentsDashboard() {
+  playSynthSound('pop');
+  saveSettings();
+  document.getElementById('parents-dashboard').classList.add('hidden');
+}
+
+function setPlayTimerLimit(mins, btn) {
+  playSynthSound('pop');
+  const timerBtns = document.querySelectorAll('.timer-btn');
+  timerBtns.forEach(b => b.className = "timer-btn py-2 rounded-xl text-xs font-extrabold border-b-4 bg-slate-800 text-white border-slate-950 cursor-pointer");
+  btn.className = "timer-btn py-2 rounded-xl text-xs font-extrabold border-b-4 bg-amber-400 text-indigo-950 border-amber-600 cursor-pointer";
+  
+  if (mins === 0) {
+    stopPlayTimer();
+  } else {
+    startPlayTimer(mins);
+  }
+}
+
+function setDifficulty(level, btn) {
+  playSynthSound('pop');
+  parentSettings.difficulty = level;
+  saveSettings();
+  
+  const diffBtns = document.querySelectorAll('.diff-btn');
+  diffBtns.forEach(b => b.className = "diff-btn py-2 rounded-xl text-xs font-extrabold border-b-4 bg-slate-800 text-white border-slate-950 cursor-pointer");
+  btn.className = "diff-btn py-2 rounded-xl text-xs font-extrabold border-b-4 bg-amber-400 text-indigo-950 border-amber-600 cursor-pointer";
+}
+
+function adjustTtsParams() {
+  const speed = parseFloat(document.getElementById('tts-speed-slider').value);
+  const pitch = parseFloat(document.getElementById('tts-pitch-slider').value);
+  
+  parentSettings.speed = speed;
+  parentSettings.pitch = pitch;
+  
+  // labels text
+  let speedText = "Normal";
+  if (speed < 0.7) speedText = "Lent";
+  else if (speed > 1.1) speedText = "Rapide";
+  document.getElementById('txt-speed-val').textContent = speedText;
+
+  let pitchText = "Normal";
+  if (pitch < 0.9) pitchText = "Grave";
+  else if (pitch >= 1.4 && pitch < 1.8) pitchText = "Enfantin";
+  else if (pitch >= 1.8) pitchText = "Très aigu";
+  else if (pitch > 1.1) pitchText = "Aigu";
+  document.getElementById('txt-pitch-val').textContent = pitchText;
+}
+
+function resetChildProgress() {
+  if (confirm("Voulez-vous vraiment réinitialiser tout l'album d'autocollants ?")) {
+    playSynthSound('error');
+    userProgress.unlockedStickers = ['vivi'];
+    saveProgress();
+    closeParentsDashboard();
+    showPage('page-home');
+    dire(" Progression réinitialisée.");
+  }
+}
+
+/* ══════════ COMPAGNON MASCOT SELECTOR ══════════ */
+let mascotBeforeOpen = null;
+
+function openMascotSelector() {
+  playSynthSound('pop');
+  mascotBeforeOpen = userProgress.activeMascot;
+  
+  // highlight active
+  const cards = document.querySelectorAll('.mascot-sel-card');
+  cards.forEach(c => {
+    if (c.getAttribute('onclick').includes(userProgress.activeMascot)) {
+      c.classList.add('border-amber-400', 'bg-indigo-950/50');
+      c.classList.remove('border-white/10');
+    } else {
+      c.classList.remove('border-amber-400', 'bg-indigo-950/50');
+      c.classList.add('border-white/10');
+    }
+  });
+
+  document.getElementById('mascot-selector-modal').classList.remove('hidden');
+}
+
+function closeMascotSelector() {
+  playSynthSound('pop');
+  document.getElementById('mascot-selector-modal').classList.add('hidden');
+  
+  // update Home mascot representations
+  updateMascotRendering('home-mascot-slot', userProgress.activeMascot, 'neutral', 82);
+  updateMascotRendering('home-mascot-sidebar', userProgress.activeMascot, 'neutral', 300);
+
+  // La presentation est dite sur le menu d'activites, seulement si la mascotte a change
+  if (mascotBeforeOpen && mascotBeforeOpen !== userProgress.activeMascot) {
+    setTimeout(() => presentSelectedMascot(), 250);
+  }
+  mascotBeforeOpen = null;
+}
+
+function selectMascot(mascotName) {
+  playSynthSound('success');
+  userProgress.activeMascot = mascotName;
+  saveProgress();
+  
+  // update selectors border
+  const cards = document.querySelectorAll('.mascot-sel-card');
+  cards.forEach(c => {
+    if (c.getAttribute('onclick').includes(mascotName)) {
+      c.classList.add('border-amber-400', 'bg-indigo-950/50');
+      c.classList.remove('border-white/10');
+    } else {
+      c.classList.remove('border-amber-400', 'bg-indigo-950/50');
+      c.classList.add('border-white/10');
+    }
+  });
+}
+
+function homeMascotSpeak() {
+  const quotes = MASCOT_QUOTES[userProgress.activeMascot] || MASCOT_QUOTES.lion;
+  const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+  const txtTop = document.getElementById('home-speech-text');
+  const txtSide = document.getElementById('sidebar-speech-text');
+  if(txtTop) txtTop.textContent = randomQuote.text;
+  if(txtSide) txtSide.textContent = randomQuote.text;
+  updateMascotRendering('home-mascot-slot', userProgress.activeMascot, 'correct', 82);
+  updateMascotRendering('home-mascot-sidebar', userProgress.activeMascot, 'correct', 300);
+  const p = randomQuote.key ? direAudio(randomQuote.key, randomQuote.text) : dire(randomQuote.text);
+  p.then(() => {
+    updateMascotRendering('home-mascot-slot', userProgress.activeMascot, 'neutral', 82);
+    updateMascotRendering('home-mascot-sidebar', userProgress.activeMascot, 'neutral', 300);
+  });
+}
+
+function presentSelectedMascot() {
+  const presentation = MASCOT_PRESENTATIONS[userProgress.activeMascot] || MASCOT_PRESENTATIONS.lion;
+  const txtTop = document.getElementById('home-speech-text');
+  const txtSide = document.getElementById('sidebar-speech-text');
+  if (txtTop) txtTop.textContent = presentation.text;
+  if (txtSide) txtSide.textContent = presentation.text;
+  updateMascotRendering('home-mascot-slot', userProgress.activeMascot, 'correct', 82);
+  updateMascotRendering('home-mascot-sidebar', userProgress.activeMascot, 'correct', 300);
+  const p = presentation.key ? direAudio(presentation.key, presentation.text) : dire(presentation.text);
+  p.then(() => {
+    updateMascotRendering('home-mascot-slot', userProgress.activeMascot, 'neutral', 82);
+    updateMascotRendering('home-mascot-sidebar', userProgress.activeMascot, 'neutral', 300);
+  });
+}
+
+function mascotClickReact() {
+  playSynthSound('pop');
+  const splashMascot = document.getElementById('splash-mascot-container');
+  
+  // cycle simple expressions
+  const exprs = ['correct', 'thinking', 'wrong', 'neutral'];
+  const pick = exprs[Math.floor(Math.random() * exprs.length)];
+  
+  updateMascotRendering('splash-mascot-container', userProgress.activeMascot, pick, 320);
+}
+
+/* ══════════ QUESTION SYSTEM DATA & GENERATOR ══════════ */
+const ALPHA = [
+  {l:'A',mot:'Araignée', e:'🕷️'},{l:'B',mot:'Baleine',  e:'🐋'},{l:'C',mot:'Canard',   e:'🦆'},
+  {l:'D',mot:'Dauphin',  e:'🐬'},{l:'E',mot:'Éléphant', e:'🐘'},{l:'F',mot:'Flamant',  e:'🦩'},
+  {l:'G',mot:'Girafe',   e:'🦒'},{l:'H',mot:'Hibou',    e:'🦉'},{l:'I',mot:'Iguane',   e:'🦎'},
+  {l:'J',mot:'Jaguar',   e:'🐆'},{l:'K',mot:'Koala',    e:'🐨'},{l:'L',mot:'Lion', speak:'Liyon', e:'🦁'},
+  {l:'M',mot:'Mouton',   e:'🐑'},{l:'N',mot:'Narval',   e:'🦄'},{l:'O',mot:'Ours', speak:'Ourse', e:'🐻'},
+  {l:'P',mot:'Perroquet',e:'🦜'},{l:'Q',mot:'Quetzal',  e:'🦚'},{l:'R',mot:'Renard',   e:'🦊'},
+  {l:'S',mot:'Singe',    e:'🐒'},{l:'T',mot:'Tortue',   e:'🐢'},{l:'U',mot:'Urial',    e:'🐏'},
+  {l:'V',mot:'Vache',    e:'🐄'},{l:'W',mot:'Wapiti',   e:'🦌'},{l:'X',mot:'Xérus',    e:'🐿️'},
+  {l:'Y',mot:'Yak', speak:'Yack', e:'🐃'},{l:'Z',mot:'Zèbre',    e:'🦓'},
+];
+const NUMS = [
+  {n:1,w:'un'},{n:2,w:'deux'},{n:3,w:'trois'},{n:4,w:'quatre'},{n:5,w:'cinq'},
+  {n:6,w:'six'},{n:7,w:'sept'},{n:8,w:'huit'},{n:9,w:'neuf'},{n:10,w:'dix'},
+];
+const COULEURS = [
+  {nom:'rouge',hex:'#E53935',tc:'white'},{nom:'bleu',hex:'#1565C0',tc:'white'},
+  {nom:'jaune',hex:'#F9A825',tc:'#333'},{nom:'vert',hex:'#2E7D32',tc:'white'},
+  {nom:'orange',hex:'#E65100',tc:'white'},{nom:'violet',hex:'#6A1B9A',tc:'white'},
+  {nom:'rose',hex:'#C2185B',tc:'white'},{nom:'blanc',hex:'#ECEFF1',tc:'#333'},
+  {nom:'noir',hex:'#212121',tc:'white'},{nom:'marron',hex:'#4E342E',tc:'white'},
+  {nom:'gris',hex:'#757575',tc:'white'},{nom:'turquoise',hex:'#00838F',tc:'white'},
+];
+const FORMES = [
+  {nom:'cercle',  col:'#4D96FF',svg:'<circle cx="50" cy="50" r="44" fill="__COL__"/>'},
+  {nom:'carré',   col:'#FF6B35',svg:'<rect x="6" y="6" width="88" height="88" rx="6" fill="__COL__"/>'},
+  {nom:'triangle',col:'#6BCB77',svg:'<polygon points="50,6 94,94 6,94" fill="__COL__"/>'},
+  {nom:'rectangle',col:'#C77DFF',svg:'<rect x="4" y="22" width="92" height="56" rx="6" fill="__COL__"/>'},
+  {nom:'étoile',  col:'#FFD93D',svg:'<polygon points="50,4 61,36 96,36 68,58 79,92 50,70 21,92 32,58 4,36 39,36" fill="__COL__"/>'},
+  {nom:'cœur',    col:'#FF4757',svg:'<path d="M50,85 C8,58 4,18 26,8 C36,3 46,12 50,22 C54,12 64,3 74,8 C96,18 92,58 50,85Z" fill="__COL__"/>'},
+  {nom:'losange', col:'#00C9A7',svg:'<polygon points="50,4 96,50 50,96 4,50" fill="__COL__"/>'},
+  {nom:'ovale',   col:'#FF6B9D',svg:'<ellipse cx="50" cy="50" rx="46" ry="30" fill="__COL__"/>'},
+];
+const ANIMAUX = [
+  {nom:'chat',    e:'🐱',bebe:'chaton',      eb:'🐱', hint:'il fait miaou !'},
+  {nom:'chien',   e:'🐕',bebe:'chiot',       eb:'🐶', hint:'il fait ouaf ouaf !'},
+  {nom:'vache',   e:'🐄',bebe:'veau',        eb:'🐄', hint:'elle fait meuh !'},
+  {nom:'cheval',  e:'🐴',bebe:'poulain',     eb:'🐎', hint:'il fait hii-han !'},
+  {nom:'lion',    e:'🦁',bebe:'lionceau',    eb:'🦁', hint:'il rugit très fort !'},
+  {nom:'éléphant',e:'🐘',bebe:'éléphanteau', eb:'🐘', hint:'il a une grande trompe !'},
+  {nom:'ours',    e:'🐻',bebe:'ourson',      eb:'🐻', hint:'il aime manger du miel !'},
+  {nom:'canard',  e:'🦆',bebe:'caneton',     eb:'🐥', hint:'il fait coin coin !'},
+  {nom:'poule',   e:'🐓',bebe:'poussin',     eb:'🐣', hint:'elle fait cot cot cot !'},
+  {nom:'cochon',  e:'🐷',bebe:'porcelet',    eb:'🐷', hint:'il fait groin groin !'},
+  {nom:'mouton',  e:'🐑',bebe:'agneau',      eb:'🐑', hint:'il fait bêêê !'},
+  {nom:'lapin',   e:'🐰',bebe:'lapereau',    eb:'🐰', hint:'il a de grandes oreilles !'},
+];
+const NOURRIT = [
+  {nom:'pomme',e:'🍎',cat:'fruit'},{nom:'banane',e:'🍌',cat:'fruit'},
+  {nom:'fraise',e:'🍓',cat:'fruit'},{nom:'raisin',e:'🍇',cat:'fruit'},
+  {nom:'carotte',e:'🥕',cat:'légume'},{nom:'brocoli',e:'🥦',cat:'légume'},
+  {nom:'maïs',e:'🌽',cat:'légume'},{nom:'tomate',e:'🍅',cat:'légume'},
+  {nom:'pain',e:'🍞',cat:'aliment'},{nom:'fromage',e:'🧀',cat:'aliment'},
+  {nom:'pizza',e:'🍕',cat:'plat'},{nom:'pâtes',e:'🍝',cat:'plat'},
+  {nom:'gâteau',e:'🎂',cat:'sucrerie'},{nom:'glace',e:'🍦',cat:'sucrerie'},
+];
+const MOTS = [
+  {mot:'MAMAN', syl:['MA','MAN']},
+  {mot:'PAPA',  syl:['PA','PA']},
+  {mot:'CHAT',  syl:['CH','AT']},
+  {mot:'LION',  syl:['LI','ON']},
+  {mot:'SOLEIL',syl:['SO','LEIL']},
+  {mot:'MAISON',syl:['MAI','SON']},
+  {mot:'LAPIN', syl:['LA','PIN']},
+  {mot:'BATEAU',syl:['BA','TEAU']},
+  {mot:'GÂTEAU',syl:['GÂ','TEAU']},
+];
+const REGLES = [
+  {consigne:"Clique sur l'image qui montre qu'on dit bonjour !",
+   audioKey:'regles_q1_bonjour',
+   correct:'👋',choix:['👋','😴','🤬','🙈'],labels:['Dire bonjour','Dormir','Se fâcher','Se cacher'],
+   bravo:"Oui ! On dit bonjour quand on arrive quelque part !", audioBravo:'regles_rep_bonjour'},
+  {consigne:"On t'offre un cadeau. Que fais-tu ?",
+   audioKey:'regles_q2_cadeau',
+   correct:'🙏',choix:['🙏','🏃','😤','🎮'],labels:['Dire merci','S\'enfuir','Bouder','Ne rien dire'],
+   bravo:'Super ! On dit toujours merci quand on reçoit un cadeau.', audioBravo:'regles_rep_merci'},
+  {consigne:"Ton ami veut jouer avec ton jouet. Que fais-tu ?",
+   audioKey:'regles_q2_jouet',
+   correct:'🤝',choix:['🤝','🚫','😡','🏃'],labels:['Je partage','Je refuse','Je me fâche','Je cours'],
+   bravo:"Bravo ! Partager ses jouets permet de bien s'amuser ensemble.", audioBravo:null},
+  {consigne:"Tu veux parler en classe. Que fais-tu ?",
+   audioKey:'regles_q2_classe',
+   correct:'✋',choix:['✋','📢','😴','🏃'],labels:['Je lève la main','Je crie fort','Je m\'endors','Je cavale'],
+   bravo:"Excellent ! En classe, on lève le doigt pour demander la parole.", audioBravo:'regles_rep_main'},
+  {consigne:"Tu as un papier sale dans la main. Où le jeter ?",
+   audioKey:'regles_q2_papier',
+   correct:'🗑️',choix:['🗑️','🌿','🛋️','🚿'],labels:['Dans la poubelle','Dans l\'herbe','Sur le canapé','Dans la douche'],
+   bravo:"Parfait ! On jette toujours les déchets à la poubelle !", audioBravo:'regles_rep_poubelle'},
+  {consigne:"Ton copain de classe pleure. Que fais-tu ?",
+   audioKey:'regles_q2_pleure',
+   correct:'🤗',choix:['🤗','😂','🏃','🎮'],labels:['Je le console','Je me moque','Je l\'évite','Je joue seul'],
+   bravo:"Bravo ! C'est très gentil de consoler un ami triste !", audioBravo:'regles_rep_ami_triste'},
+];
+const CONTRAIRES = [
+  {consigne:'Quel animal est GRAND ?',audioKey:'contr_q1_grand',correct:'🐘',choix:['🐘','🐭'],labels:["L'éléphant","La souris"],bravo:"Oui ! L'éléphant est grand, la souris est toute petite !",audioBravo:'contr_rep_elephant_souris'},
+  {consigne:'Lequel est CHAUD ?',audioKey:'contr_q1_chaud',correct:'☀️',choix:['☀️','🧊'],labels:['Le soleil','Le glaçon'],bravo:'Bravo ! Le soleil brûle de chaleur, le glaçon est glacé !',audioBravo:'contr_rep_guepard_chaud'},
+  {consigne:'Lequel est RAPIDE ?',audioKey:'contr_q1_rapide',correct:'🐆',choix:['🐆','🐢'],labels:['Le guépard','La tortue'],bravo:'Oui ! Le guépard sprinte vite, la tortue marche lentement !',audioBravo:'contr_rep_guepard_tortue'},
+  {consigne:'Lequel est LONG ?',audioKey:'contr_q1_long',correct:'🐍',choix:['🐍','🐛'],labels:['Le serpent','La chenille'],bravo:'Bravo ! Le serpent est très long, la chenille est courte !',audioBravo:null},
+  {consigne:'Lequel est LOURD ?',audioKey:'contr_q1_lourd',correct:'🦛',choix:['🦛','🐦'],labels:["L'hippopotame","Le petit oiseau"],bravo:"Oui ! L'hippopotame pèse lourd, l'oiseau est léger !",audioBravo:'contr_rep_rhinoceros_oiseau'},
+  {consigne:'Lequel est MOUILLÉ ?',audioKey:'contr_q1_mouille',correct:'🌧️',choix:['🌧️','🏜️'],labels:['La pluie','Le désert'],bravo:'Bravo ! La pluie mouille tout, le désert est sec !',audioBravo:'contr_rep_pluie_desert'},
+  {consigne:'Lequel est DOUX ?',audioKey:'contr_q1_doux',correct:'🐰',choix:['🐰','🦔'],labels:['Le lapin','Le hérisson'],bravo:'Oui ! Le lapin a un pelage tout doux, le hérisson pique !',audioBravo:'contr_rep_lapin_herisson'},
+  {consigne:'Lequel est FORT ?',audioKey:'contr_q1_fier',correct:'🦁',choix:['🦁','🐜'],labels:['Le lion','La fourmi'],bravo:'Bravo ! Le lion est fort et robuste, la fourmi est minuscule !',audioBravo:null},
+  {consigne:'Lequel est HEUREUX ?',audioKey:'contr_q1_heureux',correct:'😄',choix:['😄','😢'],labels:['Sourire','Pleurer'],bravo:'Oui ! Sourire montre la joie, pleurer montre la tristesse !',audioBravo:'contr_rep_sourire_pleurer'},
+  {consigne:'Lequel est ALLUMÉ ?',audioKey:'contr_q1_allume',correct:'💡',choix:['💡','🕯️'],labels:['La lampe allumée','La bougie éteinte'],bravo:"Super ! L'ampoule brille de mille feux !",audioBravo:'contr_rep_lampe'},
+];
+const ANGLAIS = [
+  {q:"Comment dit-on 'chat' en anglais ?",    audioKey:'anglais_q1_chat',     c:"Cat",     choices:["Cat","Dog","Cow","Rabbit"],          labels:["Cat 🐱","Dog 🐶","Cow 🐮","Rabbit 🐰"],              speak:["cat","dog","cow","rabbit"]},
+  {q:"Comment dit-on 'chien' en anglais ?",   audioKey:'anglais_q1_chien',    c:"Dog",     choices:["Dog","Cat","Lion","Sheep"],          labels:["Dog 🐶","Cat 🐱","Lion 🦁","Sheep 🐑"],              speak:["dog","cat","lion","sheep"]},
+  {q:"Comment dit-on 'Rouge' en anglais ?",   audioKey:'anglais_q1_rouge',    c:"Red",     choices:["Red","Blue","Green","Yellow"],       labels:["Red 🔴","Blue 🔵","Green 🟢","Yellow 🟡"],           speak:["red","blue","green","yellow"]},
+  {q:"Comment dit-on 'Bleu' en anglais ?",    audioKey:'anglais_q1_bleu',     c:"Blue",    choices:["Blue","Red","Pink","Purple"],        labels:["Blue 🔵","Red 🔴","Pink 🩷","Purple 🟣"],            speak:["blue","red","pink","purple"]},
+  {q:"Comment dit-on 'Pomme' en anglais ?",   audioKey:'anglais_q1_pomme',    c:"Apple",   choices:["Apple","Banana","Orange","Strawberry"],labels:["Apple 🍎","Banana 🍌","Orange 🍊","Strawberry 🍓"], speak:["apple","banana","orange","strawberry"]},
+  {q:"Comment dit-on 'Soleil' en anglais ?",  audioKey:'anglais_q1_soleil',   c:"Sun",     choices:["Sun","Moon","Star","Rain"],          labels:["Sun ☀️","Moon 🌙","Star ⭐","Rain 🌧️"],             speak:["sun","moon","star","rain"]},
+  {q:"Comment dit-on 'Bonjour' en anglais ?", audioKey:'anglais_q1_bonjour',  c:"Hello",   choices:["Hello","Goodbye","Please","Thanks"], labels:["Hello 👋","Goodbye 👋","Please 🙏","Thanks 😊"],      speak:["hello","goodbye","please","thanks"]},
+  {q:"Comment dit-on 'Au revoir' en anglais ?",audioKey:'anglais_q1_aurevoir',c:"Goodbye", choices:["Goodbye","Hello","Yes","No"],        labels:["Goodbye 👋","Hello 👋","Yes ✅","No ❌"],             speak:["goodbye","hello","yes","no"]},
+  {q:"Comment dit-on le chiffre 'Un' en anglais ?",   audioKey:'anglais_q1_un',    c:"One",   choices:["One","Two","Three","Four"],  labels:["One 1️⃣","Two 2️⃣","Three 3️⃣","Four 4️⃣"],        speak:["one","two","three","four"]},
+  {q:"Comment dit-on le chiffre 'Deux' en anglais ?", audioKey:'anglais_q1_deux',  c:"Two",   choices:["Two","One","Three","Five"],  labels:["Two 2️⃣","One 1️⃣","Three 3️⃣","Five 5️⃣"],        speak:["two","one","three","five"]},
+  {q:"Comment dit-on le chiffre 'Trois' en anglais ?",audioKey:'anglais_q1_trois', c:"Three", choices:["Three","Two","Four","Six"],  labels:["Three 3️⃣","Two 2️⃣","Four 4️⃣","Six 6️⃣"],        speak:["three","two","four","six"]},
+];
+
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function pick(arr, n) {
+  return shuffle(arr).slice(0, n);
+}
+
+function buildQ(mod) {
+  const qs = [];
+  
+  if (mod === 'alphabet') {
+    // Table de prononciation des lettres isolées pour le TTS français
+    const PRONONC_LETTRES = {
+      'A':'a','B':'bé','C':'cé','D':'dé','E':'e','F':'effe','G':'jé',
+      'H':'ache','I':'i','J':'ji','K':'ka','L':'elle','M':'emme',
+      'N':'enne','O':'o','P':'pé','Q':'cu','R':'erre','S':'esse',
+      'T':'té','U':'u','V':'vé','W':'double vé','X':'ixe','Y':'i grec','Z':'zède'
+    };
+    shuffle(ALPHA).slice(0, 8).forEach(it => {
+      const d = pick(ALPHA.filter(a => a.l !== it.l), 3);
+      qs.push({
+        consigne: `Clique sur la lettre qui commence le mot ${it.speak || it.mot} !`,
+        consigneDisplay: `Clique sur la lettre qui commence le mot ${it.mot} !`,
+        audioKey: `alpha_q1_${it.l}`,
+        correct: it.l,
+        type: 'text',
+        choix: shuffle([it, ...d]).map(x => ({ val: x.l, label: x.l, speak: PRONONC_LETTRES[x.l] || x.l.toLowerCase() }))
+      });
+      
+      const d2 = pick(ALPHA.filter(a => a.l !== it.l), 3);
+      qs.push({
+        consigne: `Quelle image commence par la lettre ${it.l} ?`,
+        audioKey: `alpha_q2_${it.l}`,
+        correct: it.mot,
+        type: 'emoji',
+        choix: shuffle([it, ...d2]).map(x => ({ val: x.mot, label: x.mot, emoji: x.e, speak: x.speak || x.mot }))
+      });
+    });
+  }
+  
+  if (mod === 'chiffres') {
+    shuffle(NUMS).forEach(it => {
+      const d = pick(NUMS.filter(n => n.n !== it.n), 3);
+      qs.push({
+        consigne: `Clique sur le chiffre ${it.w} !`,
+        audioKey: `chiffres_q1_${it.n}`,
+        correct: String(it.n),
+        type: 'text',
+        choix: shuffle([it, ...d]).map(x => ({ val: String(x.n), label: String(x.n), speak: x.w }))
+      });
+      const dots = '●'.repeat(it.n);
+      const d2 = pick(NUMS.filter(n => n.n !== it.n), 3);
+      qs.push({
+        consigne: `Compte les points : ${dots} — Combien y en a-t-il ?`,
+        audioKey: 'chiffres_compte_points',
+        correct: String(it.n),
+        type: 'text',
+        choix: shuffle([it, ...d2]).map(x => ({ val: String(x.n), label: String(x.n), speak: x.w }))
+      });
+    });
+  }
+
+  if (mod === 'couleurs') {
+    // "la couleur" est féminin : violet/blanc/noir/gris doivent s'accorder
+    // pour correspondre aux voix enregistrées (violette/blanche/noire/grise).
+    const COULEUR_FEM = { violet: 'violette', blanc: 'blanche', noir: 'noire', gris: 'grise' };
+    shuffle(COULEURS).forEach(c => {
+      const d = pick(COULEURS.filter(x => x.nom !== c.nom), 3);
+      const accord = COULEUR_FEM[c.nom] || c.nom;
+      qs.push({
+        consigne: `Clique sur la couleur ${accord} !`,
+        audioKey: `couleurs_q1_${accord}`,
+        correct: c.nom,
+        type: 'color',
+        choix: shuffle([c, ...d]).map(x => ({ val: x.nom, label: x.nom, hex: x.hex, tc: x.tc, speak: COULEUR_FEM[x.nom] || x.nom }))
+      });
+    });
+  }
+
+  if (mod === 'formes') {
+    shuffle(FORMES).forEach(f => {
+      const d = pick(FORMES.filter(x => x.nom !== f.nom), 3);
+      const nomKey = f.nom.replace(/œ/gi, 'oe').replace(/æ/gi, 'ae').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z]/gi,'').toLowerCase();
+      qs.push({
+        consigne: `Clique sur le ${f.nom} !`,
+        audioKey: `formes_q1_${nomKey}`,
+        correct: f.nom,
+        type: 'shape',
+        choix: shuffle([f, ...d]).map(x => ({ val: x.nom, label: x.nom, svg: x.svg, col: x.col, speak: x.nom }))
+      });
+    });
+  }
+
+  if (mod === 'animaux') {
+    shuffle(ANIMAUX).forEach(a => {
+      const d1 = pick(ANIMAUX.filter(x => x.nom !== a.nom), 3);
+      const nomKey = a.nom.normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z]/gi,'').toLowerCase();
+      qs.push({
+        consigne: `Quel est cet animal ? Indice : ${a.hint}`,
+        consigneDisplay: `Quel est cet animal ? Indice : ${a.hint}`,
+        audioKey: 'animaux_quel_animal',
+        correct: a.nom,
+        type: 'emoji',
+        choix: shuffle([a, ...d1]).map(x => ({ val: x.nom, label: x.nom, emoji: x.e, speak: x.nom }))
+      });
+      const d2 = pick(ANIMAUX.filter(x => x.nom !== a.nom), 3);
+      const article = a.nom.startsWith('é') || a.nom.startsWith('o') || a.nom.startsWith('a') || a.nom.startsWith('i') || a.nom.startsWith('u') ? "de l'" : "du ";
+      qs.push({
+        consigne: `Comment s'appelle le bébé ${article}${a.nom} ?`,
+        audioKey: `animaux_bebe_${nomKey}`,
+        correct: a.bebe,
+        type: 'emoji',
+        choix: shuffle([a, ...d2]).map(x => ({ val: x.bebe, label: x.bebe, emoji: x.eb, speak: x.bebe }))
+      });
+    });
+  }
+
+  if (mod === 'nourriture') {
+    shuffle(NOURRIT).forEach(f => {
+      const d = pick(NOURRIT.filter(x => x.nom !== f.nom), 3);
+      const nomKey = f.nom.normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z]/gi,'').toLowerCase();
+      qs.push({
+        consigne: `Clique sur ${f.nom} !`,
+        audioKey: `nourr_q1_${nomKey}`,
+        correct: f.nom,
+        type: 'emoji',
+        choix: shuffle([f, ...d]).map(x => ({ val: x.nom, label: x.nom, emoji: x.e, speak: x.nom }))
+      });
+    });
+  }
+
+  if (mod === 'lecture') {
+    shuffle(MOTS).forEach(m => {
+      const d = pick(MOTS.filter(x => x.mot !== m.mot).map(x => x.syl[0]), 3);
+      const motKey = m.mot.normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z]/gi,'').toLowerCase();
+      qs.push({
+        consigne: `Quelle est la première syllabe du mot ${m.mot} ?`,
+        audioKey: `lect_q1_${motKey}`,
+        correct: m.syl[0],
+        type: 'text',
+        choix: shuffle([m.syl[0], ...d]).map(s => ({ val: s, label: s, speak: syllabesToSpeech(s) }))
+      });
+    });
+  }
+
+  if (mod === 'regles') {
+    shuffle(REGLES).forEach(r => {
+      qs.push({
+        consigne: r.consigne,
+        audioKey: r.audioKey,
+        correct: r.correct,
+        bravo: r.bravo,
+        audioBravo: r.audioBravo,
+        type: 'emoji',
+        choix: r.choix.map((c, i) => ({ val: c, label: r.labels[i], emoji: c, speak: r.labels[i] }))
+      });
+    });
+  }
+
+  if (mod === 'contraires') {
+    shuffle(CONTRAIRES).forEach(c => {
+      qs.push({
+        consigne: c.consigne,
+        audioKey: c.audioKey,
+        correct: c.correct,
+        bravo: c.bravo,
+        audioBravo: c.audioBravo,
+        type: 'emoji',
+        choix: c.choix.map((v, i) => ({ val: v, label: c.labels[i], emoji: v, speak: c.labels[i] }))
+      });
+    });
+  }
+
+  if (mod === 'anglais') {
+    shuffle(ANGLAIS).slice(0, 10).forEach(item => {
+      const isEnglishQ = item.q.includes('anglais');
+      qs.push({
+        consigne: item.q,
+        audioKey: item.audioKey,
+        correct: item.c,
+        type: 'text',
+        isEnglishSpeech: isEnglishQ,
+        choix: item.choices.map((ch, idx) => ({
+          val: ch,
+          label: item.labels[idx],
+          speak: item.speak[idx],
+          isEnglishOption: isEnglishQ
+        }))
+      });
+    });
+  }
+  
+  // apply difficulty slicing
+  const finalQs = shuffle(qs).slice(0, 10);
+  
+  // filter choices size in each question based on difficulty settings
+  finalQs.forEach(q => {
+    let targetCount = 3; // medium default
+    if (parentSettings.difficulty === 'easy') targetCount = 2;
+    if (parentSettings.difficulty === 'hard') targetCount = 4;
+    
+    if (q.choix.length > targetCount) {
+      // ensure correct answer is preserved
+      const correctObj = q.choix.find(x => x.val === q.correct);
+      const wrongOnes = q.choix.filter(x => x.val !== q.correct);
+      q.choix = shuffle([correctObj, ...pick(wrongOnes, targetCount - 1)]);
+    }
+  });
+
+  return finalQs;
+}
+
+const MOD_LABELS = {
+  alphabet: '🔤 Alphabet',
+  chiffres: '🔢 Chiffres',
+  couleurs: '🎨 Couleurs',
+  formes: '🔷 Formes',
+  animaux: '🐘 Animaux',
+  nourriture: '🍎 Nourriture',
+  lecture: '📖 Je lis',
+  regles: '💛 Vivre ensemble',
+  contraires: '↔️ Les contraires',
+  anglais: '🇬🇧 Mon premier Anglais',
+  memory: '🧠 Jeu de Mémoire'
+};
+
+/* ══════════ CORE SYSTEM ROUTINES ══════════ */
+let questions = [];
+let qIdx = 0;
+let score = 0;
+let chancesRestantes = 2;
+let locked = false;
+let enoncant = false;
+let currentMod = null;
+
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+  
+  // special sub-canvas handling for creative mode
+  if (id === 'page-draw') {
+    initCreativeCanvas();
+  } else if (id === 'page-stickers') {
+    initStickersScenery();
+  }
+  
+  playSynthSound('pop');
+}
+
+function chancesHTML(n) {
+  return '❤️'.repeat(n) + '🖤'.repeat(2 - n);
+}
+
+function bravoAlea() {
+  const msgs = ['Bravo ! 👏', 'Super ! 🌟', 'Excellent ! 🎉', 'Tu es génial ! 💪', 'Magnifique ! ✨', 'Wouah ! 🤩'];
+  return msgs[Math.floor(Math.random() * msgs.length)];
+}
+
+/* ══════════ LAUNCH EDUCATIONAL LEVEL ══════════ */
+function lancerModule(mod) {
+  initAudio();
+  currentMod = mod;
+  locked = false;
+  enoncant = false;
+  
+  if (mod === 'tableau') {
+    showPage('page-draw');
+    return;
+  }
+  
+  if (mod === 'memory') {
+    lancerMemoryMatchGame();
+    return;
+  }
+  
+  questions = buildQ(mod);
+  qIdx = 0;
+  score = 0;
+  chancesRestantes = 2;
+  
+  document.getElementById('game-modname').textContent = MOD_LABELS[mod] || mod;
+  document.getElementById('game-score').textContent = '⭐ 0';
+  document.getElementById('game-chances').textContent = chancesHTML(chancesRestantes);
+  document.getElementById('game-progress').style.width = '0%';
+  
+  showPage('page-game');
+  updateMascotRendering('game-mascot-slot', userProgress.activeMascot, 'neutral', 80);
+  
+  setTimeout(afficherQ, 200);
+}
+
+/* ══════════ ANSWER SPEAK CARDS VOICEOVER ══════════ */
+async function enoncer(cards, choix) {
+  enoncant = true;
+
+  // Petite intro audio "Écoute bien les choix..." avant l'énoncé des réponses
+  if (cards.length > 1) {
+    await direAudio('ecoute_choix', 'Écoute bien les choix...');
+    await new Promise(r => setTimeout(r, 100));
+  }
+  if (!enoncant) { enoncant = false; return; }
+
+  for (let i = 0; i < cards.length; i++) {
+    if (!enoncant) {
+      // Nettoyer toutes les cartes si l'enfant a cliqué en cours de lecture
+      cards.forEach(c => c.classList.remove('speaking', 'border-amber-400'));
+      updateMascotRendering('game-mascot-slot', userProgress.activeMascot, 'neutral', 80);
+      break;
+    }
+    cards[i].classList.add('speaking', 'border-amber-400');
+    updateMascotRendering('game-mascot-slot', userProgress.activeMascot, 'correct', 80);
+    
+    await dire(choix[i].speak || choix[i].label, 0, choix[i].isEnglishOption || false);
+    await new Promise(r => setTimeout(r, 150));
+    
+    cards[i].classList.remove('speaking', 'border-amber-400');
+    updateMascotRendering('game-mascot-slot', userProgress.activeMascot, 'neutral', 80);
+    await new Promise(r => setTimeout(r, 120));
+  }
+  enoncant = false;
+}
+
+/* ══════════ RENDER QUESTION ══════════ */
+function afficherQ() {
+  if (qIdx >= questions.length) {
+    afficherBravo();
+    return;
+  }
+  
+  locked = true;
+  enoncant = false;
+  updateMascotRendering('game-mascot-slot', userProgress.activeMascot, 'thinking', 80);
+  
+  const q = questions[qIdx];
+  document.getElementById('game-consigne').textContent = q.consigneDisplay || q.consigne;
+  document.getElementById('game-score').textContent = '⭐ ' + score;
+  document.getElementById('game-chances').textContent = chancesHTML(chancesRestantes);
+  
+  const pct = Math.round((qIdx / questions.length) * 100);
+  document.getElementById('game-progress').style.width = pct + '%';
+  
+  const grid = document.getElementById('game-answers-grid');
+  grid.innerHTML = '';
+  
+  // Dynamic grid columns structure based on options size
+  const cols = q.choix.length;
+  if (cols === 2) {
+    grid.className = "answers-grid grid grid-cols-2 gap-4 max-w-md mx-auto";
+  } else if (cols === 3) {
+    grid.className = "answers-grid grid grid-cols-3 gap-4 max-w-2xl mx-auto";
+  } else {
+    grid.className = "answers-grid grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-4xl mx-auto";
+  }
+  
+  q.choix.forEach((ch) => {
+    const card = document.createElement('div');
+    card.className = 'clay-card p-4 flex flex-col items-center justify-center cursor-pointer select-none disabled opacity-50 pointer-events-none min-h-[110px]';
+    card.dataset.val = ch.val;
+    
+    if (q.type === 'text') {
+      card.innerHTML = `<div class="text-white font-extrabold text-2xl md:text-4xl tracking-wide">${ch.label}</div>`;
+    } else if (q.type === 'color') {
+      card.style.background = ch.hex;
+      card.style.color = ch.tc || 'white';
+      card.innerHTML = `<div class="font-extrabold text-lg drop-shadow-md">${ch.label}</div>`;
+      card.classList.remove('clay-card');
+      card.classList.add('rounded-2xl', 'border-4', 'border-white/20', 'shadow-xl', 'text-center');
+    } else if (q.type === 'shape') {
+      const coloredSvg = ch.svg.replace('__COL__', ch.col);
+      card.innerHTML = `
+        <svg viewBox="0 0 100 100" class="w-14 h-14 md:w-20 md:h-20 drop-shadow-md select-none pointer-events-none">${coloredSvg}</svg>
+        <div class="text-white/80 font-bold text-xs md:text-sm mt-1 capitalize">${ch.label}</div>
+      `;
+    } else {
+      card.innerHTML = `
+        <div class="text-4xl md:text-6xl drop-shadow-md select-none pointer-events-none">${ch.emoji || ch.val}</div>
+        <div class="text-white/95 font-extrabold text-xs md:text-base mt-1 capitalize text-center">${ch.label}</div>
+      `;
+    }
+    
+    card.addEventListener('click', () => validerReponse(ch.val, q));
+    grid.appendChild(card);
+  });
+  
+  const allCards = grid.querySelectorAll('.clay-card, .rounded-2xl');
+  direQ(q).then(() => {
+    if (qIdx >= questions.length) return;
+    
+    // DÉBLOQUER IMMÉDIATEMENT : l'enfant peut cliquer dès maintenant
+    allCards.forEach(c => {
+      c.classList.remove('disabled', 'opacity-50');
+      c.style.pointerEvents = 'auto';
+    });
+    locked = false;
+    updateMascotRendering('game-mascot-slot', userProgress.activeMascot, 'neutral', 80);
+    
+    // Lire les options en arrière-plan (l'enfant n'est pas obligé d'attendre)
+    enoncer(Array.from(allCards), q.choix);
+  });
+}
+
+/* ══════════ VALIDATE ACTION ANSWER ══════════ */
+function validerReponse(val, q) {
+  if (locked) return;
+  
+  // Arrêter la voix et le highlight si l'enfant clique pendant la lecture
+  stopVoix();
+  enoncant = false;
+  
+  // Nettoyer tous les highlights de lecture en cours
+  const gridCards = document.getElementById('game-answers-grid');
+  if (gridCards) {
+    gridCards.querySelectorAll('.speaking').forEach(c => {
+      c.classList.remove('speaking', 'border-amber-400');
+    });
+  }
+  
+  const ok = (val === q.correct);
+  
+  if (ok) {
+    locked = true;
+    updateMascotRendering('game-mascot-slot', userProgress.activeMascot, 'correct', 80);
+    
+    const grid = document.getElementById('game-answers-grid');
+    const correctCard = grid.querySelector(`[data-val="${CSS.escape(val)}"]`);
+    if (correctCard) {
+      correctCard.classList.add('border-4', 'border-emerald-400', 'bg-emerald-950/20');
+    }
+    
+    score++;
+    document.getElementById('game-score').textContent = '⭐ ' + score;
+    playSynthSound('success');
+    
+    const fb = q.bravo ? { text: q.bravo, key: q.audioBravo || null } : bravoFeedback();
+    document.getElementById('ov-em').textContent = '🎉';
+    document.getElementById('ov-tx').textContent = fb.text;
+    document.getElementById('ov-box').style.borderColor = '#10b981';
+    document.getElementById('overlay').classList.remove('hidden');
+    
+    confettisAction();
+    
+    // Attendre que la voix finisse complètement avant de passer à la suite
+    const voicePromise = fb.key ? direAudio(fb.key, fb.text, 300) : dire(fb.text, 300);
+    voicePromise.then(() => {
+      // Petit délai supplémentaire pour que l'enfant puisse lire
+      setTimeout(() => {
+        document.getElementById('overlay').classList.add('hidden');
+        qIdx++;
+        afficherQ();
+      }, 800);
+    });
+    
+  } else {
+    chancesRestantes--;
+    document.getElementById('game-chances').textContent = chancesHTML(chancesRestantes);
+    updateMascotRendering('game-mascot-slot', userProgress.activeMascot, 'wrong', 80);
+    
+    const grid = document.getElementById('game-answers-grid');
+    const cardKo = grid.querySelector(`[data-val="${CSS.escape(val)}"]`);
+    if (cardKo) {
+      cardKo.classList.add('shake-card', 'border-4', 'border-pink-600', 'bg-pink-950/25');
+      playSynthSound('error');
+      setTimeout(() => cardKo.classList.remove('shake-card'), 450);
+    }
+    
+    if (chancesRestantes > 0) {
+      direAudio('oups', "Oups ! Réessaie ! Tu vas y arriver !", 200);
+      if (cardKo) {
+        cardKo.classList.add('disabled', 'opacity-40');
+        cardKo.style.pointerEvents = 'none';
+      }
+    } else {
+      locked = true;
+      // reveal correct answer card
+      const goodCard = grid.querySelector(`[data-val="${CSS.escape(q.correct)}"]`);
+      if (goodCard) goodCard.classList.add('border-4', 'border-emerald-400');
+      
+      const correctChoice = q.choix.find(c => c.val === q.correct);
+      const spokenAns = correctChoice ? (correctChoice.speak || correctChoice.label) : q.correct;
+      
+      const enc = encourageFeedback();
+      const reponseTxt = `La bonne réponse c'était : ${spokenAns}.`;
+      const msg = `${enc.text} ${reponseTxt}`;
+      document.getElementById('ov-em').textContent = '😅';
+      document.getElementById('ov-tx').textContent = msg;
+      document.getElementById('ov-box').style.borderColor = '#f59e0b';
+      document.getElementById('overlay').classList.remove('hidden');
+      
+      // Joue l'encouragement enregistré, puis rejoue la consigne d'origine
+      // (déjà enregistrée en vraie voix de Vivi pour cette question) —
+      // la bonne carte est surlignée en vert à l'écran pendant ce temps,
+      // donc pas besoin de resynthétiser le mot de la réponse.
+      direAudio(enc.key, enc.text, 300)
+        .then(() => {
+          if (q.audioKey) return direAudio(q.audioKey, q.consigne);
+        })
+        .then(() => {
+        setTimeout(() => {
+          document.getElementById('overlay').classList.add('hidden');
+          qIdx++;
+          afficherQ();
+        }, 800);
+      });
+    }
+  }
+}
+
+/* ══════════ INTERACTIVE MEMORY MATCH MODULE ══════════ */
+let memoryDeck = [];
+let memoryFirstCard = null;
+let memorySecondCard = null;
+let memoryMatchesCount = 0;
+let memoryLock = false;
+
+const MEMORY_POOL = ['🦁', '🦒', '🐨', '🦄', '🍎', '🍌', '🍓', '🍇', '🐶', '🐱', '🚗', '🚀', '🍕', '🍦', '🎈', '🐝'];
+
+function lancerMemoryMatchGame() {
+  initAudio();
+  currentMod = 'memory';
+  locked = false;
+  enoncant = false;
+  
+  document.getElementById('game-modname').textContent = "🧠 Jeu de Mémoire";
+  document.getElementById('game-score').textContent = '⭐ 0';
+  document.getElementById('game-chances').textContent = 'Memory Mode';
+  document.getElementById('game-progress').style.width = '0%';
+  
+  showPage('page-game');
+  updateMascotRendering('game-mascot-slot', userProgress.activeMascot, 'neutral', 80);
+  document.getElementById('game-consigne').textContent = "Retrouve toutes les paires d'autocollants ! Tapote les cartes pour les retourner !";
+  
+  direAudio('memoire_bienvenue', "Bienvenue dans le jeu de mémoire ! Retourne les cartes pour trouver les couples identiques ! C'est très bon pour ton cerveau !");
+  
+  // Build deck based on difficulty settings
+  let pairsCount = 6; // 12 cards (medium default)
+  if (parentSettings.difficulty === 'easy') pairsCount = 4; // 8 cards
+  if (parentSettings.difficulty === 'hard') pairsCount = 8; // 16 cards
+  
+  const pickedEmojis = pick(MEMORY_POOL, pairsCount);
+  const doubleDeck = [...pickedEmojis, ...pickedEmojis];
+  memoryDeck = shuffle(doubleDeck);
+  
+  memoryFirstCard = null;
+  memorySecondCard = null;
+  memoryMatchesCount = 0;
+  memoryLock = false;
+  
+  const interactionZone = document.getElementById('game-interaction-zone');
+  interactionZone.innerHTML = '<div class="memory-grid mx-auto" id="memory-grid-container"></div>';
+  
+  const container = document.getElementById('memory-grid-container');
+  
+  // responsive columns for memory
+  if (pairsCount === 4) {
+    container.style.gridTemplateColumns = 'repeat(4, minmax(0, 1fr))';
+    container.style.maxWidth = '460px';
+  } else if (pairsCount === 6) {
+    container.style.gridTemplateColumns = 'repeat(4, minmax(0, 1fr))';
+    container.style.maxWidth = '580px';
+  } else {
+    container.style.gridTemplateColumns = 'repeat(4, minmax(0, 1fr))';
+    container.style.maxWidth = '580px';
+  }
+  
+  memoryDeck.forEach((em, idx) => {
+    const card = document.createElement('div');
+    card.className = 'memory-card';
+    card.dataset.emoji = em;
+    card.dataset.index = idx;
+    card.innerHTML = `
+      <div class="memory-card-inner w-full h-full">
+        <div class="memory-card-back text-3xl text-white font-black">❓</div>
+        <div class="memory-card-front text-4xl md:text-5xl select-none pointer-events-none">${em}</div>
+      </div>
+    `;
+    
+    card.addEventListener('click', () => handleMemoryFlip(card));
+    container.appendChild(card);
+  });
+}
+
+function handleMemoryFlip(card) {
+  if (memoryLock) return;
+  if (card.classList.contains('flipped') || card.classList.contains('matched')) return;
+  
+  playSynthSound('pop');
+  card.classList.add('flipped');
+  
+  // identify emoji vocally
+  const emo = card.dataset.emoji;
+  const stickerObj = STICKERS.find(s => s.emoji === emo);
+  if (stickerObj) {
+    direAudio(stickerObj.audioKey, stickerObj.voice);
+  } else {
+    dire(emo);
+  }
+  
+  if (!memoryFirstCard) {
+    memoryFirstCard = card;
+  } else {
+    memorySecondCard = card;
+    checkMemoryMatch();
+  }
+}
+
+function checkMemoryMatch() {
+  memoryLock = true;
+  const emoji1 = memoryFirstCard.dataset.emoji;
+  const emoji2 = memorySecondCard.dataset.emoji;
+  
+  const totalPairs = memoryDeck.length / 2;
+  
+  if (emoji1 === emoji2) {
+    // Match success!
+    memoryFirstCard.classList.add('matched');
+    memorySecondCard.classList.add('matched');
+    
+    memoryMatchesCount++;
+    playSynthSound('success');
+    
+    const pct = Math.round((memoryMatchesCount / totalPairs) * 100);
+    document.getElementById('game-progress').style.width = pct + '%';
+    document.getElementById('game-score').textContent = '⭐ ' + memoryMatchesCount;
+    
+    memoryFirstCard = null;
+    memorySecondCard = null;
+    memoryLock = false;
+    
+    if (memoryMatchesCount === totalPairs) {
+      setTimeout(() => {
+        score = 10; // maximum bravo trigger
+        afficherBravo();
+      }, 1000);
+    }
+  } else {
+    // Match failure
+    setTimeout(() => {
+      memoryFirstCard.classList.remove('flipped');
+      memorySecondCard.classList.remove('flipped');
+      
+      playSynthSound('error');
+      
+      memoryFirstCard = null;
+      memorySecondCard = null;
+      memoryLock = false;
+    }, 1100);
+  }
+}
+
+function cleanMemoryLayout() {
+  // rebuild default gameplay zone back for other modules
+  const interactionZone = document.getElementById('game-interaction-zone');
+  interactionZone.innerHTML = '<div class="answers-grid grid grid-cols-2 gap-4" id="game-answers-grid"></div>';
+}
+
+/* ══════════ DYNAMIC TABLEAU CRÉATIF DRAWING CANVAS ══════════ */
+let creativeCanvas = null;
+let creativeCtx = null;
+let creativeIsDrawing = false;
+let creativeLastX = 0;
+let creativeLastY = 0;
+let currentBrushColor = '#E53935';
+let currentBrushSize = 16;
+let activeTool = 'brush'; // 'brush', 'eraser', 'stamp'
+let activeStampEmoji = '';
+let isRainbowBrush = false;
+let rainbowHue = 0;
+
+const CANVAS_PALETTE_PRESETS = [
+  '#E53935', // red
+  '#1565C0', // blue
+  '#F9A825', // yellow
+  '#2E7D32', // green
+  '#E65100', // orange
+  '#6A1B9A', // purple
+  '#C2185B', // pink
+  '#212121'  // black
+];
+
+function initCreativeCanvas() {
+  creativeCanvas = document.getElementById('drawing-board');
+  creativeCtx = creativeCanvas.getContext('2d');
+  
+  // set correct size based on parent container
+  const container = creativeCanvas.parentElement;
+  creativeCanvas.width = container.clientWidth;
+  creativeCanvas.height = container.clientHeight || 450;
+  
+  // clean canvas default background white
+  creativeCtx.fillStyle = '#FFFFFF';
+  creativeCtx.fillRect(0, 0, creativeCanvas.width, creativeCanvas.height);
+  
+  // Setup tool presets
+  const palette = document.getElementById('canvas-palette');
+  palette.innerHTML = '';
+  CANVAS_PALETTE_PRESETS.forEach(hex => {
+    const btn = document.createElement('button');
+    btn.className = 'w-10 h-10 rounded-full border-4 border-white/20 cursor-pointer hover:scale-110 transition-all active:scale-95 shadow-md';
+    btn.style.background = hex;
+    btn.onclick = () => selectBrushColor(hex, btn);
+    palette.appendChild(btn);
+  });
+  
+  // activate default brush size
+  const sizes = document.querySelectorAll('.brush-size-btn');
+  sizes.forEach((s, i) => {
+    if (i === 1) {
+      s.classList.add('border-amber-400');
+      currentBrushSize = 16;
+    } else {
+      s.classList.remove('border-amber-400');
+    }
+  });
+  
+  selectBrushColor(CANVAS_PALETTE_PRESETS[0], palette.firstChild);
+  
+  // stamps loader
+  loadUnlockedStampsForCanvas();
+  
+  // Event listeners
+  creativeCanvas.addEventListener('mousedown', startDrawingCreative);
+  creativeCanvas.addEventListener('mousemove', drawCreative);
+  creativeCanvas.addEventListener('mouseup', stopDrawingCreative);
+  creativeCanvas.addEventListener('mouseout', stopDrawingCreative);
+  
+  creativeCanvas.addEventListener('touchstart', startDrawingCreative, { passive: false });
+  creativeCanvas.addEventListener('touchmove', drawCreative, { passive: false });
+  creativeCanvas.addEventListener('touchend', stopDrawingCreative);
+  
+  // render mascot help widget
+  updateMascotRendering('creative-mascot-avatar', userProgress.activeMascot, 'neutral', 40);
+}
+
+function loadUnlockedStampsForCanvas() {
+  const container = document.getElementById('canvas-stamps-container');
+  container.innerHTML = '';
+  
+  STICKERS.forEach(stk => {
+    const isMascot = ['vivi', 'gigi', 'koko', 'lili'].includes(stk.id);
+    // Map old mascot IDs to new ones for stamps if needed
+    let displayEmoji = stk.emoji;
+    if (stk.id === 'vivi') displayEmoji = '🦁';
+    
+    const unlocked = userProgress.unlockedStickers.includes(stk.id);
+    const cell = document.createElement('button');
+    cell.className = `w-10 h-10 rounded-xl text-2xl flex items-center justify-center bg-slate-950 border border-white/5 cursor-pointer shadow-inner transition-all hover:scale-115 ${unlocked ? '' : 'opacity-20 pointer-events-none'}`;
+    cell.textContent = displayEmoji;
+    cell.title = stk.name;
+    
+    if (unlocked) {
+      cell.onclick = () => {
+        activeTool = 'stamp';
+        activeStampEmoji = displayEmoji;
+        isRainbowBrush = false;
+        
+        // reset highlights
+        document.getElementById('btn-eraser').className = "w-full py-3 rounded-2xl bg-slate-800 text-white font-extrabold border-b-4 border-slate-950 flex items-center justify-center gap-2 shadow-md cursor-pointer";
+        
+        // remove selected rings from palette
+        const paletteBtns = document.querySelectorAll('#canvas-palette button');
+        paletteBtns.forEach(b => b.classList.remove('border-amber-400'));
+        document.getElementById('btn-rainbow-brush').style.transform = "none";
+        
+        playSynthSound('pop');
+        dire(`Tampon ${stk.name}`);
+      };
+    }
+    
+    container.appendChild(cell);
+  });
+}
+
+function selectBrushColor(hex, btn) {
+  activeTool = 'brush';
+  currentBrushColor = hex;
+  isRainbowBrush = false;
+  
+  const paletteBtns = document.querySelectorAll('#canvas-palette button');
+  paletteBtns.forEach(b => b.classList.remove('border-amber-400'));
+  if (btn) btn.classList.add('border-amber-400');
+  
+  document.getElementById('btn-eraser').className = "w-full py-3 rounded-2xl bg-slate-800 text-white font-extrabold border-b-4 border-slate-950 flex items-center justify-center gap-2 shadow-md cursor-pointer";
+  document.getElementById('btn-rainbow-brush').style.transform = "none";
+  
+  playSynthSound('pop');
+}
+
+function toggleRainbowBrush() {
+  activeTool = 'brush';
+  isRainbowBrush = true;
+  
+  const paletteBtns = document.querySelectorAll('#canvas-palette button');
+  paletteBtns.forEach(b => b.classList.remove('border-amber-400'));
+  document.getElementById('btn-eraser').className = "w-full py-3 rounded-2xl bg-slate-800 text-white font-extrabold border-b-4 border-slate-950 flex items-center justify-center gap-2 shadow-md cursor-pointer";
+  
+  document.getElementById('btn-rainbow-brush').style.transform = "scale(1.03)";
+  
+  playSynthSound('sparkle');
+  dire("Pinceau arc-en-ciel super coloré !");
+}
+
+function setBrushSize(size, btn) {
+  currentBrushSize = size;
+  
+  const sizes = document.querySelectorAll('.brush-size-btn');
+  sizes.forEach(s => s.classList.remove('border-amber-400'));
+  if (btn) btn.classList.add('border-amber-400');
+  
+  playSynthSound('pop');
+}
+
+function activateEraser() {
+  activeTool = 'eraser';
+  isRainbowBrush = false;
+  
+  const paletteBtns = document.querySelectorAll('#canvas-palette button');
+  paletteBtns.forEach(b => b.classList.remove('border-amber-400'));
+  document.getElementById('btn-rainbow-brush').style.transform = "none";
+  
+  document.getElementById('btn-eraser').className = "w-full py-3 rounded-2xl bg-gradient-to-b from-pink-500 to-rose-600 text-white font-extrabold border-b-4 border-rose-950 flex items-center justify-center gap-2 shadow-md cursor-pointer scale-103";
+  
+  playSynthSound('pop');
+  dire("Gomme pour effacer.");
+}
+
+function clearCanvas() {
+  if (confirm("Voulez-vous vraiment nettoyer tout le tableau blanc ?")) {
+    playSynthSound('error');
+    creativeCtx.fillStyle = '#FFFFFF';
+    creativeCtx.fillRect(0, 0, creativeCanvas.width, creativeCanvas.height);
+    dire("Tableau nettoyé !");
+  }
+}
+
+function exitCreative() {
+  stopVoix();
+  cleanMemoryLayout();
+  showPage('page-home');
+}
+
+function startDrawingCreative(e) {
+  creativeIsDrawing = true;
+  const rect = creativeCanvas.getBoundingClientRect();
+  const clientX = e.type.startsWith('touch') ? e.touches[0].clientX : e.clientX;
+  const clientY = e.type.startsWith('touch') ? e.touches[0].clientY : e.clientY;
+  
+  creativeLastX = clientX - rect.left;
+  creativeLastY = clientY - rect.top;
+  
+  if (activeTool === 'stamp') {
+    placeStampEmoji(creativeLastX, creativeLastY);
+    creativeIsDrawing = false;
+  }
+  if (e.cancelable) e.preventDefault();
+}
+
+function drawCreative(e) {
+  if (!creativeIsDrawing || activeTool === 'stamp') return;
+  const rect = creativeCanvas.getBoundingClientRect();
+  const clientX = e.type.startsWith('touch') ? e.touches[0].clientX : e.clientX;
+  const clientY = e.type.startsWith('touch') ? e.touches[0].clientY : e.clientY;
+  
+  const curX = clientX - rect.left;
+  const curY = clientY - rect.top;
+  
+  creativeCtx.beginPath();
+  creativeCtx.moveTo(creativeLastX, creativeLastY);
+  creativeCtx.lineTo(curX, curY);
+  
+  if (activeTool === 'eraser') {
+    creativeCtx.strokeStyle = '#FFFFFF';
+    creativeCtx.lineWidth = 40;
+  } else {
+    if (isRainbowBrush) {
+      rainbowHue = (rainbowHue + 3) % 360;
+      creativeCtx.strokeStyle = `hsl(${rainbowHue}, 90%, 55%)`;
+    } else {
+      creativeCtx.strokeStyle = currentBrushColor;
+    }
+    creativeCtx.lineWidth = currentBrushSize;
+  }
+  
+  creativeCtx.lineCap = 'round';
+  creativeCtx.lineJoin = 'round';
+  creativeCtx.stroke();
+  
+  creativeLastX = curX;
+  creativeLastY = curY;
+  
+  if (e.cancelable) e.preventDefault();
+}
+
+function stopDrawingCreative() {
+  creativeIsDrawing = false;
+}
+
+function placeStampEmoji(x, y) {
+  creativeCtx.font = `${currentBrushSize * 3}px 'Nunito', sans-serif`;
+  creativeCtx.textAlign = 'center';
+  creativeCtx.textBaseline = 'middle';
+  creativeCtx.fillText(activeStampEmoji, x, y);
+  
+  // bounce effect in mascot
+  updateMascotRendering('creative-mascot-avatar', userProgress.activeMascot, 'correct', 40);
+  playSynthSound('pop');
+  
+  setTimeout(() => {
+    updateMascotRendering('creative-mascot-avatar', userProgress.activeMascot, 'neutral', 40);
+  }, 600);
+}
+
+/* ══════════ DYNAMIC STICKER ALBUM SCENERY PLAYBOOK ══════════ */
+let stickerSceneryBackground = 'meadow';
+let maxZIndex = 100;
+
+const SCENERY_DECOR = {
+  meadow: `
+    <div class="absolute inset-0 bg-gradient-to-b from-sky-300 via-sky-200 to-emerald-100"></div>
+    <div class="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-b from-emerald-400 to-green-600 rounded-t-[40px]"></div>
+    <div class="absolute top-12 left-12 text-yellow-400 text-6xl animate-pulse">☀️</div>
+    <div class="absolute top-16 right-20 text-white/70 text-4xl">☁️</div>
+    <div class="absolute top-24 left-1/3 text-white/50 text-5xl">☁️</div>
+  `,
+  space: `
+    <div class="absolute inset-0 bg-gradient-to-b from-slate-950 via-indigo-950 to-slate-900"></div>
+    <div class="absolute top-20 right-24 w-36 h-36 rounded-full bg-gradient-to-br from-orange-500 to-pink-600 shadow-inner border border-white/10"></div>
+    <div class="absolute bottom-12 left-20 w-16 h-16 rounded-full bg-indigo-800 opacity-40 shadow-xl"></div>
+    <div class="absolute top-12 left-12 text-indigo-400 text-2xl animate-ping">✨</div>
+  `,
+  sunset: `
+    <div class="absolute inset-0 bg-gradient-to-b from-amber-500 via-orange-500 to-rose-700"></div>
+    <div class="absolute bottom-0 left-0 right-0 h-24 bg-rose-950 opacity-80 rounded-t-3xl"></div>
+    <div class="absolute bottom-6 left-1/2 -translate-x-1/2 w-32 h-32 rounded-full bg-yellow-300 blur-sm"></div>
+  `
+};
+
+function initStickersScenery() {
+  setStickerBackground(stickerSceneryBackground);
+  renderStickersTrayDrawer();
+}
+
+function setStickerBackground(bgStyle) {
+  stickerSceneryBackground = bgStyle;
+  const decor = document.getElementById('sticker-landscape-decor');
+  if (decor) {
+    decor.innerHTML = SCENERY_DECOR[bgStyle] || '';
+  }
+  playSynthSound('pop');
+}
+
+function renderStickersTrayDrawer() {
+  const container = document.getElementById('sticker-drawer-container');
+  container.innerHTML = '';
+  
+  STICKERS.forEach(stk => {
+    const unlocked = userProgress.unlockedStickers.includes(stk.id);
+    const item = document.createElement('div');
+    item.className = `flex-shrink-0 w-16 h-16 rounded-2xl flex flex-col items-center justify-center shadow-md cursor-pointer transition-all hover:scale-105 border border-white/10 ${unlocked ? 'bg-indigo-900/80' : 'bg-slate-950/85 opacity-30 pointer-events-none'}`;
+    
+    item.innerHTML = `
+      <span class="text-3xl select-none pointer-events-none">${unlocked ? stk.emoji : '🔒'}</span>
+      <span class="text-[9px] text-white/70 truncate w-full text-center mt-0.5 font-bold px-1">${unlocked ? stk.name.split(' ')[0] : 'Serré'}</span>
+    `;
+    
+    if (unlocked) {
+      item.onclick = () => placeStickerOnLandscape(stk);
+    }
+    container.appendChild(item);
+  });
+}
+
+function placeStickerOnLandscape(sticker) {
+  playSynthSound('pop');
+  
+  const root = document.getElementById('stickers-scenery-root');
+  const el = document.createElement('div');
+  el.className = 'sticker-el flex flex-col items-center justify-center p-2 active:scale-105';
+  
+  // absolute initial random placement in target area
+  const rx = 50 + Math.floor(Math.random() * (root.clientWidth - 160));
+  const ry = 50 + Math.floor(Math.random() * (root.clientHeight - 160));
+  
+  el.style.left = rx + 'px';
+  el.style.top = ry + 'px';
+  el.style.zIndex = ++maxZIndex;
+  el.dataset.stickerId = sticker.id;
+  
+  el.innerHTML = `
+    <!-- Sticker Control actions overlay -->
+    <div class="sticker-control">
+      <button class="text-white font-black text-xs bg-rose-600 w-5 h-5 rounded-full hover:bg-rose-500" onclick="this.closest('.sticker-el').remove(); playSynthSound('error');">✕</button>
+      <button class="text-white font-black text-xs bg-slate-700 w-5 h-5 rounded-full" onclick="scaleSticker(this.closest('.sticker-el'), 1.15)">➕</button>
+      <button class="text-white font-black text-xs bg-slate-700 w-5 h-5 rounded-full" onclick="scaleSticker(this.closest('.sticker-el'), 0.85)">➖</button>
+    </div>
+    <div class="sticker-body text-6xl select-none cursor-move transition-transform duration-200" style="transform: scale(1)">
+      ${sticker.emoji}
+    </div>
+  `;
+  
+  // configure double click to trigger voice readout of items
+  el.addEventListener('dblclick', () => {
+    direAudio(sticker.audioKey, sticker.voice || sticker.name);
+    el.querySelector('.sticker-body').classList.add('rotate-12');
+    setTimeout(() => el.querySelector('.sticker-body').classList.remove('rotate-12'), 300);
+  });
+  
+  // touch and drag systems setup
+  el.addEventListener('mousedown', (e) => handleStickerDragStart(e, el));
+  el.addEventListener('touchstart', (e) => handleStickerDragStart(e, el), { passive: false });
+  
+  root.appendChild(el);
+  
+  // Speak stamp voice trigger
+  direAudio(sticker.audioKey, sticker.voice || sticker.name);
+}
+
+function scaleSticker(el, factor) {
+  playSynthSound('pop');
+  const body = el.querySelector('.sticker-body');
+  let curScale = parseFloat(body.style.transform.replace('scale(', '').replace(')', '')) || 1;
+  curScale = Math.max(0.5, Math.min(2.5, curScale * factor));
+  body.style.transform = `scale(${curScale})`;
+}
+
+function clearStickerBookScenery() {
+  if (confirm("Voulez-vous vider tout votre album ?")) {
+    playSynthSound('error');
+    document.getElementById('stickers-scenery-root').innerHTML = '';
+    dire("L'album est tout propre !");
+  }
+}
+
+/* Flawless Sticker drag/drop mechanics */
+let activeDragSticker = null;
+let dragStartX, dragStartY, dragInitialLeft, dragInitialTop;
+
+function handleStickerDragStart(e, el) {
+  // ignore drag triggers if clicking buttons
+  if (e.target.tagName === 'BUTTON') return;
+  
+  activeDragSticker = el;
+  el.classList.add('active');
+  
+  const clientX = e.type.startsWith('touch') ? e.touches[0].clientX : e.clientX;
+  const clientY = e.type.startsWith('touch') ? e.touches[0].clientY : e.clientY;
+  
+  dragStartX = clientX;
+  dragStartY = clientY;
+  
+  dragInitialLeft = parseInt(el.style.left) || 0;
+  dragInitialTop = parseInt(el.style.top) || 0;
+  
+  el.style.zIndex = ++maxZIndex;
+  
+  document.addEventListener('mousemove', handleStickerDragMove, { passive: false });
+  document.addEventListener('touchmove', handleStickerDragMove, { passive: false });
+  document.addEventListener('mouseup', handleStickerDragEnd);
+  document.addEventListener('touchend', handleStickerDragEnd);
+  
+  // illuminate trash drop indicator
+  document.getElementById('sticker-trash-zone').style.opacity = "0.8";
+  
+  if (e.cancelable) e.preventDefault();
+}
+
+function handleStickerDragMove(e) {
+  if (!activeDragSticker) return;
+  const clientX = e.type.startsWith('touch') ? e.touches[0].clientX : e.clientX;
+  const clientY = e.type.startsWith('touch') ? e.touches[0].clientY : e.clientY;
+  
+  const dx = clientX - dragStartX;
+  const dy = clientY - dragStartY;
+  
+  const root = document.getElementById('stickers-scenery-root');
+  
+  let newLeft = dragInitialLeft + dx;
+  let newTop = dragInitialTop + dy;
+  
+  // limit layout boundaries slightly
+  newLeft = Math.max(-20, Math.min(root.clientWidth - activeDragSticker.clientWidth + 20, newLeft));
+  newTop = Math.max(-20, Math.min(root.clientHeight - activeDragSticker.clientHeight + 20, newTop));
+  
+  activeDragSticker.style.left = newLeft + 'px';
+  activeDragSticker.style.top = newTop + 'px';
+  
+  // Trash highlights drop detection
+  const trashZone = document.getElementById('sticker-trash-zone');
+  const trashRect = trashZone.getBoundingClientRect();
+  const stickerRect = activeDragSticker.getBoundingClientRect();
+  
+  const overlapping = !(stickerRect.right < trashRect.left || 
+                        stickerRect.left > trashRect.right || 
+                        stickerRect.bottom < trashRect.top || 
+                        stickerRect.top > trashRect.bottom);
+                        
+  if (overlapping) {
+    trashZone.classList.remove('bg-rose-500/80');
+    trashZone.classList.add('bg-red-600', 'scale-110');
+  } else {
+    trashZone.classList.add('bg-rose-500/80');
+    trashZone.classList.remove('bg-red-600', 'scale-110');
+  }
+  
+  if (e.cancelable) e.preventDefault();
+}
+
+function handleStickerDragEnd() {
+  if (!activeDragSticker) return;
+  
+  activeDragSticker.classList.remove('active');
+  
+  // Trash drop action trigger check
+  const trashZone = document.getElementById('sticker-trash-zone');
+  const trashRect = trashZone.getBoundingClientRect();
+  const stickerRect = activeDragSticker.getBoundingClientRect();
+  
+  const overlapping = !(stickerRect.right < trashRect.left || 
+                        stickerRect.left > trashRect.right || 
+                        stickerRect.bottom < trashRect.top || 
+                        stickerRect.top > trashRect.bottom);
+                        
+  if (overlapping) {
+    activeDragSticker.remove();
+    playSynthSound('error');
+  }
+  
+  activeDragSticker = null;
+  
+  document.removeEventListener('mousemove', handleStickerDragMove);
+  document.removeEventListener('touchmove', handleStickerDragMove);
+  document.removeEventListener('mouseup', handleStickerDragEnd);
+  document.removeEventListener('touchend', handleStickerDragEnd);
+  
+  trashZone.style.opacity = "0.3";
+  trashZone.classList.remove('scale-110', 'bg-red-600');
+  trashZone.classList.add('bg-rose-500/80');
+}
+
+function openStickerBook() {
+  showPage('page-stickers');
+}
+
+/* ══════════ BRAVO REWARD SEQUENCE & GIFT CHEST UNLOCKING ══════════ */
+let lastEarnedStickerId = null;
+
+function afficherBravo() {
+  stopVoix();
+  
+  // check score ratio to see if reward applies
+  const isWinSuccess = (score >= 7 || currentMod === 'memory');
+  
+  document.getElementById('bravo-stars').textContent = '⭐'.repeat(Math.max(3, Math.min(score, 10)));
+  document.getElementById('bravo-info').textContent = `Tu as eu ${score} bonne${score > 1 ? 's' : ''} réponse${score > 1 ? 's' : ''} !`;
+  
+  // check if we can distribute stickers reward
+  const remainingStickers = STICKERS.filter(s => !userProgress.unlockedStickers.includes(s.id));
+  
+  if (isWinSuccess && remainingStickers.length > 0) {
+    // pick a locked sticker as reward gift!
+    const prize = remainingStickers[Math.floor(Math.random() * remainingStickers.length)];
+    lastEarnedStickerId = prize.id;
+    
+    // setup chest screen reward panel
+    document.getElementById('chest-box').textContent = '🎁';
+    document.getElementById('chest-box').className = "text-7xl md:text-9xl cursor-pointer shake-chest filter drop-shadow-2xl select-none";
+    document.getElementById('chest-instructions').textContent = "Tapote le paquet surprise pour découvrir ton cadeau ! 😍";
+    document.getElementById('chest-instructions').classList.add('animate-pulse');
+    
+    document.getElementById('sticker-reward-chest-wrapper').classList.remove('hidden');
+  } else {
+    document.getElementById('sticker-reward-chest-wrapper').classList.add('hidden');
+    lastEarnedStickerId = null;
+  }
+  
+  showPage('page-bravo');
+  
+  // Sound chimes
+  playSynthSound('success');
+  setTimeout(() => playSynthSound('success'), 300);
+  
+  confettisAction();
+  
+  let msg, audioKey;
+  if (score >= 8) {
+    msg = "Bravo champion ! Tu es vraiment fort !";
+    audioKey = 'fin_super';
+  } else if (score >= 5) {
+    msg = "Très bien ! Continue à t'entraîner !";
+    audioKey = 'fin_bien';
+  } else {
+    msg = "Continue, tu progresses à chaque fois !";
+    audioKey = 'fin_courage';
+  }
+
+  direAudio(audioKey, msg, 600);
+}
+
+function unlockVictoryGift() {
+  if (!lastEarnedStickerId) return;
+  
+  const prize = STICKERS.find(s => s.id === lastEarnedStickerId);
+  if (!prize) return;
+  
+  // shaking box drum chimes
+  playSynthSound('pop');
+  
+  const chest = document.getElementById('chest-box');
+  chest.className = "text-7xl md:text-9xl filter drop-shadow-2xl select-none animate-bounce";
+  
+  const instructions = document.getElementById('chest-instructions');
+  instructions.textContent = "Surprise en cours... 🤫";
+  instructions.classList.remove('animate-pulse');
+  
+  // add to unlocked progress state
+  if (!userProgress.unlockedStickers.includes(prize.id)) {
+    userProgress.unlockedStickers.push(prize.id);
+    saveProgress();
+  }
+  
+  setTimeout(() => {
+    playSynthSound('sparkle');
+    playSynthSound('success');
+    
+    confettisAction();
+    
+    chest.textContent = prize.emoji;
+    chest.className = "text-8xl md:text-[120px] select-none filter drop-shadow-2xl scale-110 transition-transform duration-500";
+    
+    instructions.innerHTML = `<span class="text-amber-400 font-black text-sm md:text-base uppercase tracking-wider">Nouveau Sticker !</span><br><span class="text-white font-bold">${prize.name}</span>`;
+    
+    direAudio('sticker_gagne', 'Bravo ! Tu as gagné un nouveau sticker !')
+      .then(() => direAudio(prize.audioKey, prize.voice || prize.name));
+    
+    lastEarnedStickerId = null; // reset
+  }, 1400);
+}
+
+function confettisAction() {
+  const emojis = ['🎉', '⭐', '🌟', '🎊', '✨', '💫', '🎈', '❤️'];
+  for (let i = 0; i < 22; i++) {
+    const em = emojis[Math.floor(Math.random() * emojis.length)];
+    const c = document.createElement('div');
+    c.className = 'conf select-none pointer-events-none';
+    c.textContent = em;
+    c.style.left = Math.random() * 100 + 'vw';
+    c.style.animationDuration = (1.2 + Math.random() * 1.6) + 's';
+    c.style.animationDelay = Math.random() * 0.3 + 's';
+    c.style.fontSize = (20 + Math.floor(Math.random() * 20)) + 'px';
+    
+    document.body.appendChild(c);
+    c.addEventListener('animationend', () => c.remove());
+  }
+}
+
+/* ══════════ MAIN BOOTSTRAP EVENT HANDLERS ══════════ */
+window.addEventListener('DOMContentLoaded', () => {
+  loadProgressAndSettings();
+  
+  // setup initial splash image
+  updateMascotRendering('splash-mascot-container', userProgress.activeMascot, 'neutral', 320);
+  
+  // setup home layout mascot renderings
+  updateMascotRendering('home-mascot-slot', userProgress.activeMascot, 'neutral', 82);
+  updateMascotRendering('home-mascot-sidebar', userProgress.activeMascot, 'neutral', 300);
+  
+  // initial load canvas animation background
+  initBgEffects();
+  drawBgEffects();
+  
+  // play playtimers if loaded
+  if (parentSettings.timerMinutes > 0) {
+    startPlayTimer(parentSettings.timerMinutes);
+  }
+
+  // ══════════ SPLASH GIF HANDLING ══════════
+  const splashGif = document.getElementById('splash-gif');
+  const splashContainer = document.getElementById('splash-video-container');
+  const skipBtn = document.getElementById('btn-skip-splash');
+  let splashDismissed = false;
+
+  // Show skip button after 2 seconds
+  setTimeout(() => {
+    if (skipBtn && !splashDismissed) {
+      skipBtn.style.opacity = '1';
+      skipBtn.style.pointerEvents = 'auto';
+    }
+  }, 2000);
+
+  // Skip button click
+  if (skipBtn) {
+    skipBtn.addEventListener('click', () => {
+      enterApp();
+    });
+  }
+
+  // Click n'importe où sur le splash pour passer
+  if (splashContainer) {
+    splashContainer.addEventListener('click', (e) => {
+      if (e.target === splashContainer || e.target === splashGif) {
+        enterApp();
+      }
+    });
+  }
+
+  // Lancer la lecture de la vidéo (certains navigateurs bloquent l'autoplay,
+  // et si le fichier venait à manquer un jour, le poster ./splash.png reste
+  // affiché à la place d'un écran vide).
+  if (splashGif && splashGif.play) {
+    const playPromise = splashGif.play();
+    if (playPromise && playPromise.catch) {
+      playPromise.catch(() => {
+        // Autoplay bloqué ou fichier manquant : le poster reste affiché,
+        // l'utilisateur peut quand même appuyer pour entrer.
+      });
+    }
+  }
+
+  function enterApp() {
+    if (splashDismissed) return;
+    splashDismissed = true;
+
+    // Fade out splash
+    if (splashContainer) {
+      splashContainer.style.transition = 'opacity 0.8s ease';
+      splashContainer.style.opacity = '0';
+      setTimeout(() => {
+        splashContainer.style.display = 'none';
+      }, 800);
+    }
+
+    // Initialize audio context on user interaction
+    initAudio();
+
+    // Show home page
+    showPage('page-home');
+
+    // Welcome greeting from mascot
+    const greetings = {
+      lion:     { key: 'lion_bienvenue',     text: "Bonjour petit aventurier ! Je suis Vivi le lion ! Bienvenue dans La Ludobox de Vivi ! Choisis un jeu pour t'amuser avec moi !" },
+      girafe:   { key: 'girafe_bienvenue',   text: "Coucou ! C'est Gigi la girafe ! Bienvenue dans la Ludobox ! Choisis une activité, on va bien rigoler !" },
+      panthere: { key: 'panthere_bienvenue', text: "Salut petit champion ! C'est Paty la panthère ! Choisis une activité et avançons comme des explorateurs !" },
+      koala:    { key: 'koala_bienvenue',    text: "Coucou ! Je suis Koko le koala ! Bienvenue dans la Ludobox ! Choisis un jeu et on s'entraîne ensemble !" }
+    };
+    const greet = greetings[userProgress.activeMascot] || greetings.lion;
+    direAudio(greet.key, greet.text, 600);
+  }
+});
+
+// bind modules launchers cards clicks
+document.querySelectorAll('.mod-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const moduleName = btn.dataset.mod;
+    lancerModule(moduleName);
+  });
+});
+
+// Back actions
+document.getElementById('btn-game-back').addEventListener('click', () => {
+  stopVoix();
+  enoncant = false;
+  cleanMemoryLayout();
+  showPage('page-home');
+  direAudio('choisis', 'Choisis une activité !', 300);
+});
+
+document.getElementById('btn-bravo-replay').addEventListener('click', () => {
+  if (currentMod) {
+    lancerModule(currentMod);
+  } else {
+    showPage('page-home');
+  }
+});
+
+document.getElementById('btn-bravo-menu').addEventListener('click', () => {
+  stopVoix();
+  cleanMemoryLayout();
+  showPage('page-home');
+});
+
+// repeat questions prompts listener
+document.getElementById('game-bubble').addEventListener('click', () => {
+  if (currentMod === 'memory') {
+    direAudio('memoire_consigne', "Retrouve toutes les paires d'autocollants ! Tapote les cartes pour les retourner !");
+    return;
+  }
+  if (!questions.length || qIdx >= questions.length) return;
+  
+  const q = questions[qIdx];
+  stopVoix();
+  enoncant = false;
+  locked = true;
+  
+  const allCards = document.querySelectorAll('#game-answers-grid .clay-card, #game-answers-grid .rounded-2xl');
+  allCards.forEach(c => {
+    c.dataset.wasDisabled = c.classList.contains('disabled') ? '1' : '0';
+    c.classList.add('disabled', 'opacity-50');
+    c.style.pointerEvents = 'none';
+    c.classList.remove('speaking', 'border-amber-400');
+  });
+  
+  updateMascotRendering('game-mascot-slot', userProgress.activeMascot, 'thinking', 80);
+  
+  direAudio('repete_consigne', 'Écoute encore la question !').then(() => {
+    return direQ(q);
+  }).then(() => {
+    if (qIdx >= questions.length) return;
+    
+    // Remettre l'état des cartes et débloquer
+    allCards.forEach(c => {
+      if (c.dataset.wasDisabled === '1') {
+        c.classList.add('disabled', 'opacity-50');
+        c.style.pointerEvents = 'none';
+      } else {
+        c.classList.remove('disabled', 'opacity-50');
+        c.style.pointerEvents = 'auto';
+      }
+      delete c.dataset.wasDisabled;
+    });
+    locked = false;
+    updateMascotRendering('game-mascot-slot', userProgress.activeMascot, 'neutral', 80);
+    
+    // Lire les options en arrière-plan
+    enoncer(Array.from(allCards), q.choix);
+  });
+});
+
+// dismiss success overlays on simple click
+document.getElementById('overlay').addEventListener('click', function() {
+  this.classList.add('hidden');
+});
+
+console.log('🦁 Ludobox de Vivi active et prête pour les aventures !');
+
+// ══════════ ENREGISTREMENT DU SERVICE WORKER (mode hors-ligne / PWA) ══════════
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(err => {
+      console.warn('Service Worker non enregistré :', err);
+    });
+  });
+}
+</script>
+</body>
+</html>
