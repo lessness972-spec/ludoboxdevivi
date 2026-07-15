@@ -474,6 +474,11 @@ footer {
   <button id="btn-skip-splash" aria-label="Appuie pour jouer"></button>
 </div>
 
+<!-- Musique de fond (démarre au tap du splash, coupée pendant les voix) -->
+<audio id="bg-music" loop preload="auto">
+  <source src="./audio/musique_fond.mp3" type="audio/mpeg">
+</audio>
+
 <!-- ==================== PAGE: HOME PAGE ==================== -->
 <div id="page-home" class="page relative z-10">
   
@@ -631,6 +636,11 @@ footer {
       <!-- Audio Mute Toggle -->
       <button onclick="toggleMuteAudio()" id="btn-mute-toggle" class="clay-btn bg-slate-800/80 text-lg p-2 rounded-xl border-b-4 border-slate-950 cursor-pointer">
         🔊
+      </button>
+      
+      <!-- Music Mute Toggle -->
+      <button onclick="toggleMuteMusic()" id="btn-music-toggle" class="clay-btn bg-slate-800/80 text-lg p-2 rounded-xl border-b-4 border-slate-950 cursor-pointer">
+        🎵
       </button>
       
       <!-- Hearts Lives -->
@@ -1093,6 +1103,40 @@ let audioCtx = null;
 let voixFR = null;
 let voixEN = null;
 let soundMuted = false;
+let musicMuted = false;
+const MUSIC_VOLUME = 0.25;
+const MUSIC_VOLUME_DUCKED = 0.06;
+
+function getBgMusic() {
+  return document.getElementById('bg-music');
+}
+
+function startBgMusic() {
+  const bg = getBgMusic();
+  if (!bg) return;
+  bg.volume = musicMuted ? 0 : MUSIC_VOLUME;
+  const p = bg.play();
+  if (p && p.catch) p.catch(() => { /* sera relancée au prochain geste utilisateur */ });
+}
+
+function duckMusic() {
+  const bg = getBgMusic();
+  if (bg && !musicMuted) bg.volume = MUSIC_VOLUME_DUCKED;
+}
+
+function unduckMusic() {
+  const bg = getBgMusic();
+  if (bg) bg.volume = musicMuted ? 0 : MUSIC_VOLUME;
+}
+
+function toggleMuteMusic() {
+  musicMuted = !musicMuted;
+  const bg = getBgMusic();
+  if (bg) bg.volume = musicMuted ? 0 : MUSIC_VOLUME;
+  const btn = document.getElementById('btn-music-toggle');
+  if (btn) btn.textContent = musicMuted ? '🚫' : '🎵';
+  playSynthSound('pop');
+}
 
 function initAudio() {
   if (audioCtx) return;
@@ -1278,10 +1322,12 @@ function dire(texte, delaiMs = 0, isEnglish = false) {
       if (resolved) return;
       resolved = true;
       clearTimeout(safeguard);
+      unduckMusic();
       resolve();
     };
     // Safety safeguard so the game doesn't freeze if synth events miss
     const safeguard = setTimeout(done, Math.max(3500, texteNettoye.length * 130));
+    duckMusic();
 
     const go = () => {
       window.speechSynthesis.cancel();
@@ -1604,12 +1650,14 @@ function direAudio(key, fallbackText, delaiMs = 0, isEnglish = false) {
       const audio = new Audio(src);
       currentAudioEl = audio;
       let done = false;
+      duckMusic();
 
       const finish = () => {
         if (done) return;
         done = true;
         clearTimeout(safeguard);
         if (currentAudioEl === audio) currentAudioEl = null;
+        unduckMusic();
         resolve();
       };
 
@@ -1618,6 +1666,7 @@ function direAudio(key, fallbackText, delaiMs = 0, isEnglish = false) {
         done = true;
         clearTimeout(safeguard);
         if (currentAudioEl === audio) currentAudioEl = null;
+        unduckMusic();
         dire(fallbackText, 0, isEnglish).then(resolve);
       };
 
@@ -3635,9 +3684,26 @@ window.addEventListener('DOMContentLoaded', () => {
   }, 2000);
 
   // Skip button click
+  // Démasque le son au moment du tap : un vrai clic/tap est une interaction
+  // utilisateur, donc les navigateurs autorisent le son à partir de là
+  // (contrairement à l'autoplay automatique qui doit rester muet).
+  function unmuteAndEnter() {
+    if (splashGif && 'muted' in splashGif) {
+      splashGif.muted = false;
+      const p = splashGif.play && splashGif.play();
+      if (p && p.catch) p.catch(() => {});
+    }
+    startBgMusic();
+    // Appel immédiat et synchrone (pas de setTimeout) : sur mobile,
+    // le droit de jouer du son accordé par un clic ne dure que le temps
+    // du clic lui-même. Un délai ferait échouer la vraie voix enregistrée
+    // et basculerait sur la voix de synthèse de secours.
+    enterApp();
+  }
+
   if (skipBtn) {
     skipBtn.addEventListener('click', () => {
-      enterApp();
+      unmuteAndEnter();
     });
   }
 
@@ -3645,7 +3711,7 @@ window.addEventListener('DOMContentLoaded', () => {
   if (splashContainer) {
     splashContainer.addEventListener('click', (e) => {
       if (e.target === splashContainer || e.target === splashGif) {
-        enterApp();
+        unmuteAndEnter();
       }
     });
   }
@@ -3690,7 +3756,7 @@ window.addEventListener('DOMContentLoaded', () => {
       koala:    { key: 'koala_bienvenue',    text: "Coucou ! Je suis Koko le koala ! Bienvenue dans la Ludobox ! Choisis un jeu et on s'entraîne ensemble !" }
     };
     const greet = greetings[userProgress.activeMascot] || greetings.lion;
-    direAudio(greet.key, greet.text, 600);
+    direAudio(greet.key, greet.text, 0);
   }
 });
 
