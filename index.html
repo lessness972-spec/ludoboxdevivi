@@ -3742,6 +3742,13 @@ window.addEventListener('DOMContentLoaded', () => {
       }, 800);
     }
 
+    // Stopper la vidéo du splash : sinon son audio (avec `loop`) continue de
+    // tourner en boucle par-dessus la vraie musique de fond une fois dans l'appli.
+    if (splashGif) {
+      splashGif.pause();
+      splashGif.muted = true;
+    }
+
     // Initialize audio context on user interaction
     initAudio();
 
