@@ -1,0 +1,194 @@
+﻿PHRASES À AJOUTER DANS ELEVENLABS STUDIO (voix de Vivi)
+Créer un chapitre par bloc, avec exactement le nom indiqué, puis coller les lignes
+(une ligne = un paragraphe, dans cet ordre). Export : « Paragraphes », MP3.
+
+==================== Vivi 1 - Vêtements (noms) (18 lignes) ====================
+le t-shirt
+la chemise
+la robe
+le manteau
+le pantalon
+le short
+les chaussettes
+les baskets
+les bottes
+les tongs
+la casquette
+le chapeau
+les gants
+l'écharpe
+les lunettes de soleil
+le maillot de bain
+le parapluie
+le cartable
+
+==================== Vivi 2 - Vêtements (Montre-moi) (18 lignes) ====================
+Montre-moi le short !
+Montre-moi les baskets !
+Montre-moi la chemise !
+Montre-moi l'écharpe !
+Montre-moi le parapluie !
+Montre-moi les tongs !
+Montre-moi les lunettes de soleil !
+Montre-moi le pantalon !
+Montre-moi le t-shirt !
+Montre-moi la casquette !
+Montre-moi la robe !
+Montre-moi le cartable !
+Montre-moi les chaussettes !
+Montre-moi les gants !
+Montre-moi le manteau !
+Montre-moi le chapeau !
+Montre-moi les bottes !
+Montre-moi le maillot de bain !
+
+==================== Vivi 3 - Vêtements (bravo) (18 lignes) ====================
+Oui ! C'est le short !
+Oui ! Ce sont les baskets !
+Oui ! C'est la chemise !
+Oui ! C'est l'écharpe !
+Oui ! C'est le parapluie !
+Oui ! Ce sont les tongs !
+Oui ! Ce sont les lunettes de soleil !
+Oui ! C'est le pantalon !
+Oui ! C'est le t-shirt !
+Oui ! C'est la casquette !
+Oui ! C'est la robe !
+Oui ! C'est le cartable !
+Oui ! Ce sont les chaussettes !
+Oui ! Ce sont les gants !
+Oui ! C'est le manteau !
+Oui ! C'est le chapeau !
+Oui ! Ce sont les bottes !
+Oui ! C'est le maillot de bain !
+
+==================== Vivi 4 - Vêtements (histoires) (33 lignes) ====================
+Brrr, il fait froid ! Je m'habille pour aller à l'école. Qu'est-ce que je mets sur mes jambes ?
+Oui ! Le pantalon, pour avoir les jambes au chaud.
+Qu'est-ce que je mets sur mon corps ?
+Oui ! Le t-shirt va sur mon corps.
+Qu'est-ce que je mets sur mes pieds, avant les chaussures ?
+Bravo ! Les chaussettes vont sur les pieds.
+Il fait froid dehors. Qu'est-ce que je mets par-dessus pour sortir ?
+Super ! Le manteau me tient bien chaud.
+Qu'est-ce que je mets autour de mon cou ?
+Oui ! L'écharpe se met autour du cou.
+Qu'est-ce que je mets sur mes mains ?
+Bravo ! Les gants, pour avoir les mains au chaud.
+Je suis prêt ! Qu'est-ce que je prends pour aller à l'école ?
+Bravo ! Le cartable, et en route pour l'école !
+Oh, il pleut ! Je m'habille pour aller à l'école. Qu'est-ce que je mets sur mes jambes ?
+Oui ! Le pantalon va sur les jambes.
+Qu'est-ce que je mets sur mes pieds, avant les bottes ?
+Il pleut ! Qu'est-ce que je mets à mes pieds pour sauter dans les flaques ?
+Super ! Avec les bottes, mes pieds restent au sec.
+Qu'est-ce que je mets par-dessus pour ne pas être mouillé ?
+Oui ! Le manteau me protège de la pluie.
+Qu'est-ce que je prends pour me protéger de la pluie ?
+Bravo ! Le parapluie, pour ne pas avoir la tête mouillée.
+Il fait chaud et il y a du soleil ! Je m'habille pour aller à l'école. Qu'est-ce que je mets sur mon corps ?
+Oui ! Le t-shirt, c'est léger quand il fait chaud.
+Il fait chaud ! Qu'est-ce que je mets sur mes jambes ?
+Bravo ! Le short va sur les jambes.
+Qu'est-ce que je mets sur mes pieds pour courir dans la cour ?
+Super ! Avec les baskets, je cours très vite.
+Le soleil tape fort. Qu'est-ce que je mets sur ma tête ?
+Oui ! La casquette protège ma tête du soleil.
+Le soleil brille. Qu'est-ce que je mets sur mes yeux ?
+Bravo ! Les lunettes de soleil protègent mes yeux.
+
+==================== Vivi 5 - Alphabet (mots) (20 lignes) ====================
+Araignée
+Baleine
+Dauphin
+Flamant
+Girafe
+Hibou
+Iguane
+Jaguar
+Koala
+Nounours
+Perroquet
+Quetzal
+Renard
+Singe
+Tortue
+Urial
+Wapiti
+Xérus
+Yack
+Zèbre
+
+==================== Vivi 6 - Animaux (devinettes) (12 lignes) ====================
+Quel est cet animal ? Indice : il fait miaou !
+Quel est cet animal ? Indice : il fait ouaf ouaf !
+Quel est cet animal ? Indice : elle fait meuh !
+Quel est cet animal ? Indice : il fait hiiiii !
+Quel est cet animal ? Indice : il rugit très fort !
+Quel est cet animal ? Indice : il a une grande trompe !
+Quel est cet animal ? Indice : il aime manger du miel !
+Quel est cet animal ? Indice : il fait coin coin !
+Quel est cet animal ? Indice : elle fait cot cot cot !
+Quel est cet animal ? Indice : il fait groin groin !
+Quel est cet animal ? Indice : il fait bêêê !
+Quel est cet animal ? Indice : il a de grandes oreilles !
+
+==================== Vivi 7 - Anglais (32 lignes) ====================
+(mots à dire en anglais : choisir la langue anglaise pour ce chapitre si possible)
+cat
+dog
+cow
+rabbit
+lion
+sheep
+red
+blue
+green
+yellow
+pink
+purple
+apple
+banana
+orange
+strawberry
+sun
+moon
+star
+rain
+hello
+goodbye
+please
+thanks
+yes
+no
+one
+two
+three
+four
+five
+six
+
+==================== Vivi 8 - Divers (22 lignes) ====================
+Clique sur la lettre qui commence le mot Yak !
+Quelle est la première syllabe du mot SOLEIL ?
+Quelle est la première syllabe du mot BATEAU ?
+ma
+pa
+li
+so
+mè
+la
+ba
+ga
+Le glaçon
+L'hippopotame
+Sourire
+Pleurer
+Oui ! L'hippopotame pèse lourd, l'oiseau est léger !
+Pinceau arc-en-ciel super coloré !
+Gomme pour effacer.
+Tableau nettoyé !
+L'album est tout propre !
+Coucou champion ! C'est l'heure de faire une petite pause. Repose tes yeux et on revient jouer très bientôt ! Bisous !
+Progression réinitialisée.
+

@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Studio voix Ludobox</title>
+<style>
+  :root {
+    --fond: #f6f4fb; --carte: #ffffff; --texte: #1d1b2e; --doux: #6b6883;
+    --bord: #e3e0ef; --accent: #6d4aff; --accent-texte: #ffffff;
+    --ok: #1f9d55; --manque: #d97706; --rec: #e11d48;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: "Segoe UI", system-ui, sans-serif; background: var(--fond); color: var(--texte); }
+  header { padding: 20px 24px 8px; max-width: 1000px; margin: 0 auto; }
+  h1 { margin: 0 0 6px; font-size: 26px; }
+  .etapes { color: var(--doux); margin: 0; padding-left: 20px; line-height: 1.6; }
+  main { max-width: 1000px; margin: 0 auto; padding: 8px 24px 60px; }
+  .barre { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin: 14px 0; }
+  button { font: inherit; border: 1px solid var(--bord); background: var(--carte); color: var(--texte);
+           border-radius: 10px; padding: 8px 14px; cursor: pointer; }
+  button:hover { border-color: var(--accent); }
+  button.principal { background: var(--accent); color: var(--accent-texte); border-color: var(--accent); font-weight: 600; }
+  button.rec { background: var(--rec); color: #fff; border-color: var(--rec); font-weight: 600; }
+  button:disabled { opacity: .4; cursor: default; }
+  select, label { font: inherit; }
+  select { padding: 7px 10px; border-radius: 10px; border: 1px solid var(--bord); background: var(--carte); }
+  .progression { margin-left: auto; font-weight: 600; }
+  .avert { background: #fff4e5; border: 1px solid #f5c98b; padding: 10px 14px; border-radius: 10px; margin: 10px 0; }
+
+  #pupitre { position: sticky; top: 0; z-index: 5; background: var(--carte); border: 2px solid var(--accent);
+             border-radius: 16px; padding: 18px 20px; margin: 10px 0 18px; box-shadow: 0 6px 20px rgba(60,40,140,.12); }
+  #pupitre .groupe { color: var(--doux); font-size: 14px; }
+  #pupitre .phrase { font-size: 30px; font-weight: 700; margin: 6px 0 4px; line-height: 1.25; }
+  #pupitre .note { color: var(--manque); font-size: 15px; min-height: 1em; }
+  #pupitre .fichier { color: var(--doux); font-family: Consolas, monospace; font-size: 13px; }
+  #pupitre .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; align-items: center; }
+  .touche { font-size: 12px; color: var(--doux); margin-left: 4px; }
+  .vu { flex: 1 1 160px; height: 12px; background: var(--bord); border-radius: 6px; overflow: hidden; min-width: 120px; }
+  .vu > div { height: 100%; width: 0; background: linear-gradient(90deg, #22c55e, #eab308 70%, #ef4444); transition: width .05s; }
+  #etat { margin-top: 10px; font-size: 15px; min-height: 1.3em; }
+
+  table { width: 100%; border-collapse: collapse; background: var(--carte); border-radius: 12px; overflow: hidden; border: 1px solid var(--bord); }
+  td { padding: 9px 12px; border-top: 1px solid var(--bord); vertical-align: middle; }
+  tr:first-child td { border-top: none; }
+  tr.courante td { background: #efeaff; }
+  tr { cursor: pointer; }
+  .statut { width: 34px; text-align: center; font-size: 18px; }
+  .txt { font-size: 17px; }
+  .en { font-size: 12px; background: #e0ecff; color: #1e40af; border-radius: 6px; padding: 1px 6px; margin-left: 6px; }
+  .nomf { color: var(--doux); font-family: Consolas, monospace; font-size: 12px; white-space: nowrap; }
+  .groupe-titre td { background: var(--fond); font-weight: 700; color: var(--doux); cursor: default; }
+</style>
+</head>
+<body>
+<header>
+  <h1>🎙️ Studio voix de la Ludobox</h1>
+  <ol class="etapes">
+    <li>Clique sur <b>Ouvrir le dossier audio</b> et choisis le dossier de la mascotte, par exemple <code>ludoboxdevivi/audio/lion</code>.</li>
+    <li>Lis la phrase affichée, appuie sur <b>Espace</b> pour enregistrer, et encore sur <b>Espace</b> pour arrêter.</li>
+    <li><b>R</b> pour réécouter, <b>Entrée</b> pour garder (le MP3 est rangé tout seul au bon nom), <b>↓ / ↑</b> pour changer de phrase.</li>
+  </ol>
+</header>
+<main>
+  <div id="avert-navigateur" class="avert" hidden>
+    Ce navigateur ne sait pas écrire directement dans un dossier : les MP3 seront <b>téléchargés</b>
+    et il faudra les déplacer toi-même dans <code>audio/lion/</code> (ou le dossier de la mascotte). Pour que ce soit automatique, ouvre cette page avec <b>Microsoft Edge</b> ou <b>Google Chrome</b>.
+  </div>
+
+  <div class="barre">
+    <button class="principal" id="btn-dossier">📁 Ouvrir le dossier audio</button>
+    <label><input type="checkbox" id="chk-manquantes" checked> Seulement les phrases manquantes</label>
+    <select id="sel-groupe"><option value="">Tous les jeux</option></select>
+    <span class="progression" id="progression"></span>
+  </div>
+
+  <section id="pupitre">
+    <div class="groupe" id="p-groupe"></div>
+    <div class="phrase" id="p-phrase">Ouvre le dossier audio pour commencer.</div>
+    <div class="note" id="p-note"></div>
+    <div class="fichier" id="p-fichier"></div>
+    <div class="actions">
+      <button id="btn-rec" class="rec" disabled>● Enregistrer <span class="touche">Espace</span></button>
+      <button id="btn-reecouter" disabled>▶ Réécouter <span class="touche">R</span></button>
+      <button id="btn-garder" class="principal" disabled>✅ Garder <span class="touche">Entrée</span></button>
+      <button id="btn-existant" disabled>🔈 Version actuelle</button>
+      <div class="vu"><div id="vu"></div></div>
+    </div>
+    <div id="etat"></div>
+  </section>
+
+  <table><tbody id="liste"></tbody></table>
+</main>
+
+<script src="../voix.js"></script>
+<script src="lame.min.js"></script>
+<script>
+'use strict';
+
+const PHRASES = (window.VOIX_PHRASES || []).map((p, i) => ({ ...p, i }));
+const peutEcrire = 'showDirectoryPicker' in window;
+if (!peutEcrire) document.getElementById('avert-navigateur').hidden = false;
+
+let dossier = null;            // FileSystemDirectoryHandle du dossier audio
+const presents = new Set();    // noms de fichiers déjà présents
+let visibles = [];             // phrases affichées dans la liste
+let courante = null;           // phrase sélectionnée
+let prise = null;              // { mp3: Blob, url } dernier enregistrement traité
+let enregistreur = null, flux = null, morceaux = [], analyseur = null, vuTimer = null;
+
+const $ = id => document.getElementById(id);
+const nomFichier = p => p.fichier + '.mp3';
+const etat = (msg, couleur) => { $('etat').textContent = msg; $('etat').style.color = couleur || ''; };
+
+/* ── Liste des groupes ── */
+[...new Set(PHRASES.map(p => p.groupe))].forEach(g => {
+  const o = document.createElement('option'); o.value = g; o.textContent = g; $('sel-groupe').appendChild(o);
+});
+
+/* ── Dossier audio ── */
+$('btn-dossier').onclick = async () => {
+  if (!peutEcrire) { dossier = null; rafraichir(); choisirSuivante(-1); return; }
+  try {
+    dossier = await window.showDirectoryPicker({ id: 'ludobox-audio', mode: 'readwrite' });
+  } catch (e) { return; }
+  if (!['lion', 'girafe', 'panthere', 'koala'].includes(dossier.name) &&
+      !confirm(`Le dossier choisi s'appelle « ${dossier.name} » : ce n'est pas un dossier de mascotte (audio/lion, audio/girafe…). Continuer quand même ?`)) {
+    dossier = null; return;
+  }
+  presents.clear();
+  for await (const [nom, h] of dossier.entries()) if (h.kind === 'file') presents.add(nom);
+  $('btn-dossier').textContent = '📁 Dossier : ' + dossier.name;
+  rafraichir();
+  choisirSuivante(-1);
+};
+
+$('chk-manquantes').onchange = () => rafraichir();
+$('sel-groupe').onchange = () => rafraichir();
+
+function rafraichir() {
+  const seulManq = $('chk-manquantes').checked;
+  const g = $('sel-groupe').value;
+  visibles = PHRASES.filter(p => (!g || p.groupe === g) && (!seulManq || !presents.has(nomFichier(p)) || p === courante));
+  const faits = PHRASES.filter(p => presents.has(nomFichier(p))).length;
+  $('progression').textContent = `${faits} / ${PHRASES.length} phrases enregistrées`;
+
+  const tb = $('liste'); tb.innerHTML = '';
+  let groupePrec = null;
+  visibles.forEach(p => {
+    if (p.groupe !== groupePrec) {
+      groupePrec = p.groupe;
+      const trg = document.createElement('tr'); trg.className = 'groupe-titre';
+      trg.innerHTML = `<td colspan="3"></td>`; trg.firstChild.textContent = p.groupe; tb.appendChild(trg);
+    }
+    const tr = document.createElement('tr');
+    tr.dataset.i = p.i;
+    if (p === courante) tr.className = 'courante';
+    const ok = presents.has(nomFichier(p));
+    tr.innerHTML = `<td class="statut">${ok ? '✅' : '⭕'}</td><td class="txt"></td><td class="nomf"></td>`;
+    tr.children[1].textContent = p.texte;
+    if (p.en) tr.children[1].insertAdjacentHTML('beforeend', '<span class="en">anglais</span>');
+    tr.children[2].textContent = nomFichier(p);
+    tr.onclick = () => selectionner(p);
+    tb.appendChild(tr);
+  });
+}
+
+function selectionner(p) {
+  if (enregistreur) return;
+  courante = p;
+  prise = null;
+  $('p-groupe').textContent = p.groupe + (p.en ? ' · 🇬🇧 à dire en anglais' : '');
+  $('p-phrase').textContent = p.texte;
+  $('p-note').textContent = p.note || '';
+  $('p-fichier').textContent = 'Fichier : ' + (dossier ? dossier.name + '/' : '') + nomFichier(p);
+  $('btn-rec').disabled = false;
+  $('btn-reecouter').disabled = true;
+  $('btn-garder').disabled = true;
+  $('btn-existant').disabled = !presents.has(nomFichier(p));
+  etat('');
+  document.querySelectorAll('#liste tr.courante').forEach(t => t.classList.remove('courante'));
+  const tr = document.querySelector(`#liste tr[data-i="${p.i}"]`);
+  if (tr) { tr.classList.add('courante'); tr.scrollIntoView({ block: 'nearest' }); }
+}
+
+function choisirSuivante(sens) {
+  if (!visibles.length) { $('p-phrase').textContent = '🎉 Toutes les phrases sont enregistrées !'; return; }
+  let idx = courante ? visibles.indexOf(courante) : -1;
+  if (sens === -1 && !courante) idx = -1, sens = 1;
+  const suiv = visibles[Math.min(visibles.length - 1, Math.max(0, idx + sens))];
+  if (suiv) selectionner(suiv);
+}
+
+/* ── Enregistrement ── */
+$('btn-rec').onclick = () => enregistreur ? arreter() : demarrer();
+
+async function demarrer() {
+  if (!courante) return;
+  try {
+    flux = await navigator.mediaDevices.getUserMedia({
+      audio: { echoCancellation: false, noiseSuppression: true, autoGainControl: false, channelCount: 1 }
+    });
+  } catch (e) {
+    etat("Micro inaccessible : autorise le micro pour cette page (icône à gauche de l'adresse).", 'var(--rec)');
+    return;
+  }
+  morceaux = [];
+  enregistreur = new MediaRecorder(flux);
+  enregistreur.ondataavailable = e => { if (e.data.size) morceaux.push(e.data); };
+  enregistreur.onstop = traiter;
+  enregistreur.start();
+
+  const ctx = new AudioContext();
+  analyseur = ctx.createAnalyser(); analyseur.fftSize = 512;
+  ctx.createMediaStreamSource(flux).connect(analyseur);
+  const buf = new Float32Array(analyseur.fftSize);
+  vuTimer = setInterval(() => {
+    analyseur.getFloatTimeDomainData(buf);
+    let pic = 0; for (const v of buf) pic = Math.max(pic, Math.abs(v));
+    $('vu').style.width = Math.min(100, pic * 130) + '%';
+  }, 50);
+  analyseur._ctx = ctx;
+
+  $('btn-rec').innerHTML = '■ Arrêter <span class="touche">Espace</span>';
+  $('btn-reecouter').disabled = true; $('btn-garder').disabled = true;
+  etat('🔴 Enregistrement… lis la phrase, puis appuie sur Espace.', 'var(--rec)');
+}
+
+function arreter() {
+  if (!enregistreur) return;
+  enregistreur.stop();
+  flux.getTracks().forEach(t => t.stop());
+  clearInterval(vuTimer); $('vu').style.width = '0';
+  analyseur._ctx.close();
+  enregistreur = null;
+  $('btn-rec').innerHTML = '● Recommencer <span class="touche">Espace</span>';
+  etat('Traitement…');
+}
+
+async function traiter() {
+  try {
+    const brut = new Blob(morceaux, { type: morceaux[0] ? morceaux[0].type : 'audio/webm' });
+    const ctx = new AudioContext({ sampleRate: 44100 });
+    const audio = await ctx.decodeAudioData(await brut.arrayBuffer());
+    ctx.close();
+    const pcm = nettoyer(audio);
+    if (!pcm) { etat("Je n'ai rien entendu : rapproche-toi du micro et recommence.", 'var(--rec)'); return; }
+    const mp3 = encoderMp3(pcm, audio.sampleRate);
+    if (prise) URL.revokeObjectURL(prise.url);
+    prise = { mp3, url: URL.createObjectURL(mp3) };
+    $('btn-reecouter').disabled = false; $('btn-garder').disabled = false;
+    etat(`Prise prête (${(pcm.length / audio.sampleRate).toFixed(1)} s). R pour réécouter, Entrée pour garder.`);
+    jouer(prise.url);
+  } catch (e) {
+    console.error(e);
+    etat('Erreur pendant le traitement : ' + e.message, 'var(--rec)');
+  }
+}
+
+// Mono, suppression des silences au début et à la fin, volume harmonisé, fondus courts.
+function nettoyer(audio) {
+  const n = audio.length, sr = audio.sampleRate;
+  const mono = new Float32Array(n);
+  for (let c = 0; c < audio.numberOfChannels; c++) {
+    const d = audio.getChannelData(c);
+    for (let i = 0; i < n; i++) mono[i] += d[i] / audio.numberOfChannels;
+  }
+  const fen = Math.round(sr * 0.01);
+  const rms = [];
+  for (let i = 0; i < n; i += fen) {
+    let s = 0; const fin = Math.min(n, i + fen);
+    for (let j = i; j < fin; j++) s += mono[j] * mono[j];
+    rms.push(Math.sqrt(s / (fin - i)));
+  }
+  const max = Math.max(...rms);
+  if (max < 0.005) return null;
+  const seuil = Math.max(0.004, max * 0.08);
+  let deb = rms.findIndex(v => v > seuil);
+  let fin = rms.length - 1 - [...rms].reverse().findIndex(v => v > seuil);
+  deb = Math.max(0, deb * fen - Math.round(sr * 0.12));
+  fin = Math.min(n, (fin + 1) * fen + Math.round(sr * 0.25));
+  const out = mono.slice(deb, fin);
+
+  let pic = 0; for (const v of out) pic = Math.max(pic, Math.abs(v));
+  const gain = pic > 0 ? 0.89 / pic : 1;
+  const fondu = Math.round(sr * 0.015);
+  for (let i = 0; i < out.length; i++) {
+    let g = gain;
+    if (i < fondu) g *= i / fondu;
+    if (i > out.length - fondu) g *= (out.length - i) / fondu;
+    out[i] *= g;
+  }
+  return out;
+}
+
+function encoderMp3(pcm, sr) {
+  const enc = new lamejs.Mp3Encoder(1, sr, 128);
+  const ech = new Int16Array(pcm.length);
+  for (let i = 0; i < pcm.length; i++) ech[i] = Math.max(-32768, Math.min(32767, Math.round(pcm[i] * 32767)));
+  const parts = [];
+  for (let i = 0; i < ech.length; i += 1152) {
+    const b = enc.encodeBuffer(ech.subarray(i, i + 1152));
+    if (b.length) parts.push(new Uint8Array(b));
+  }
+  const f = enc.flush(); if (f.length) parts.push(new Uint8Array(f));
+  return new Blob(parts, { type: 'audio/mpeg' });
+}
+
+let lecteur = null;
+function jouer(url) { if (lecteur) lecteur.pause(); lecteur = new Audio(url); lecteur.play(); }
+
+$('btn-reecouter').onclick = () => prise && jouer(prise.url);
+
+$('btn-existant').onclick = async () => {
+  if (!dossier || !courante) return;
+  try {
+    const f = await (await dossier.getFileHandle(nomFichier(courante))).getFile();
+    jouer(URL.createObjectURL(f));
+  } catch (e) { etat('Fichier introuvable.'); }
+};
+
+$('btn-garder').onclick = garder;
+async function garder() {
+  if (!prise || !courante) return;
+  const nom = nomFichier(courante);
+  if (presents.has(nom) && !confirm(`« ${nom} » existe déjà. Le remplacer par ta nouvelle prise ?`)) return;
+  try {
+    if (dossier) {
+      const h = await dossier.getFileHandle(nom, { create: true });
+      const w = await h.createWritable(); await w.write(prise.mp3); await w.close();
+    } else {
+      const a = document.createElement('a'); a.href = prise.url; a.download = nom; a.click();
+    }
+  } catch (e) {
+    etat("Impossible d'écrire le fichier : " + e.message, 'var(--rec)'); return;
+  }
+  presents.add(nom);
+  const faite = courante;
+  etat('✅ Enregistré : ' + nom, 'var(--ok)');
+  const idx = visibles.indexOf(faite);
+  rafraichir();
+  // Passe à la phrase suivante de la liste
+  const suiv = visibles.find((p, k) => k >= idx && p !== faite && (!$('chk-manquantes').checked || !presents.has(nomFichier(p))))
+            || visibles.find(p => p !== faite);
+  if (suiv) selectionner(suiv); else { courante = null; rafraichir(); $('p-phrase').textContent = '🎉 Toutes les phrases sont enregistrées !'; }
+}
+
+/* ── Raccourcis clavier ── */
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'SELECT' || e.target.tagName === 'INPUT') return;
+  if (e.code === 'Space') { e.preventDefault(); if (courante) $('btn-rec').click(); }
+  else if (e.key === 'Enter') { e.preventDefault(); if (!$('btn-garder').disabled) garder(); }
+  else if (e.key === 'r' || e.key === 'R') { if (prise) jouer(prise.url); }
+  else if (e.key === 'ArrowDown') { e.preventDefault(); choisirSuivante(1); }
+  else if (e.key === 'ArrowUp') { e.preventDefault(); choisirSuivante(-1); }
+});
+
+rafraichir();
+</script>
+</body>
+</html>

@@ -1,0 +1,1087 @@
+[
+ {
+  "chapitre": "Vivi 1 - Vêtements (noms)",
+  "paragraphes": [
+   {
+    "texte": "le t-shirt",
+    "fichiers": [
+     "vet_mot_tshirt"
+    ]
+   },
+   {
+    "texte": "la chemise",
+    "fichiers": [
+     "vet_mot_chemise"
+    ]
+   },
+   {
+    "texte": "la robe",
+    "fichiers": [
+     "vet_mot_robe"
+    ]
+   },
+   {
+    "texte": "le manteau",
+    "fichiers": [
+     "vet_mot_manteau"
+    ]
+   },
+   {
+    "texte": "le pantalon",
+    "fichiers": [
+     "vet_mot_pantalon"
+    ]
+   },
+   {
+    "texte": "le short",
+    "fichiers": [
+     "vet_mot_short"
+    ]
+   },
+   {
+    "texte": "les chaussettes",
+    "fichiers": [
+     "vet_mot_chaussettes"
+    ]
+   },
+   {
+    "texte": "les baskets",
+    "fichiers": [
+     "vet_mot_baskets"
+    ]
+   },
+   {
+    "texte": "les bottes",
+    "fichiers": [
+     "vet_mot_bottes"
+    ]
+   },
+   {
+    "texte": "les tongs",
+    "fichiers": [
+     "vet_mot_tongs"
+    ]
+   },
+   {
+    "texte": "la casquette",
+    "fichiers": [
+     "vet_mot_casquette"
+    ]
+   },
+   {
+    "texte": "le chapeau",
+    "fichiers": [
+     "vet_mot_chapeau"
+    ]
+   },
+   {
+    "texte": "les gants",
+    "fichiers": [
+     "vet_mot_gants"
+    ]
+   },
+   {
+    "texte": "l'écharpe",
+    "fichiers": [
+     "vet_mot_echarpe"
+    ]
+   },
+   {
+    "texte": "les lunettes de soleil",
+    "fichiers": [
+     "vet_mot_lunettes"
+    ]
+   },
+   {
+    "texte": "le maillot de bain",
+    "fichiers": [
+     "vet_mot_maillot"
+    ]
+   },
+   {
+    "texte": "le parapluie",
+    "fichiers": [
+     "vet_mot_parapluie"
+    ]
+   },
+   {
+    "texte": "le cartable",
+    "fichiers": [
+     "vet_mot_cartable"
+    ]
+   }
+  ]
+ },
+ {
+  "chapitre": "Vivi 2 - Vêtements (Montre-moi)",
+  "paragraphes": [
+   {
+    "texte": "Montre-moi le short !",
+    "fichiers": [
+     "vet_montre_short"
+    ]
+   },
+   {
+    "texte": "Montre-moi les baskets !",
+    "fichiers": [
+     "vet_montre_baskets"
+    ]
+   },
+   {
+    "texte": "Montre-moi la chemise !",
+    "fichiers": [
+     "vet_montre_chemise"
+    ]
+   },
+   {
+    "texte": "Montre-moi l'écharpe !",
+    "fichiers": [
+     "vet_montre_echarpe"
+    ]
+   },
+   {
+    "texte": "Montre-moi le parapluie !",
+    "fichiers": [
+     "vet_montre_parapluie"
+    ]
+   },
+   {
+    "texte": "Montre-moi les tongs !",
+    "fichiers": [
+     "vet_montre_tongs"
+    ]
+   },
+   {
+    "texte": "Montre-moi les lunettes de soleil !",
+    "fichiers": [
+     "vet_montre_lunettes"
+    ]
+   },
+   {
+    "texte": "Montre-moi le pantalon !",
+    "fichiers": [
+     "vet_montre_pantalon"
+    ]
+   },
+   {
+    "texte": "Montre-moi le t-shirt !",
+    "fichiers": [
+     "vet_montre_tshirt"
+    ]
+   },
+   {
+    "texte": "Montre-moi la casquette !",
+    "fichiers": [
+     "vet_montre_casquette"
+    ]
+   },
+   {
+    "texte": "Montre-moi la robe !",
+    "fichiers": [
+     "vet_montre_robe"
+    ]
+   },
+   {
+    "texte": "Montre-moi le cartable !",
+    "fichiers": [
+     "vet_montre_cartable"
+    ]
+   },
+   {
+    "texte": "Montre-moi les chaussettes !",
+    "fichiers": [
+     "vet_montre_chaussettes"
+    ]
+   },
+   {
+    "texte": "Montre-moi les gants !",
+    "fichiers": [
+     "vet_montre_gants"
+    ]
+   },
+   {
+    "texte": "Montre-moi le manteau !",
+    "fichiers": [
+     "vet_montre_manteau"
+    ]
+   },
+   {
+    "texte": "Montre-moi le chapeau !",
+    "fichiers": [
+     "vet_montre_chapeau"
+    ]
+   },
+   {
+    "texte": "Montre-moi les bottes !",
+    "fichiers": [
+     "vet_montre_bottes"
+    ]
+   },
+   {
+    "texte": "Montre-moi le maillot de bain !",
+    "fichiers": [
+     "vet_montre_maillot"
+    ]
+   }
+  ]
+ },
+ {
+  "chapitre": "Vivi 3 - Vêtements (bravo)",
+  "paragraphes": [
+   {
+    "texte": "Oui ! C'est le short !",
+    "fichiers": [
+     "vet_cest_short"
+    ]
+   },
+   {
+    "texte": "Oui ! Ce sont les baskets !",
+    "fichiers": [
+     "vet_cest_baskets"
+    ]
+   },
+   {
+    "texte": "Oui ! C'est la chemise !",
+    "fichiers": [
+     "vet_cest_chemise"
+    ]
+   },
+   {
+    "texte": "Oui ! C'est l'écharpe !",
+    "fichiers": [
+     "vet_cest_echarpe"
+    ]
+   },
+   {
+    "texte": "Oui ! C'est le parapluie !",
+    "fichiers": [
+     "vet_cest_parapluie"
+    ]
+   },
+   {
+    "texte": "Oui ! Ce sont les tongs !",
+    "fichiers": [
+     "vet_cest_tongs"
+    ]
+   },
+   {
+    "texte": "Oui ! Ce sont les lunettes de soleil !",
+    "fichiers": [
+     "vet_cest_lunettes"
+    ]
+   },
+   {
+    "texte": "Oui ! C'est le pantalon !",
+    "fichiers": [
+     "vet_cest_pantalon"
+    ]
+   },
+   {
+    "texte": "Oui ! C'est le t-shirt !",
+    "fichiers": [
+     "vet_cest_tshirt"
+    ]
+   },
+   {
+    "texte": "Oui ! C'est la casquette !",
+    "fichiers": [
+     "vet_cest_casquette"
+    ]
+   },
+   {
+    "texte": "Oui ! C'est la robe !",
+    "fichiers": [
+     "vet_cest_robe"
+    ]
+   },
+   {
+    "texte": "Oui ! C'est le cartable !",
+    "fichiers": [
+     "vet_cest_cartable"
+    ]
+   },
+   {
+    "texte": "Oui ! Ce sont les chaussettes !",
+    "fichiers": [
+     "vet_cest_chaussettes"
+    ]
+   },
+   {
+    "texte": "Oui ! Ce sont les gants !",
+    "fichiers": [
+     "vet_cest_gants"
+    ]
+   },
+   {
+    "texte": "Oui ! C'est le manteau !",
+    "fichiers": [
+     "vet_cest_manteau"
+    ]
+   },
+   {
+    "texte": "Oui ! C'est le chapeau !",
+    "fichiers": [
+     "vet_cest_chapeau"
+    ]
+   },
+   {
+    "texte": "Oui ! Ce sont les bottes !",
+    "fichiers": [
+     "vet_cest_bottes"
+    ]
+   },
+   {
+    "texte": "Oui ! C'est le maillot de bain !",
+    "fichiers": [
+     "vet_cest_maillot"
+    ]
+   }
+  ]
+ },
+ {
+  "chapitre": "Vivi 4 - Vêtements (histoires)",
+  "paragraphes": [
+   {
+    "texte": "Brrr, il fait froid ! Je m'habille pour aller à l'école. Qu'est-ce que je mets sur mes jambes ?",
+    "fichiers": [
+     "vet_froid_1"
+    ]
+   },
+   {
+    "texte": "Oui ! Le pantalon, pour avoir les jambes au chaud.",
+    "fichiers": [
+     "vet_froid_1_bravo"
+    ]
+   },
+   {
+    "texte": "Qu'est-ce que je mets sur mon corps ?",
+    "fichiers": [
+     "vet_froid_2",
+     "vet_pluie_2"
+    ]
+   },
+   {
+    "texte": "Oui ! Le t-shirt va sur mon corps.",
+    "fichiers": [
+     "vet_froid_2_bravo",
+     "vet_pluie_2_bravo"
+    ]
+   },
+   {
+    "texte": "Qu'est-ce que je mets sur mes pieds, avant les chaussures ?",
+    "fichiers": [
+     "vet_froid_3"
+    ]
+   },
+   {
+    "texte": "Bravo ! Les chaussettes vont sur les pieds.",
+    "fichiers": [
+     "vet_froid_3_bravo",
+     "vet_pluie_3_bravo"
+    ]
+   },
+   {
+    "texte": "Il fait froid dehors. Qu'est-ce que je mets par-dessus pour sortir ?",
+    "fichiers": [
+     "vet_froid_4"
+    ]
+   },
+   {
+    "texte": "Super ! Le manteau me tient bien chaud.",
+    "fichiers": [
+     "vet_froid_4_bravo"
+    ]
+   },
+   {
+    "texte": "Qu'est-ce que je mets autour de mon cou ?",
+    "fichiers": [
+     "vet_froid_5"
+    ]
+   },
+   {
+    "texte": "Oui ! L'écharpe se met autour du cou.",
+    "fichiers": [
+     "vet_froid_5_bravo"
+    ]
+   },
+   {
+    "texte": "Qu'est-ce que je mets sur mes mains ?",
+    "fichiers": [
+     "vet_froid_6"
+    ]
+   },
+   {
+    "texte": "Bravo ! Les gants, pour avoir les mains au chaud.",
+    "fichiers": [
+     "vet_froid_6_bravo"
+    ]
+   },
+   {
+    "texte": "Je suis prêt ! Qu'est-ce que je prends pour aller à l'école ?",
+    "fichiers": [
+     "vet_froid_7",
+     "vet_pluie_7",
+     "vet_chaud_6"
+    ]
+   },
+   {
+    "texte": "Bravo ! Le cartable, et en route pour l'école !",
+    "fichiers": [
+     "vet_froid_7_bravo",
+     "vet_pluie_7_bravo",
+     "vet_chaud_6_bravo"
+    ]
+   },
+   {
+    "texte": "Oh, il pleut ! Je m'habille pour aller à l'école. Qu'est-ce que je mets sur mes jambes ?",
+    "fichiers": [
+     "vet_pluie_1"
+    ]
+   },
+   {
+    "texte": "Oui ! Le pantalon va sur les jambes.",
+    "fichiers": [
+     "vet_pluie_1_bravo"
+    ]
+   },
+   {
+    "texte": "Qu'est-ce que je mets sur mes pieds, avant les bottes ?",
+    "fichiers": [
+     "vet_pluie_3"
+    ]
+   },
+   {
+    "texte": "Il pleut ! Qu'est-ce que je mets à mes pieds pour sauter dans les flaques ?",
+    "fichiers": [
+     "vet_pluie_4"
+    ]
+   },
+   {
+    "texte": "Super ! Avec les bottes, mes pieds restent au sec.",
+    "fichiers": [
+     "vet_pluie_4_bravo"
+    ]
+   },
+   {
+    "texte": "Qu'est-ce que je mets par-dessus pour ne pas être mouillé ?",
+    "fichiers": [
+     "vet_pluie_5"
+    ]
+   },
+   {
+    "texte": "Oui ! Le manteau me protège de la pluie.",
+    "fichiers": [
+     "vet_pluie_5_bravo"
+    ]
+   },
+   {
+    "texte": "Qu'est-ce que je prends pour me protéger de la pluie ?",
+    "fichiers": [
+     "vet_pluie_6"
+    ]
+   },
+   {
+    "texte": "Bravo ! Le parapluie, pour ne pas avoir la tête mouillée.",
+    "fichiers": [
+     "vet_pluie_6_bravo"
+    ]
+   },
+   {
+    "texte": "Il fait chaud et il y a du soleil ! Je m'habille pour aller à l'école. Qu'est-ce que je mets sur mon corps ?",
+    "fichiers": [
+     "vet_chaud_1"
+    ]
+   },
+   {
+    "texte": "Oui ! Le t-shirt, c'est léger quand il fait chaud.",
+    "fichiers": [
+     "vet_chaud_1_bravo"
+    ]
+   },
+   {
+    "texte": "Il fait chaud ! Qu'est-ce que je mets sur mes jambes ?",
+    "fichiers": [
+     "vet_chaud_2"
+    ]
+   },
+   {
+    "texte": "Bravo ! Le short va sur les jambes.",
+    "fichiers": [
+     "vet_chaud_2_bravo"
+    ]
+   },
+   {
+    "texte": "Qu'est-ce que je mets sur mes pieds pour courir dans la cour ?",
+    "fichiers": [
+     "vet_chaud_3"
+    ]
+   },
+   {
+    "texte": "Super ! Avec les baskets, je cours très vite.",
+    "fichiers": [
+     "vet_chaud_3_bravo"
+    ]
+   },
+   {
+    "texte": "Le soleil tape fort. Qu'est-ce que je mets sur ma tête ?",
+    "fichiers": [
+     "vet_chaud_4"
+    ]
+   },
+   {
+    "texte": "Oui ! La casquette protège ma tête du soleil.",
+    "fichiers": [
+     "vet_chaud_4_bravo"
+    ]
+   },
+   {
+    "texte": "Le soleil brille. Qu'est-ce que je mets sur mes yeux ?",
+    "fichiers": [
+     "vet_chaud_5"
+    ]
+   },
+   {
+    "texte": "Bravo ! Les lunettes de soleil protègent mes yeux.",
+    "fichiers": [
+     "vet_chaud_5_bravo"
+    ]
+   }
+  ]
+ },
+ {
+  "chapitre": "Vivi 5 - Alphabet (mots)",
+  "paragraphes": [
+   {
+    "texte": "Araignée",
+    "fichiers": [
+     "alpha_mot_araignee"
+    ]
+   },
+   {
+    "texte": "Baleine",
+    "fichiers": [
+     "alpha_mot_baleine"
+    ]
+   },
+   {
+    "texte": "Dauphin",
+    "fichiers": [
+     "alpha_mot_dauphin"
+    ]
+   },
+   {
+    "texte": "Flamant",
+    "fichiers": [
+     "alpha_mot_flamant"
+    ]
+   },
+   {
+    "texte": "Girafe",
+    "fichiers": [
+     "alpha_mot_girafe"
+    ]
+   },
+   {
+    "texte": "Hibou",
+    "fichiers": [
+     "alpha_mot_hibou"
+    ]
+   },
+   {
+    "texte": "Iguane",
+    "fichiers": [
+     "alpha_mot_iguane"
+    ]
+   },
+   {
+    "texte": "Jaguar",
+    "fichiers": [
+     "alpha_mot_jaguar"
+    ]
+   },
+   {
+    "texte": "Koala",
+    "fichiers": [
+     "alpha_mot_koala"
+    ]
+   },
+   {
+    "texte": "Nounours",
+    "fichiers": [
+     "alpha_mot_nounours"
+    ]
+   },
+   {
+    "texte": "Perroquet",
+    "fichiers": [
+     "alpha_mot_perroquet"
+    ]
+   },
+   {
+    "texte": "Quetzal",
+    "fichiers": [
+     "alpha_mot_quetzal"
+    ]
+   },
+   {
+    "texte": "Renard",
+    "fichiers": [
+     "alpha_mot_renard"
+    ]
+   },
+   {
+    "texte": "Singe",
+    "fichiers": [
+     "alpha_mot_singe"
+    ]
+   },
+   {
+    "texte": "Tortue",
+    "fichiers": [
+     "alpha_mot_tortue"
+    ]
+   },
+   {
+    "texte": "Urial",
+    "fichiers": [
+     "alpha_mot_urial"
+    ]
+   },
+   {
+    "texte": "Wapiti",
+    "fichiers": [
+     "alpha_mot_wapiti"
+    ]
+   },
+   {
+    "texte": "Xérus",
+    "fichiers": [
+     "alpha_mot_xerus"
+    ]
+   },
+   {
+    "texte": "Yack",
+    "fichiers": [
+     "alpha_mot_yak"
+    ]
+   },
+   {
+    "texte": "Zèbre",
+    "fichiers": [
+     "alpha_mot_zebre"
+    ]
+   }
+  ]
+ },
+ {
+  "chapitre": "Vivi 6 - Animaux (devinettes)",
+  "paragraphes": [
+   {
+    "texte": "Quel est cet animal ? Indice : il fait miaou !",
+    "fichiers": [
+     "animaux_indice_chat"
+    ]
+   },
+   {
+    "texte": "Quel est cet animal ? Indice : il fait ouaf ouaf !",
+    "fichiers": [
+     "animaux_indice_chien"
+    ]
+   },
+   {
+    "texte": "Quel est cet animal ? Indice : elle fait meuh !",
+    "fichiers": [
+     "animaux_indice_vache"
+    ]
+   },
+   {
+    "texte": "Quel est cet animal ? Indice : il fait hiiiii !",
+    "fichiers": [
+     "animaux_indice_cheval"
+    ]
+   },
+   {
+    "texte": "Quel est cet animal ? Indice : il rugit très fort !",
+    "fichiers": [
+     "animaux_indice_lion"
+    ]
+   },
+   {
+    "texte": "Quel est cet animal ? Indice : il a une grande trompe !",
+    "fichiers": [
+     "animaux_indice_elephant"
+    ]
+   },
+   {
+    "texte": "Quel est cet animal ? Indice : il aime manger du miel !",
+    "fichiers": [
+     "animaux_indice_ours"
+    ]
+   },
+   {
+    "texte": "Quel est cet animal ? Indice : il fait coin coin !",
+    "fichiers": [
+     "animaux_indice_canard"
+    ]
+   },
+   {
+    "texte": "Quel est cet animal ? Indice : elle fait cot cot cot !",
+    "fichiers": [
+     "animaux_indice_poule"
+    ]
+   },
+   {
+    "texte": "Quel est cet animal ? Indice : il fait groin groin !",
+    "fichiers": [
+     "animaux_indice_cochon"
+    ]
+   },
+   {
+    "texte": "Quel est cet animal ? Indice : il fait bêêê !",
+    "fichiers": [
+     "animaux_indice_mouton"
+    ]
+   },
+   {
+    "texte": "Quel est cet animal ? Indice : il a de grandes oreilles !",
+    "fichiers": [
+     "animaux_indice_lapin"
+    ]
+   }
+  ]
+ },
+ {
+  "chapitre": "Vivi 7 - Anglais",
+  "paragraphes": [
+   {
+    "texte": "cat",
+    "fichiers": [
+     "en_cat"
+    ]
+   },
+   {
+    "texte": "dog",
+    "fichiers": [
+     "en_dog"
+    ]
+   },
+   {
+    "texte": "cow",
+    "fichiers": [
+     "en_cow"
+    ]
+   },
+   {
+    "texte": "rabbit",
+    "fichiers": [
+     "en_rabbit"
+    ]
+   },
+   {
+    "texte": "lion",
+    "fichiers": [
+     "en_lion"
+    ]
+   },
+   {
+    "texte": "sheep",
+    "fichiers": [
+     "en_sheep"
+    ]
+   },
+   {
+    "texte": "red",
+    "fichiers": [
+     "en_red"
+    ]
+   },
+   {
+    "texte": "blue",
+    "fichiers": [
+     "en_blue"
+    ]
+   },
+   {
+    "texte": "green",
+    "fichiers": [
+     "en_green"
+    ]
+   },
+   {
+    "texte": "yellow",
+    "fichiers": [
+     "en_yellow"
+    ]
+   },
+   {
+    "texte": "pink",
+    "fichiers": [
+     "en_pink"
+    ]
+   },
+   {
+    "texte": "purple",
+    "fichiers": [
+     "en_purple"
+    ]
+   },
+   {
+    "texte": "apple",
+    "fichiers": [
+     "en_apple"
+    ]
+   },
+   {
+    "texte": "banana",
+    "fichiers": [
+     "en_banana"
+    ]
+   },
+   {
+    "texte": "orange",
+    "fichiers": [
+     "en_orange"
+    ]
+   },
+   {
+    "texte": "strawberry",
+    "fichiers": [
+     "en_strawberry"
+    ]
+   },
+   {
+    "texte": "sun",
+    "fichiers": [
+     "en_sun"
+    ]
+   },
+   {
+    "texte": "moon",
+    "fichiers": [
+     "en_moon"
+    ]
+   },
+   {
+    "texte": "star",
+    "fichiers": [
+     "en_star"
+    ]
+   },
+   {
+    "texte": "rain",
+    "fichiers": [
+     "en_rain"
+    ]
+   },
+   {
+    "texte": "hello",
+    "fichiers": [
+     "en_hello"
+    ]
+   },
+   {
+    "texte": "goodbye",
+    "fichiers": [
+     "en_goodbye"
+    ]
+   },
+   {
+    "texte": "please",
+    "fichiers": [
+     "en_please"
+    ]
+   },
+   {
+    "texte": "thanks",
+    "fichiers": [
+     "en_thanks"
+    ]
+   },
+   {
+    "texte": "yes",
+    "fichiers": [
+     "en_yes"
+    ]
+   },
+   {
+    "texte": "no",
+    "fichiers": [
+     "en_no"
+    ]
+   },
+   {
+    "texte": "one",
+    "fichiers": [
+     "en_one"
+    ]
+   },
+   {
+    "texte": "two",
+    "fichiers": [
+     "en_two"
+    ]
+   },
+   {
+    "texte": "three",
+    "fichiers": [
+     "en_three"
+    ]
+   },
+   {
+    "texte": "four",
+    "fichiers": [
+     "en_four"
+    ]
+   },
+   {
+    "texte": "five",
+    "fichiers": [
+     "en_five"
+    ]
+   },
+   {
+    "texte": "six",
+    "fichiers": [
+     "en_six"
+    ]
+   }
+  ]
+ },
+ {
+  "chapitre": "Vivi 8 - Divers",
+  "paragraphes": [
+   {
+    "texte": "Clique sur la lettre qui commence le mot Yak !",
+    "fichiers": [
+     "alpha_q1_Y"
+    ]
+   },
+   {
+    "texte": "Quelle est la première syllabe du mot SOLEIL ?",
+    "fichiers": [
+     "lect_q1_soleil"
+    ]
+   },
+   {
+    "texte": "Quelle est la première syllabe du mot BATEAU ?",
+    "fichiers": [
+     "lect_q1_bateau"
+    ]
+   },
+   {
+    "texte": "ma",
+    "fichiers": [
+     "syllabe_ma"
+    ]
+   },
+   {
+    "texte": "pa",
+    "fichiers": [
+     "syllabe_pa"
+    ]
+   },
+   {
+    "texte": "li",
+    "fichiers": [
+     "syllabe_li"
+    ]
+   },
+   {
+    "texte": "so",
+    "fichiers": [
+     "syllabe_so"
+    ]
+   },
+   {
+    "texte": "mè",
+    "fichiers": [
+     "syllabe_mai"
+    ]
+   },
+   {
+    "texte": "la",
+    "fichiers": [
+     "syllabe_la"
+    ]
+   },
+   {
+    "texte": "ba",
+    "fichiers": [
+     "syllabe_ba"
+    ]
+   },
+   {
+    "texte": "ga",
+    "fichiers": [
+     "syllabe_ga"
+    ]
+   },
+   {
+    "texte": "Le glaçon",
+    "fichiers": [
+     "contr_mot_glacon"
+    ]
+   },
+   {
+    "texte": "L'hippopotame",
+    "fichiers": [
+     "contr_mot_hippopotame"
+    ]
+   },
+   {
+    "texte": "Sourire",
+    "fichiers": [
+     "contr_mot_sourire"
+    ]
+   },
+   {
+    "texte": "Pleurer",
+    "fichiers": [
+     "contr_mot_pleurer"
+    ]
+   },
+   {
+    "texte": "Oui ! L'hippopotame pèse lourd, l'oiseau est léger !",
+    "fichiers": [
+     "contr_rep_lourd"
+    ]
+   },
+   {
+    "texte": "Pinceau arc-en-ciel super coloré !",
+    "fichiers": [
+     "dessin_arc_en_ciel"
+    ]
+   },
+   {
+    "texte": "Gomme pour effacer.",
+    "fichiers": [
+     "dessin_gomme"
+    ]
+   },
+   {
+    "texte": "Tableau nettoyé !",
+    "fichiers": [
+     "dessin_nettoye"
+    ]
+   },
+   {
+    "texte": "L'album est tout propre !",
+    "fichiers": [
+     "album_propre"
+    ]
+   },
+   {
+    "texte": "Coucou champion ! C'est l'heure de faire une petite pause. Repose tes yeux et on revient jouer très bientôt ! Bisous !",
+    "fichiers": [
+     "pause_coucou"
+    ]
+   },
+   {
+    "texte": "Progression réinitialisée.",
+    "fichiers": [
+     "parents_reinitialise"
+    ]
+   }
+  ]
+ }
+]

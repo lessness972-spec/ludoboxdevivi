@@ -580,6 +580,12 @@ footer {
               <p class="text-white/60 text-xs">Grand, petit, chaud, froid</p>
             </div>
 
+            <div class="mod-btn clay-card p-4 md:p-6 flex flex-col items-center justify-center text-center gap-3 cursor-pointer" data-mod="vetements">
+              <div class="w-16 h-16 md:w-24 md:h-24 flex items-center justify-center text-5xl md:text-7xl drop-shadow-lg select-none" aria-hidden="true">👕</div>
+              <h3 class="font-black text-sm md:text-lg">Je m'habille</h3>
+              <p class="text-white/60 text-xs">Les vêtements</p>
+            </div>
+
             <!-- NEW MODULES -->
             <div class="mod-btn clay-card p-4 md:p-6 flex flex-col items-center justify-center text-center gap-3 cursor-pointer border-2 border-amber-500/30" data-mod="anglais">
               <img src="./iconanglais.png" class="w-16 h-16 md:w-24 md:h-24 object-contain drop-shadow-lg" alt="Anglais">
@@ -1021,6 +1027,7 @@ footer {
   </div>
 </div>
 
+<script src="voix.js"></script>
 <script>
 'use strict';
 
@@ -1300,7 +1307,37 @@ function cleanTextForSpeech(texte) {
     .trim();
 }
 
+/* ══════════ VOIX ENREGISTRÉE PAR PHRASE (voix.js) ══════════
+   Chaque phrase listée dans voix.js a son fichier dans audio/.
+   Si le fichier est présent, on le joue ; sinon, voix de synthèse. */
+function cleVoix(texte, isEnglish = false) {
+  const t = cleanTextForSpeech(syllabesToSpeech(String(texte || '')))
+    .toLowerCase()
+    .replace(/[’]/g, "'")
+    .replace(/[^\p{L}\p{N}' ]+/gu, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  return (isEnglish ? 'en:' : '') + t;
+}
+
+const VOIX_PAR_TEXTE = {};
+(window.VOIX_PHRASES || []).forEach(p => {
+  VOIX_PAR_TEXTE[cleVoix(p.texte, p.en)] = './audio/lion/' + p.fichier + '.mp3';
+  (p.aussi || []).forEach(t => { VOIX_PAR_TEXTE[cleVoix(t, p.en)] = './audio/lion/' + p.fichier + '.mp3'; });
+});
+
+// Fichiers audio absents ou illisibles : on ne les redemande pas pendant la session
+const audiosIntrouvables = new Set();
+
 function dire(texte, delaiMs = 0, isEnglish = false) {
+  const src = VOIX_PAR_TEXTE[cleVoix(texte, isEnglish)];
+  if (src && !audiosIntrouvables.has(src)) {
+    return jouerFichierVoix(src, texte, delaiMs, isEnglish);
+  }
+  return direSynthese(texte, delaiMs, isEnglish);
+}
+
+function direSynthese(texte, delaiMs = 0, isEnglish = false) {
   return new Promise(resolve => {
     // Conversion phonétique des syllabes avant nettoyage des emojis
     const textePhon = syllabesToSpeech(texte);
@@ -1365,286 +1402,299 @@ function stopVoix() {
    Si un fichier existe pour une clé, il est joué en priorité.
    Sinon, on bascule automatiquement sur la voix de synthèse (dire()). */
 const AUDIO_BANK = {
-  bienvenue:       './audio/bienvenue.mp3',
-  choisis:         './audio/choisis.mp3',
-  ecoute_choix:    './audio/ecoute_choix.mp3',
-  repete_consigne: './audio/repete_consigne.mp3',
-  bravo_1:         './audio/bravo_1.mp3',
-  bravo_2:         './audio/bravo_2.mp3',
-  bravo_3:         './audio/bravo_3.mp3',
-  bravo_4:         './audio/bravo_4.mp3',
-  bravo_5:         './audio/bravo_5.mp3',
-  oups:            './audio/oups.mp3',
-  encourage_1:     './audio/encourage_1.mp3',
-  encourage_2:     './audio/encourage_2.mp3',
-  fin_super:       './audio/fin_super.mp3',
-  fin_bien:        './audio/fin_bien.mp3',
-  fin_courage:     './audio/fin_courage.mp3',
-  memoire_bienvenue: './audio/memoire_bienvenue.mp3',
-  memoire_consigne:  './audio/memoire_consigne.mp3',
-  sticker_gagne:     './audio/sticker_gagne.mp3',
-  sticker_vivi:    './audio/sticker_vivi.mp3',
-  sticker_gigi:    './audio/sticker_gigi.mp3',
-  sticker_koko:    './audio/sticker_koko.mp3',
-  sticker_lili:    './audio/sticker_lili.mp3',
-  sticker_rocket:  './audio/sticker_rocket.mp3',
-  sticker_dino:    './audio/sticker_dino.mp3',
-  sticker_pizza:   './audio/sticker_pizza.mp3',
-  sticker_ice:     './audio/sticker_ice.mp3',
-  sticker_panda:   './audio/sticker_panda.mp3',
-  sticker_dolph:   './audio/sticker_dolph.mp3',
-  sticker_ballon:  './audio/sticker_ballon.mp3',
-  sticker_palette: './audio/sticker_palette.mp3',
-  sticker_teddy:   './audio/sticker_teddy.mp3',
-  sticker_car:     './audio/sticker_car.mp3',
-  sticker_rainbow: './audio/sticker_rainbow.mp3',
-  sticker_bee:     './audio/sticker_bee.mp3',
-  sticker_apple:   './audio/sticker_apple.mp3',
-  sticker_banana:  './audio/sticker_banana.mp3',
-  sticker_straw:   './audio/sticker_straw.mp3',
-  sticker_grape:   './audio/sticker_grape.mp3',
-  sticker_dog:     './audio/sticker_dog.mp3',
-  sticker_cat:     './audio/sticker_cat.mp3',
+  bienvenue:               './audio/lion/bienvenue.mp3',
+  choisis:                 './audio/lion/choisis.mp3',
+  ecoute_choix:            './audio/lion/ecoute_choix.mp3',
+  repete_consigne:         './audio/lion/repete_consigne.mp3',
+  bravo_1:                 './audio/lion/bravo_1.mp3',
+  bravo_2:                 './audio/lion/bravo_2.mp3',
+  bravo_3:                 './audio/lion/bravo_3.mp3',
+  bravo_4:                 './audio/lion/bravo_4.mp3',
+  bravo_5:                 './audio/lion/bravo_5.mp3',
+  oups:                    './audio/lion/oups.mp3',
+  encourage_1:             './audio/lion/encourage_1.mp3',
+  encourage_2:             './audio/lion/encourage_2.mp3',
+  fin_super:               './audio/lion/fin_super.mp3',
+  fin_bien:                './audio/lion/fin_bien.mp3',
+  fin_courage:             './audio/lion/fin_courage.mp3',
+  memoire_bienvenue:       './audio/lion/memoire_bienvenue.mp3',
+  memoire_consigne:        './audio/lion/memoire_consigne.mp3',
+  sticker_gagne:           './audio/lion/sticker_gagne.mp3',
+  sticker_vivi:            './audio/lion/sticker_vivi.mp3',
+  sticker_gigi:            './audio/lion/sticker_gigi.mp3',
+  sticker_koko:            './audio/lion/sticker_koko.mp3',
+  sticker_lili:            './audio/lion/sticker_lili.mp3',
+  sticker_rocket:          './audio/lion/sticker_rocket.mp3',
+  sticker_dino:            './audio/lion/sticker_dino.mp3',
+  sticker_pizza:           './audio/lion/sticker_pizza.mp3',
+  sticker_ice:             './audio/lion/sticker_ice.mp3',
+  sticker_panda:           './audio/lion/sticker_panda.mp3',
+  sticker_dolph:           './audio/lion/sticker_dolph.mp3',
+  sticker_ballon:          './audio/lion/sticker_ballon.mp3',
+  sticker_palette:         './audio/lion/sticker_palette.mp3',
+  sticker_teddy:           './audio/lion/sticker_teddy.mp3',
+  sticker_car:             './audio/lion/sticker_car.mp3',
+  sticker_rainbow:         './audio/lion/sticker_rainbow.mp3',
+  sticker_bee:             './audio/lion/sticker_bee.mp3',
+  sticker_apple:           './audio/lion/sticker_apple.mp3',
+  sticker_banana:          './audio/lion/sticker_banana.mp3',
+  sticker_straw:           './audio/lion/sticker_straw.mp3',
+  sticker_grape:           './audio/lion/sticker_grape.mp3',
+  sticker_dog:             './audio/lion/sticker_dog.mp3',
+  sticker_cat:             './audio/lion/sticker_cat.mp3',
   // Alphabet — "Clique sur la lettre qui commence le mot X !"
-  alpha_q1_A: './audio/alpha_q1_A.mp3',
-  alpha_q1_B: './audio/alpha_q1_B.mp3',
-  alpha_q1_C: './audio/alpha_q1_C.mp3',
-  alpha_q1_D: './audio/alpha_q1_D.mp3',
-  alpha_q1_E: './audio/alpha_q1_E.mp3',
-  alpha_q1_F: './audio/alpha_q1_F.mp3',
-  alpha_q1_G: './audio/alpha_q1_G.mp3',
-  alpha_q1_H: './audio/alpha_q1_H.mp3',
-  alpha_q1_J: './audio/alpha_q1_J.mp3',
-  alpha_q1_K: './audio/alpha_q1_K.mp3',
-  alpha_q1_L: './audio/alpha_q1_L.mp3',
-  alpha_q1_M: './audio/alpha_q1_M.mp3',
-  alpha_q1_N: './audio/alpha_q1_N.mp3',
-  alpha_q1_O: './audio/alpha_q1_O.mp3',
-  alpha_q1_P: './audio/alpha_q1_P.mp3',
-  alpha_q1_R: './audio/alpha_q1_R.mp3',
-  alpha_q1_S: './audio/alpha_q1_S.mp3',
-  alpha_q1_T: './audio/alpha_q1_T.mp3',
-  alpha_q1_V: './audio/alpha_q1_V.mp3',
-  alpha_q1_Z: './audio/alpha_q1_Z.mp3',
+  alpha_q1_A:              './audio/lion/alpha_q1_A.mp3',
+  alpha_q1_B:              './audio/lion/alpha_q1_B.mp3',
+  alpha_q1_C:              './audio/lion/alpha_q1_C.mp3',
+  alpha_q1_D:              './audio/lion/alpha_q1_D.mp3',
+  alpha_q1_E:              './audio/lion/alpha_q1_E.mp3',
+  alpha_q1_F:              './audio/lion/alpha_q1_F.mp3',
+  alpha_q1_G:              './audio/lion/alpha_q1_G.mp3',
+  alpha_q1_H:              './audio/lion/alpha_q1_H.mp3',
+  alpha_q1_J:              './audio/lion/alpha_q1_J.mp3',
+  alpha_q1_K:              './audio/lion/alpha_q1_K.mp3',
+  alpha_q1_L:              './audio/lion/alpha_q1_L.mp3',
+  alpha_q1_M:              './audio/lion/alpha_q1_M.mp3',
+  alpha_q1_N:              './audio/lion/alpha_q1_N.mp3',
+  alpha_q1_O:              './audio/lion/alpha_q1_O.mp3',
+  alpha_q1_P:              './audio/lion/alpha_q1_P.mp3',
+  alpha_q1_R:              './audio/lion/alpha_q1_R.mp3',
+  alpha_q1_S:              './audio/lion/alpha_q1_S.mp3',
+  alpha_q1_T:              './audio/lion/alpha_q1_T.mp3',
+  alpha_q1_V:              './audio/lion/alpha_q1_V.mp3',
+  alpha_q1_Z:              './audio/lion/alpha_q1_Z.mp3',
   // Alphabet — "Quelle image commence par la lettre X ?"
-  alpha_q2_A: './audio/alpha_q2_A.mp3',
-  alpha_q2_B: './audio/alpha_q2_B.mp3',
-  alpha_q2_C: './audio/alpha_q2_C.mp3',
-  alpha_q2_D: './audio/alpha_q2_D.mp3',
-  alpha_q2_E: './audio/alpha_q2_E.mp3',
-  alpha_q2_F: './audio/alpha_q2_F.mp3',
-  alpha_q2_G: './audio/alpha_q2_G.mp3',
-  alpha_q2_H: './audio/alpha_q2_H.mp3',
-  alpha_q2_J: './audio/alpha_q2_J.mp3',
-  alpha_q2_K: './audio/alpha_q2_K.mp3',
-  alpha_q2_L: './audio/alpha_q2_L.mp3',
-  alpha_q2_M: './audio/alpha_q2_M.mp3',
-  alpha_q2_N: './audio/alpha_q2_N.mp3',
-  alpha_q2_O: './audio/alpha_q2_O.mp3',
-  alpha_q2_P: './audio/alpha_q2_P.mp3',
-  alpha_q2_R: './audio/alpha_q2_R.mp3',
-  alpha_q2_S: './audio/alpha_q2_S.mp3',
-  alpha_q2_T: './audio/alpha_q2_T.mp3',
-  alpha_q2_V: './audio/alpha_q2_V.mp3',
-  alpha_q2_Z: './audio/alpha_q2_Z.mp3',
+  alpha_q2_A:              './audio/lion/alpha_q2_A.mp3',
+  alpha_q2_B:              './audio/lion/alpha_q2_B.mp3',
+  alpha_q2_C:              './audio/lion/alpha_q2_C.mp3',
+  alpha_q2_D:              './audio/lion/alpha_q2_D.mp3',
+  alpha_q2_E:              './audio/lion/alpha_q2_E.mp3',
+  alpha_q2_F:              './audio/lion/alpha_q2_F.mp3',
+  alpha_q2_G:              './audio/lion/alpha_q2_G.mp3',
+  alpha_q2_H:              './audio/lion/alpha_q2_H.mp3',
+  alpha_q2_J:              './audio/lion/alpha_q2_J.mp3',
+  alpha_q2_K:              './audio/lion/alpha_q2_K.mp3',
+  alpha_q2_L:              './audio/lion/alpha_q2_L.mp3',
+  alpha_q2_M:              './audio/lion/alpha_q2_M.mp3',
+  alpha_q2_N:              './audio/lion/alpha_q2_N.mp3',
+  alpha_q2_O:              './audio/lion/alpha_q2_O.mp3',
+  alpha_q2_P:              './audio/lion/alpha_q2_P.mp3',
+  alpha_q2_R:              './audio/lion/alpha_q2_R.mp3',
+  alpha_q2_S:              './audio/lion/alpha_q2_S.mp3',
+  alpha_q2_T:              './audio/lion/alpha_q2_T.mp3',
+  alpha_q2_V:              './audio/lion/alpha_q2_V.mp3',
+  alpha_q2_Z:              './audio/lion/alpha_q2_Z.mp3',
   // Nouvelles lettres alphabet I, Q, U, W, X, Y
-  alpha_q1_I: './audio/alpha_q1_I.mp3',
-  alpha_q1_Q: './audio/alpha_q1_Q.mp3',
-  alpha_q1_U: './audio/alpha_q1_U.mp3',
-  alpha_q1_W: './audio/alpha_q1_W.mp3',
-  alpha_q1_X: './audio/alpha_q1_X.mp3',
-  alpha_q1_Y: './audio/alpha_q1_Y.mp3',
-  alpha_q2_I: './audio/alpha_q2_I.mp3',
-  alpha_q2_Q: './audio/alpha_q2_Q.mp3',
-  alpha_q2_U: './audio/alpha_q2_U.mp3',
-  alpha_q2_W: './audio/alpha_q2_W.mp3',
-  alpha_q2_X: './audio/alpha_q2_X.mp3',
-  alpha_q2_Y: './audio/alpha_q2_Y.mp3',
+  alpha_q1_I:              './audio/lion/alpha_q1_I.mp3',
+  alpha_q1_Q:              './audio/lion/alpha_q1_Q.mp3',
+  alpha_q1_U:              './audio/lion/alpha_q1_U.mp3',
+  alpha_q1_W:              './audio/lion/alpha_q1_W.mp3',
+  alpha_q1_X:              './audio/lion/alpha_q1_X.mp3',
+  alpha_q1_Y:              './audio/lion/alpha_q1_Y.mp3',
+  alpha_q2_I:              './audio/lion/alpha_q2_I.mp3',
+  alpha_q2_Q:              './audio/lion/alpha_q2_Q.mp3',
+  alpha_q2_U:              './audio/lion/alpha_q2_U.mp3',
+  alpha_q2_W:              './audio/lion/alpha_q2_W.mp3',
+  alpha_q2_X:              './audio/lion/alpha_q2_X.mp3',
+  alpha_q2_Y:              './audio/lion/alpha_q2_Y.mp3',
   // Mascottes
-  lion_bienvenue:        './audio/lion_bienvenue.mp3',
-  lion_presentation:     './audio/lion_presentation.mp3',
-  lion_quote_1:          './audio/lion_quote_1.mp3',
-  lion_quote_2:          './audio/lion_quote_2.mp3',
-  lion_quote_3:          './audio/lion_quote_3.mp3',
-  lion_quote_4:          './audio/lion_quote_4.mp3',
-  girafe_bienvenue:      './audio/girafe_bienvenue.mp3',
-  girafe_presentation:   './audio/girafe_presentation.mp3',
-  girafe_quote_1:        './audio/girafe_quote_1.mp3',
-  girafe_quote_2:        './audio/girafe_quote_2.mp3',
-  panthere_bienvenue:    './audio/panthere_bienvenue.mp3',
-  panthere_presentation: './audio/panthere_presentation.mp3',
-  panthere_quote_1:      './audio/panthere_quote_1.mp3',
-  panthere_quote_2:      './audio/panthere_quote_2.mp3',
-  panthere_quote_3:      './audio/panthere_quote_3.mp3',
-  koala_bienvenue:       './audio/koala_bienvenue.mp3',
-  koala_presentation:    './audio/koala_presentation.mp3',
-  koala_quote_1:         './audio/koala_quote_1.mp3',
-  koala_quote_2:         './audio/koala_quote_2.mp3',
-  koala_quote_3:         './audio/koala_quote_3.mp3',
+  lion_bienvenue:          './audio/lion/lion_bienvenue.mp3',
+  lion_presentation:       './audio/lion/lion_presentation.mp3',
+  lion_quote_1:            './audio/lion/lion_quote_1.mp3',
+  lion_quote_2:            './audio/lion/lion_quote_2.mp3',
+  lion_quote_3:            './audio/lion/lion_quote_3.mp3',
+  lion_quote_4:            './audio/lion/lion_quote_4.mp3',
+  girafe_bienvenue:        './audio/girafe/girafe_bienvenue.mp3',
+  girafe_presentation:     './audio/girafe/girafe_presentation.mp3',
+  girafe_quote_1:          './audio/girafe/girafe_quote_1.mp3',
+  girafe_quote_2:          './audio/girafe/girafe_quote_2.mp3',
+  panthere_bienvenue:      './audio/panthere/panthere_bienvenue.mp3',
+  panthere_presentation:   './audio/panthere/panthere_presentation.mp3',
+  panthere_quote_1:        './audio/panthere/panthere_quote_1.mp3',
+  panthere_quote_2:        './audio/panthere/panthere_quote_2.mp3',
+  panthere_quote_3:        './audio/panthere/panthere_quote_3.mp3',
+  koala_bienvenue:         './audio/koala/koala_bienvenue.mp3',
+  koala_presentation:      './audio/koala/koala_presentation.mp3',
+  koala_quote_1:           './audio/koala/koala_quote_1.mp3',
+  koala_quote_2:           './audio/koala/koala_quote_2.mp3',
+  koala_quote_3:           './audio/koala/koala_quote_3.mp3',
   // Chiffres
-  chiffres_q1_1:         './audio/chiffres_q1_1.mp3',
-  chiffres_q1_2:         './audio/chiffres_q1_2.mp3',
-  chiffres_q1_3:         './audio/chiffres_q1_3.mp3',
-  chiffres_q1_4:         './audio/chiffres_q1_4.mp3',
-  chiffres_q1_5:         './audio/chiffres_q1_5.mp3',
-  chiffres_q1_6:         './audio/chiffres_q1_6.mp3',
-  chiffres_q1_7:         './audio/chiffres_q1_7.mp3',
-  chiffres_q1_8:         './audio/chiffres_q1_8.mp3',
-  chiffres_q1_9:         './audio/chiffres_q1_9.mp3',
-  chiffres_q1_10:        './audio/chiffres_q1_10.mp3',
-  chiffres_compte_points:'./audio/chiffres_compte_points.mp3',
+  chiffres_q1_1:           './audio/lion/chiffres_q1_1.mp3',
+  chiffres_q1_2:           './audio/lion/chiffres_q1_2.mp3',
+  chiffres_q1_3:           './audio/lion/chiffres_q1_3.mp3',
+  chiffres_q1_4:           './audio/lion/chiffres_q1_4.mp3',
+  chiffres_q1_5:           './audio/lion/chiffres_q1_5.mp3',
+  chiffres_q1_6:           './audio/lion/chiffres_q1_6.mp3',
+  chiffres_q1_7:           './audio/lion/chiffres_q1_7.mp3',
+  chiffres_q1_8:           './audio/lion/chiffres_q1_8.mp3',
+  chiffres_q1_9:           './audio/lion/chiffres_q1_9.mp3',
+  chiffres_q1_10:          './audio/lion/chiffres_q1_10.mp3',
+  chiffres_compte_points:  './audio/lion/chiffres_compte_points.mp3',
   // Couleurs
-  couleurs_q1_rouge:     './audio/couleurs_q1_rouge.mp3',
-  couleurs_q1_bleu:      './audio/couleurs_q1_bleu.mp3',
-  couleurs_q1_jaune:     './audio/couleurs_q1_jaune.mp3',
-  couleurs_q1_vert:      './audio/couleurs_q1_vert.mp3',
-  couleurs_q1_orange:    './audio/couleurs_q1_orange.mp3',
-  couleurs_q1_violette:  './audio/couleurs_q1_violette.mp3',
-  couleurs_q1_rose:      './audio/couleurs_q1_rose.mp3',
-  couleurs_q1_blanche:   './audio/couleurs_q1_blanche.mp3',
-  couleurs_q1_noire:     './audio/couleurs_q1_noire.mp3',
-  couleurs_q1_marron:    './audio/couleurs_q1_marron.mp3',
-  couleurs_q1_grise:     './audio/couleurs_q1_grise.mp3',
-  couleurs_q1_turquoise: './audio/couleurs_q1_turquoise.mp3',
+  couleurs_q1_rouge:       './audio/lion/couleurs_q1_rouge.mp3',
+  couleurs_q1_bleu:        './audio/lion/couleurs_q1_bleu.mp3',
+  couleurs_q1_jaune:       './audio/lion/couleurs_q1_jaune.mp3',
+  couleurs_q1_vert:        './audio/lion/couleurs_q1_vert.mp3',
+  couleurs_q1_orange:      './audio/lion/couleurs_q1_orange.mp3',
+  couleurs_q1_violette:    './audio/lion/couleurs_q1_violette.mp3',
+  couleurs_q1_rose:        './audio/lion/couleurs_q1_rose.mp3',
+  couleurs_q1_blanche:     './audio/lion/couleurs_q1_blanche.mp3',
+  couleurs_q1_noire:       './audio/lion/couleurs_q1_noire.mp3',
+  couleurs_q1_marron:      './audio/lion/couleurs_q1_marron.mp3',
+  couleurs_q1_grise:       './audio/lion/couleurs_q1_grise.mp3',
+  couleurs_q1_turquoise:   './audio/lion/couleurs_q1_turquoise.mp3',
   // Formes
-  formes_q1_cercle:      './audio/formes_q1_cercle.mp3',
-  formes_q1_carre:       './audio/formes_q1_carre.mp3',
-  formes_q1_triangle:    './audio/formes_q1_triangle.mp3',
-  formes_q1_rectangle:   './audio/formes_q1_rectangle.mp3',
-  formes_q1_etoile:      './audio/formes_q1_etoile.mp3',
-  formes_q1_coeur:       './audio/formes_q1_coeur.mp3',
-  formes_q1_losange:     './audio/formes_q1_losange.mp3',
-  formes_q1_ovale:       './audio/formes_q1_ovale.mp3',
+  formes_q1_cercle:        './audio/lion/formes_q1_cercle.mp3',
+  formes_q1_carre:         './audio/lion/formes_q1_carre.mp3',
+  formes_q1_triangle:      './audio/lion/formes_q1_triangle.mp3',
+  formes_q1_rectangle:     './audio/lion/formes_q1_rectangle.mp3',
+  formes_q1_etoile:        './audio/lion/formes_q1_etoile.mp3',
+  formes_q1_coeur:         './audio/lion/formes_q1_coeur.mp3',
+  formes_q1_losange:       './audio/lion/formes_q1_losange.mp3',
+  formes_q1_ovale:         './audio/lion/formes_q1_ovale.mp3',
   // Animaux
-  animaux_quel_animal:   './audio/animaux_quel_animal.mp3',
-  animaux_bebe_chat:     './audio/animaux_bebe_chat.mp3',
-  animaux_bebe_chien:    './audio/animaux_bebe_chien.mp3',
-  animaux_bebe_vache:    './audio/animaux_bebe_vache.mp3',
-  animaux_bebe_cheval:   './audio/animaux_bebe_cheval.mp3',
-  animaux_bebe_lion:     './audio/animaux_bebe_lion.mp3',
-  animaux_bebe_elephant: './audio/animaux_bebe_elephant.mp3',
-  animaux_bebe_ours:     './audio/animaux_bebe_ours.mp3',
-  animaux_bebe_canard:   './audio/animaux_bebe_canard.mp3',
-  animaux_bebe_poule:    './audio/animaux_bebe_poule.mp3',
-  animaux_bebe_cochon:   './audio/animaux_bebe_cochon.mp3',
-  animaux_bebe_mouton:   './audio/animaux_bebe_mouton.mp3',
-  animaux_bebe_lapin:    './audio/animaux_bebe_lapin.mp3',
-  animal_chat:           './audio/animal_chat.mp3',
-  animal_chien:          './audio/animal_chien.mp3',
-  animal_vache:          './audio/animal_vache.mp3',
-  animal_cheval:         './audio/animal_cheval.mp3',
-  animal_lion:           './audio/animal_lion.mp3',
-  animal_elephant:       './audio/animal_elephant.mp3',
-  animal_ours:           './audio/animal_ours.mp3',
-  animal_canard:         './audio/animal_canard.mp3',
-  animal_poule:          './audio/animal_poule.mp3',
-  animal_cochon:         './audio/animal_cochon.mp3',
-  animal_mouton:         './audio/animal_mouton.mp3',
-  animal_lapin:          './audio/animal_lapin.mp3',
-  bebe_chaton:           './audio/bebe_chaton.mp3',
-  bebe_chiot:            './audio/bebe_chiot.mp3',
-  bebe_veau:             './audio/bebe_veau.mp3',
-  bebe_poulain:          './audio/bebe_poulain.mp3',
-  bebe_lionceau:         './audio/bebe_lionceau.mp3',
-  bebe_elephanteau:      './audio/bebe_elephanteau.mp3',
-  bebe_ourson:           './audio/bebe_ourson.mp3',
-  bebe_caneton:          './audio/bebe_caneton.mp3',
-  bebe_poussin:          './audio/bebe_poussin.mp3',
-  bebe_porcelet:         './audio/bebe_porcelet.mp3',
-  bebe_agneau:           './audio/bebe_agneau.mp3',
-  bebe_lapereau:         './audio/bebe_lapereau.mp3',
+  animaux_quel_animal:     './audio/lion/animaux_quel_animal.mp3',
+  animaux_bebe_chat:       './audio/lion/animaux_bebe_chat.mp3',
+  animaux_bebe_chien:      './audio/lion/animaux_bebe_chien.mp3',
+  animaux_bebe_vache:      './audio/lion/animaux_bebe_vache.mp3',
+  animaux_bebe_cheval:     './audio/lion/animaux_bebe_cheval.mp3',
+  animaux_bebe_lion:       './audio/lion/animaux_bebe_lion.mp3',
+  animaux_bebe_elephant:   './audio/lion/animaux_bebe_elephant.mp3',
+  animaux_bebe_ours:       './audio/lion/animaux_bebe_ours.mp3',
+  animaux_bebe_canard:     './audio/lion/animaux_bebe_canard.mp3',
+  animaux_bebe_poule:      './audio/lion/animaux_bebe_poule.mp3',
+  animaux_bebe_cochon:     './audio/lion/animaux_bebe_cochon.mp3',
+  animaux_bebe_mouton:     './audio/lion/animaux_bebe_mouton.mp3',
+  animaux_bebe_lapin:      './audio/lion/animaux_bebe_lapin.mp3',
+  animal_chat:             './audio/lion/animal_chat.mp3',
+  animal_chien:            './audio/lion/animal_chien.mp3',
+  animal_vache:            './audio/lion/animal_vache.mp3',
+  animal_cheval:           './audio/lion/animal_cheval.mp3',
+  animal_lion:             './audio/lion/animal_lion.mp3',
+  animal_elephant:         './audio/lion/animal_elephant.mp3',
+  animal_ours:             './audio/lion/animal_ours.mp3',
+  animal_canard:           './audio/lion/animal_canard.mp3',
+  animal_poule:            './audio/lion/animal_poule.mp3',
+  animal_cochon:           './audio/lion/animal_cochon.mp3',
+  animal_mouton:           './audio/lion/animal_mouton.mp3',
+  animal_lapin:            './audio/lion/animal_lapin.mp3',
+  bebe_chaton:             './audio/lion/bebe_chaton.mp3',
+  bebe_chiot:              './audio/lion/bebe_chiot.mp3',
+  bebe_veau:               './audio/lion/bebe_veau.mp3',
+  bebe_poulain:            './audio/lion/bebe_poulain.mp3',
+  bebe_lionceau:           './audio/lion/bebe_lionceau.mp3',
+  bebe_elephanteau:        './audio/lion/bebe_elephanteau.mp3',
+  bebe_ourson:             './audio/lion/bebe_ourson.mp3',
+  bebe_caneton:            './audio/lion/bebe_caneton.mp3',
+  bebe_poussin:            './audio/lion/bebe_poussin.mp3',
+  bebe_porcelet:           './audio/lion/bebe_porcelet.mp3',
+  bebe_agneau:             './audio/lion/bebe_agneau.mp3',
+  bebe_lapereau:           './audio/lion/bebe_lapereau.mp3',
   // Nourriture
-  nourr_q1_pomme:        './audio/nourr_q1_pomme.mp3',
-  nourr_q1_banane:       './audio/nourr_q1_banane.mp3',
-  nourr_q1_fraise:       './audio/nourr_q1_fraise.mp3',
-  nourr_q1_raisin:       './audio/nourr_q1_raisin.mp3',
-  nourr_q1_carotte:      './audio/nourr_q1_carotte.mp3',
-  nourr_q1_brocoli:      './audio/nourr_q1_brocoli.mp3',
-  nourr_q1_mais:         './audio/nourr_q1_mais.mp3',
-  nourr_q1_tomate:       './audio/nourr_q1_tomate.mp3',
-  nourr_q1_pain:         './audio/nourr_q1_pain.mp3',
-  nourr_q1_fromage:      './audio/nourr_q1_fromage.mp3',
-  nourr_q1_pizza:        './audio/nourr_q1_pizza.mp3',
-  nourr_q1_pates:        './audio/nourr_q1_pates.mp3',
-  nourr_q1_gateau:       './audio/nourr_q1_gateau.mp3',
-  nourr_q1_glace:        './audio/nourr_q1_glace.mp3',
-  nourr_q1_fruit:        './audio/nourr_q1_fruit.mp3',
+  nourr_q1_pomme:          './audio/lion/nourr_q1_pomme.mp3',
+  nourr_q1_banane:         './audio/lion/nourr_q1_banane.mp3',
+  nourr_q1_fraise:         './audio/lion/nourr_q1_fraise.mp3',
+  nourr_q1_raisin:         './audio/lion/nourr_q1_raisin.mp3',
+  nourr_q1_carotte:        './audio/lion/nourr_q1_carotte.mp3',
+  nourr_q1_brocoli:        './audio/lion/nourr_q1_brocoli.mp3',
+  nourr_q1_mais:           './audio/lion/nourr_q1_mais.mp3',
+  nourr_q1_tomate:         './audio/lion/nourr_q1_tomate.mp3',
+  nourr_q1_pain:           './audio/lion/nourr_q1_pain.mp3',
+  nourr_q1_fromage:        './audio/lion/nourr_q1_fromage.mp3',
+  nourr_q1_pizza:          './audio/lion/nourr_q1_pizza.mp3',
+  nourr_q1_pates:          './audio/lion/nourr_q1_pates.mp3',
+  nourr_q1_gateau:         './audio/lion/nourr_q1_gateau.mp3',
+  nourr_q1_glace:          './audio/lion/nourr_q1_glace.mp3',
+  nourr_q1_fruit:          './audio/lion/nourr_q1_fruit.mp3',
   // Lecture
-  lect_q1_maman:        './audio/lect_q1_maman.mp3',
-  lect_q1_papa:          './audio/lect_q1_papa.mp3',
-  lect_q1_chat:         './audio/lect_q1_chat.mp3',
-  lect_q1_lion:          './audio/lect_q1_lion.mp3',
-  lect_q1_maison:        './audio/lect_q1_maison.mp3',
-  lect_q1_lapin:         './audio/lect_q1_lapin.mp3',
-  lect_q1_bateau:       './audio/lect_q1_bateau.mp3',
-  lect_q1_gateau:        './audio/lect_q1_gateau.mp3',
-  lect_q1_soleil:        './audio/lect_q1_soleil.mp3',
+  lect_q1_maman:           './audio/lion/lect_q1_maman.mp3',
+  lect_q1_papa:            './audio/lion/lect_q1_papa.mp3',
+  lect_q1_chat:            './audio/lion/lect_q1_chat.mp3',
+  lect_q1_lion:            './audio/lion/lect_q1_lion.mp3',
+  lect_q1_maison:          './audio/lion/lect_q1_maison.mp3',
+  lect_q1_lapin:           './audio/lion/lect_q1_lapin.mp3',
+  lect_q1_bateau:          './audio/lion/lect_q1_bateau.mp3',
+  lect_q1_gateau:          './audio/lion/lect_q1_gateau.mp3',
   // Règles de vie
-  regles_q1_bonjour:     './audio/regles_q1_bonjour.mp3',
-  regles_q2_cadeau:      './audio/regles_q2_cadeau.mp3',
-  regles_q2_jouet:       './audio/regles_q2_jouet.mp3',
-  regles_q2_classe:      './audio/regles_q2_classe.mp3',
-  regles_q2_papier:      './audio/regles_q2_papier.mp3',
-  regles_q2_pleure:      './audio/regles_q2_pleure.mp3',
-  regles_rep_bonjour:    './audio/regles_rep_bonjour.mp3',
-  regles_rep_merci:      './audio/regles_rep_merci.mp3',
-  regles_rep_main:       './audio/regles_rep_main.mp3',
-  regles_rep_poubelle:   './audio/regles_rep_poubelle.mp3',
-  regles_rep_ami_triste: './audio/regles_rep_ami_triste.mp3',
+  regles_q1_bonjour:       './audio/lion/regles_q1_bonjour.mp3',
+  regles_q2_cadeau:        './audio/lion/regles_q2_cadeau.mp3',
+  regles_q2_jouet:         './audio/lion/regles_q2_jouet.mp3',
+  regles_q2_classe:        './audio/lion/regles_q2_classe.mp3',
+  regles_q2_papier:        './audio/lion/regles_q2_papier.mp3',
+  regles_q2_pleure:        './audio/lion/regles_q2_pleure.mp3',
+  regles_rep_bonjour:      './audio/lion/regles_rep_bonjour.mp3',
+  regles_rep_merci:        './audio/lion/regles_rep_merci.mp3',
+  regles_rep_partage:      './audio/lion/regles_rep_partage.mp3',
+  regles_rep_main:         './audio/lion/regles_rep_main.mp3',
+  regles_rep_ami_triste:   './audio/lion/regles_rep_ami_triste.mp3',
+  regles_rep_poubelle:     './audio/lion/regles_rep_poubelle.mp3',
+  // Ces deux fichiers portent un nom trompeur mais disent bien la bonne phrase
+  contr_rep_heureux:       './audio/lion/contr_rep_heureux.mp3',
+  contr_rep_allume:        './audio/lion/contr_rep_allume.mp3',
   // Contraires
-  contr_q1_grand:        './audio/contr_q1_grand.mp3',
-  contr_q1_chaud:        './audio/contr_q1_chaud.mp3',
-  contr_q1_rapide:       './audio/contr_q1_rapide.mp3',
-  contr_q1_long:         './audio/contr_q1_long.mp3',
-  contr_q1_lourd:        './audio/contr_q1_lourd.mp3',
-  contr_q1_mouille:      './audio/contr_q1_mouille.mp3',
-  contr_q1_doux:         './audio/contr_q1_doux.mp3',
-  contr_q1_fier:         './audio/contr_q1_fier.mp3',
-  contr_q1_heureux:      './audio/contr_q1_heureux.mp3',
-  contr_q1_allume:       './audio/contr_q1_allume.mp3',
-  contr_rep_elephant_souris: './audio/contr_rep_elephant_souris.mp3',
-  contr_rep_guepard_chaud:   './audio/contr_rep_guepard_chaud.mp3',
-  contr_rep_guepard_tortue:  './audio/contr_rep_guepard_tortue.mp3',
-  contr_rep_rhinoceros_oiseau:'./audio/contr_rep_rhinoceros_oiseau.mp3',
-  contr_rep_pluie_desert:    './audio/contr_rep_pluie_desert.mp3',
-  contr_rep_lapin_herisson:  './audio/contr_rep_lapin_herisson.mp3',
-  contr_rep_sourire_pleurer: './audio/contr_rep_sourire_pleurer.mp3',
-  contr_rep_lampe:           './audio/contr_rep_lampe.mp3',
-  contr_mot_la_lampe_allumee:'./audio/contr_mot_la_lampe_allumee.mp3',
-  contr_mot_la_bougie_eteinte:'./audio/contr_mot_la_bougie_eteinte.mp3',
+  contr_q1_grand:          './audio/lion/contr_q1_grand.mp3',
+  contr_q1_chaud:          './audio/lion/contr_q1_chaud.mp3',
+  contr_q1_rapide:         './audio/lion/contr_q1_rapide.mp3',
+  contr_q1_long:           './audio/lion/contr_q1_long.mp3',
+  contr_q1_lourd:          './audio/lion/contr_q1_lourd.mp3',
+  contr_q1_mouille:        './audio/lion/contr_q1_mouille.mp3',
+  contr_q1_doux:           './audio/lion/contr_q1_doux.mp3',
+  contr_q1_fort:           './audio/lion/contr_q1_fort.mp3',
+  contr_q1_heureux:        './audio/lion/contr_q1_heureux.mp3',
+  contr_q1_allume:         './audio/lion/contr_q1_allume.mp3',
+  contr_rep_grand:         './audio/lion/contr_rep_grand.mp3',
+  contr_rep_chaud:         './audio/lion/contr_rep_chaud.mp3',
+  contr_rep_rapide:        './audio/lion/contr_rep_rapide.mp3',
+  contr_rep_long:          './audio/lion/contr_rep_long.mp3',
+  contr_rep_mouille:       './audio/lion/contr_rep_mouille.mp3',
+  contr_rep_doux:          './audio/lion/contr_rep_doux.mp3',
+  contr_rep_fort:          './audio/lion/contr_rep_fort.mp3',
   // Anglais
-  anglais_q1_chat:       './audio/anglais_q1_chat.mp3',
-  anglais_q1_chien:      './audio/anglais_q1_chien.mp3',
-  anglais_q1_rouge:      './audio/anglais_q1_rouge.mp3',
-  anglais_q1_bleu:       './audio/anglais_q1_bleu.mp3',
-  anglais_q1_pomme:      './audio/anglais_q1_pomme.mp3',
-  anglais_q1_soleil:     './audio/anglais_q1_soleil.mp3',
-  anglais_q1_bonjour:    './audio/anglais_q1_bonjour.mp3',
-  anglais_q1_aurevoir:   './audio/anglais_q1_aurevoir.mp3',
-  anglais_q1_un:         './audio/anglais_q1_un.mp3',
-  anglais_q1_deux:       './audio/anglais_q1_deux.mp3',
-  anglais_q1_trois:      './audio/anglais_q1_trois.mp3',
+  anglais_q1_chat:         './audio/lion/anglais_q1_chat.mp3',
+  anglais_q1_chien:        './audio/lion/anglais_q1_chien.mp3',
+  anglais_q1_rouge:        './audio/lion/anglais_q1_rouge.mp3',
+  anglais_q1_bleu:         './audio/lion/anglais_q1_bleu.mp3',
+  anglais_q1_pomme:        './audio/lion/anglais_q1_pomme.mp3',
+  anglais_q1_soleil:       './audio/lion/anglais_q1_soleil.mp3',
+  anglais_q1_bonjour:      './audio/lion/anglais_q1_bonjour.mp3',
+  anglais_q1_aurevoir:     './audio/lion/anglais_q1_aurevoir.mp3',
+  anglais_q1_un:           './audio/lion/anglais_q1_un.mp3',
+  anglais_q1_deux:         './audio/lion/anglais_q1_deux.mp3',
+  anglais_q1_trois:        './audio/lion/anglais_q1_trois.mp3',
 };
 
 let currentAudioEl = null;
 
 // Joue un fichier audio préenregistré (clé dans AUDIO_BANK).
-// Si le fichier n'existe pas / erreur de lecture, bascule sur dire(fallbackText).
+// Si la clé n'existe pas, on cherche la phrase dans voix.js (via dire()).
 function direAudio(key, fallbackText, delaiMs = 0, isEnglish = false) {
+  // Une clé absente de AUDIO_BANK désigne directement audio/lion/<clé>.mp3
+  const src = AUDIO_BANK[key] || (key ? './audio/lion/' + key + '.mp3' : null);
+  if (!src || audiosIntrouvables.has(src)) return dire(fallbackText, delaiMs, isEnglish);
+  return jouerFichierVoix(src, fallbackText, delaiMs, isEnglish);
+}
+
+// Les voix sont rangées par mascotte : audio/lion/, audio/girafe/, audio/panthere/, audio/koala/
+// (mêmes noms de fichiers). La mascotte choisie parle avec sa voix ; si sa version
+// d'une phrase n'existe pas encore, c'est Vivi le lion qui la dit.
+function versionMascotte(src) {
+  const m = userProgress.activeMascot;
+  if (!m || m === 'lion' || !src.includes('/audio/lion/')) return src;
+  return src.replace('/audio/lion/', '/audio/' + m + '/');
+}
+
+// Joue un fichier de voix. Si le fichier manque ou ne se lit pas,
+// on bascule sur la phrase enregistrée équivalente, sinon sur la synthèse.
+function jouerFichierVoix(srcLion, fallbackText, delaiMs = 0, isEnglish = false) {
+  const perso = versionMascotte(srcLion);
+  const src = audiosIntrouvables.has(perso) ? srcLion : perso;
   return new Promise(resolve => {
     if (soundMuted) {
       setTimeout(resolve, Math.min(2200, (fallbackText || '').length * 60));
       return;
     }
 
-    const src = AUDIO_BANK[key];
-
     const go = () => {
-      if (!src) {
-        dire(fallbackText, 0, isEnglish).then(resolve);
-        return;
-      }
-
       stopVoix();
       const audio = new Audio(src);
       currentAudioEl = audio;
@@ -1660,13 +1710,23 @@ function direAudio(key, fallbackText, delaiMs = 0, isEnglish = false) {
         resolve();
       };
 
-      const fallback = () => {
+      const fallback = (introuvable) => {
         if (done) return;
         done = true;
         clearTimeout(safeguard);
         if (currentAudioEl === audio) currentAudioEl = null;
         unduckMusic();
-        dire(fallbackText, 0, isEnglish).then(resolve);
+        if (introuvable) {
+          audiosIntrouvables.add(src);
+          if (src !== srcLion) {
+            // Pas encore de version pour cette mascotte : voix de Vivi
+            jouerFichierVoix(srcLion, fallbackText, 0, isEnglish).then(resolve);
+          } else {
+            dire(fallbackText, 0, isEnglish).then(resolve);
+          }
+        } else {
+          direSynthese(fallbackText, 0, isEnglish).then(resolve);
+        }
       };
 
       // Sécurité : si le fichier audio est trop long ou bloqué, on libère après 10s
@@ -1674,10 +1734,11 @@ function direAudio(key, fallbackText, delaiMs = 0, isEnglish = false) {
 
       audio.onended = finish;
       audio.onpause = finish;
-      audio.onerror = fallback;
+      audio.onerror = () => fallback(true);
 
       const p = audio.play();
-      if (p && p.catch) p.catch(fallback);
+      // NotSupportedError = fichier absent/illisible ; autre erreur = lecture bloquée par le navigateur
+      if (p && p.catch) p.catch(err => fallback(err && err.name === 'NotSupportedError'));
     };
 
     if (delaiMs) setTimeout(go, delaiMs); else go();
@@ -2274,7 +2335,7 @@ const ALPHA = [
   {l:'D',mot:'Dauphin',  e:'🐬'},{l:'E',mot:'Éléphant', e:'🐘'},{l:'F',mot:'Flamant',  e:'🦩'},
   {l:'G',mot:'Girafe',   e:'🦒'},{l:'H',mot:'Hibou',    e:'🦉'},{l:'I',mot:'Iguane',   e:'🦎'},
   {l:'J',mot:'Jaguar',   e:'🐆'},{l:'K',mot:'Koala',    e:'🐨'},{l:'L',mot:'Lion', speak:'Liyon', e:'🦁'},
-  {l:'M',mot:'Mouton',   e:'🐑'},{l:'N',mot:'Narval',   e:'🦄'},{l:'O',mot:'Ours', speak:'Ourse', e:'🐻'},
+  {l:'M',mot:'Mouton',   e:'🐑'},{l:'N',mot:'Nounours', e:'🧸'},{l:'O',mot:'Ours', speak:'Ourse', e:'🐻'},
   {l:'P',mot:'Perroquet',e:'🦜'},{l:'Q',mot:'Quetzal',  e:'🦚'},{l:'R',mot:'Renard',   e:'🦊'},
   {l:'S',mot:'Singe',    e:'🐒'},{l:'T',mot:'Tortue',   e:'🐢'},{l:'U',mot:'Urial',    e:'🐏'},
   {l:'V',mot:'Vache',    e:'🐄'},{l:'W',mot:'Wapiti',   e:'🦌'},{l:'X',mot:'Xérus',    e:'🐿️'},
@@ -2342,37 +2403,88 @@ const REGLES = [
    bravo:"Oui ! On dit bonjour quand on arrive quelque part !", audioBravo:'regles_rep_bonjour'},
   {consigne:"On t'offre un cadeau. Que fais-tu ?",
    audioKey:'regles_q2_cadeau',
-   correct:'🙏',choix:['🙏','🏃','😤','🎮'],labels:['Dire merci','S\'enfuir','Bouder','Ne rien dire'],
-   bravo:'Super ! On dit toujours merci quand on reçoit un cadeau.', audioBravo:'regles_rep_merci'},
+   correct:'🙏',choix:['🙏','🏃','😤','🎮'],labels:['Dire merci','Partir en courant','Bouder','Jouer sans rien dire'],
+   bravo:"On dit toujours merci quand quelqu'un fait quelque chose pour nous !", audioBravo:'regles_rep_merci'},
   {consigne:"Ton ami veut jouer avec ton jouet. Que fais-tu ?",
    audioKey:'regles_q2_jouet',
    correct:'🤝',choix:['🤝','🚫','😡','🏃'],labels:['Je partage','Je refuse','Je me fâche','Je cours'],
-   bravo:"Bravo ! Partager ses jouets permet de bien s'amuser ensemble.", audioBravo:null},
+   bravo:"Bravo ! Partager, c'est la meilleure façon de se faire des amis.", audioBravo:'regles_rep_partage'},
   {consigne:"Tu veux parler en classe. Que fais-tu ?",
    audioKey:'regles_q2_classe',
-   correct:'✋',choix:['✋','📢','😴','🏃'],labels:['Je lève la main','Je crie fort','Je m\'endors','Je cavale'],
-   bravo:"Excellent ! En classe, on lève le doigt pour demander la parole.", audioBravo:'regles_rep_main'},
+   correct:'✋',choix:['✋','📢','😴','🏃'],labels:['Je lève la main','Je crie','Je dors','Je pars'],
+   bravo:"Excellent ! En classe, on lève la main pour parler.", audioBravo:'regles_rep_main'},
   {consigne:"Tu as un papier sale dans la main. Où le jeter ?",
    audioKey:'regles_q2_papier',
-   correct:'🗑️',choix:['🗑️','🌿','🛋️','🚿'],labels:['Dans la poubelle','Dans l\'herbe','Sur le canapé','Dans la douche'],
-   bravo:"Parfait ! On jette toujours les déchets à la poubelle !", audioBravo:'regles_rep_poubelle'},
+   correct:'🗑️',choix:['🗑️','🌿','🛋️','🚰'],labels:['Dans la poubelle','Par terre','Sur le canapé','Dans l\'évier'],
+   bravo:"Très bien ! On met toujours ses déchets dans la poubelle.", audioBravo:'regles_rep_poubelle'},
   {consigne:"Ton copain de classe pleure. Que fais-tu ?",
    audioKey:'regles_q2_pleure',
-   correct:'🤗',choix:['🤗','😂','🏃','🎮'],labels:['Je le console','Je me moque','Je l\'évite','Je joue seul'],
-   bravo:"Bravo ! C'est très gentil de consoler un ami triste !", audioBravo:'regles_rep_ami_triste'},
+   correct:'🤗',choix:['🤗','😂','🏃','🎮'],labels:['Je le console','Je rigole','Je pars','Je joue'],
+   bravo:"Bravo ! Quand un ami est triste, on va vers lui.", audioBravo:'regles_rep_ami_triste'},
 ];
 const CONTRAIRES = [
-  {consigne:'Quel animal est GRAND ?',audioKey:'contr_q1_grand',correct:'🐘',choix:['🐘','🐭'],labels:["L'éléphant","La souris"],bravo:"Oui ! L'éléphant est grand, la souris est toute petite !",audioBravo:'contr_rep_elephant_souris'},
-  {consigne:'Lequel est CHAUD ?',audioKey:'contr_q1_chaud',correct:'☀️',choix:['☀️','🧊'],labels:['Le soleil','Le glaçon'],bravo:'Bravo ! Le soleil brûle de chaleur, le glaçon est glacé !',audioBravo:'contr_rep_guepard_chaud'},
-  {consigne:'Lequel est RAPIDE ?',audioKey:'contr_q1_rapide',correct:'🐆',choix:['🐆','🐢'],labels:['Le guépard','La tortue'],bravo:'Oui ! Le guépard sprinte vite, la tortue marche lentement !',audioBravo:'contr_rep_guepard_tortue'},
-  {consigne:'Lequel est LONG ?',audioKey:'contr_q1_long',correct:'🐍',choix:['🐍','🐛'],labels:['Le serpent','La chenille'],bravo:'Bravo ! Le serpent est très long, la chenille est courte !',audioBravo:null},
-  {consigne:'Lequel est LOURD ?',audioKey:'contr_q1_lourd',correct:'🦛',choix:['🦛','🐦'],labels:["L'hippopotame","Le petit oiseau"],bravo:"Oui ! L'hippopotame pèse lourd, l'oiseau est léger !",audioBravo:'contr_rep_rhinoceros_oiseau'},
-  {consigne:'Lequel est MOUILLÉ ?',audioKey:'contr_q1_mouille',correct:'🌧️',choix:['🌧️','🏜️'],labels:['La pluie','Le désert'],bravo:'Bravo ! La pluie mouille tout, le désert est sec !',audioBravo:'contr_rep_pluie_desert'},
-  {consigne:'Lequel est DOUX ?',audioKey:'contr_q1_doux',correct:'🐰',choix:['🐰','🦔'],labels:['Le lapin','Le hérisson'],bravo:'Oui ! Le lapin a un pelage tout doux, le hérisson pique !',audioBravo:'contr_rep_lapin_herisson'},
-  {consigne:'Lequel est FORT ?',audioKey:'contr_q1_fier',correct:'🦁',choix:['🦁','🐜'],labels:['Le lion','La fourmi'],bravo:'Bravo ! Le lion est fort et robuste, la fourmi est minuscule !',audioBravo:null},
-  {consigne:'Lequel est HEUREUX ?',audioKey:'contr_q1_heureux',correct:'😄',choix:['😄','😢'],labels:['Sourire','Pleurer'],bravo:'Oui ! Sourire montre la joie, pleurer montre la tristesse !',audioBravo:'contr_rep_sourire_pleurer'},
-  {consigne:'Lequel est ALLUMÉ ?',audioKey:'contr_q1_allume',correct:'💡',choix:['💡','🕯️'],labels:['La lampe allumée','La bougie éteinte'],bravo:"Super ! L'ampoule brille de mille feux !",audioBravo:'contr_rep_lampe'},
+  {consigne:'Quel animal est GRAND ?',audioKey:'contr_q1_grand',correct:'🐘',choix:['🐘','🐭'],labels:["L'éléphant","La souris"],bravo:"Oui ! L'éléphant est grand, la souris est petite !",audioBravo:'contr_rep_grand'},
+  {consigne:'Lequel est CHAUD ?',audioKey:'contr_q1_chaud',correct:'☀️',choix:['☀️','🧊'],labels:['Le soleil','Le glaçon'],bravo:'Bravo ! Le soleil est chaud, la glace est froide !',audioBravo:'contr_rep_chaud'},
+  {consigne:'Lequel est RAPIDE ?',audioKey:'contr_q1_rapide',correct:'🐆',choix:['🐆','🐢'],labels:['Le guépard','La tortue'],bravo:'Oui ! Le guépard est rapide, la tortue est lente !',audioBravo:'contr_rep_rapide'},
+  {consigne:'Lequel est LONG ?',audioKey:'contr_q1_long',correct:'🐍',choix:['🐍','🐛'],labels:['Le serpent','La chenille'],bravo:'Bravo ! Le serpent est long, la chenille est courte !',audioBravo:'contr_rep_long'},
+  {consigne:'Lequel est LOURD ?',audioKey:'contr_q1_lourd',correct:'🦛',choix:['🦛','🐦'],labels:["L'hippopotame","Le petit oiseau"],bravo:"Oui ! L'hippopotame pèse lourd, l'oiseau est léger !",audioBravo:null},
+  {consigne:'Lequel est MOUILLÉ ?',audioKey:'contr_q1_mouille',correct:'🌧️',choix:['🌧️','🏜️'],labels:['La pluie','Le désert'],bravo:'Bravo ! La pluie est mouillée, le désert est sec !',audioBravo:'contr_rep_mouille'},
+  {consigne:'Lequel est DOUX ?',audioKey:'contr_q1_doux',correct:'🐰',choix:['🐰','🦔'],labels:['Le lapin','Le hérisson'],bravo:'Oui ! Le lapin est doux, le hérisson est piquant !',audioBravo:'contr_rep_doux'},
+  {consigne:'Lequel est FORT ?',audioKey:'contr_q1_fort',correct:'🦁',choix:['🦁','🐜'],labels:['Le lion','La fourmi'],bravo:'Bravo ! Le lion est fort, la fourmi est faible !',audioBravo:'contr_rep_fort'},
+  {consigne:'Lequel est HEUREUX ?',audioKey:'contr_q1_heureux',correct:'😄',choix:['😄','😢'],labels:['Sourire','Pleurer'],bravo:"Oui ! Sourire c'est être heureux, pleurer c'est être triste !",audioBravo:'contr_rep_heureux'},
+  {consigne:'Lequel est ALLUMÉ ?',audioKey:'contr_q1_allume',correct:'💡',choix:['💡','🕯️'],labels:['La lampe allumée','La bougie éteinte'],bravo:'Bravo ! La lampe est allumée, la bougie est éteinte !',audioBravo:'contr_rep_allume'},
 ];
+/* ── Je m'habille : vêtements ── */
+const VETEMENTS = [
+  {id:'tshirt',      nom:'le t-shirt',             e:'👕'},
+  {id:'chemise',     nom:'la chemise',             e:'👔'},
+  {id:'robe',        nom:'la robe',                e:'👗'},
+  {id:'manteau',     nom:'le manteau',             e:'🧥'},
+  {id:'pantalon',    nom:'le pantalon',            e:'👖'},
+  {id:'short',       nom:'le short',               e:'🩳'},
+  {id:'chaussettes', nom:'les chaussettes',        e:'🧦', pluriel:true},
+  {id:'baskets',     nom:'les baskets',            e:'👟', pluriel:true},
+  {id:'bottes',      nom:'les bottes',             e:'👢', pluriel:true},
+  {id:'tongs',       nom:'les tongs',              e:'🩴', pluriel:true},
+  {id:'casquette',   nom:'la casquette',           e:'🧢'},
+  {id:'chapeau',     nom:'le chapeau',             e:'👒'},
+  {id:'gants',       nom:'les gants',              e:'🧤', pluriel:true},
+  {id:'echarpe',     nom:"l'écharpe",              e:'🧣'},
+  {id:'lunettes',    nom:'les lunettes de soleil', e:'🕶️', pluriel:true},
+  {id:'maillot',     nom:'le maillot de bain',     e:'🩱'},
+  {id:'parapluie',   nom:'le parapluie',           e:'☂️'},
+  {id:'cartable',    nom:'le cartable',            e:'🎒'},
+];
+// Histoire « Je m'habille pour aller à l'école » : une météo, 6 étapes dans l'ordre
+const HABILLAGE = {
+  froid: { icone:'❄️', etapes:[
+    {q:"Brrr, il fait froid ! Je m'habille pour aller à l'école. Qu'est-ce que je mets sur mes jambes ?", ok:'pantalon', faux:['short','maillot','gants'], bravo:"Oui ! Le pantalon, pour avoir les jambes au chaud."},
+    {q:"Qu'est-ce que je mets sur mon corps ?", ok:'tshirt', faux:['short','gants','chaussettes'], bravo:"Oui ! Le t-shirt va sur mon corps."},
+    {q:"Qu'est-ce que je mets sur mes pieds, avant les chaussures ?", ok:'chaussettes', faux:['gants','casquette','echarpe'], bravo:"Bravo ! Les chaussettes vont sur les pieds."},
+    {q:"Il fait froid dehors. Qu'est-ce que je mets par-dessus pour sortir ?", ok:'manteau', faux:['maillot','short','tongs'], bravo:"Super ! Le manteau me tient bien chaud."},
+    {q:"Qu'est-ce que je mets autour de mon cou ?", ok:'echarpe', faux:['chaussettes','lunettes','bottes'], bravo:"Oui ! L'écharpe se met autour du cou."},
+    {q:"Qu'est-ce que je mets sur mes mains ?", ok:'gants', faux:['chaussettes','casquette','short'], bravo:"Bravo ! Les gants, pour avoir les mains au chaud."},
+    {q:"Je suis prêt ! Qu'est-ce que je prends pour aller à l'école ?", ok:'cartable', faux:['maillot','tongs','lunettes'], bravo:"Bravo ! Le cartable, et en route pour l'école !"},
+  ]},
+  pluie: { icone:'🌧️', etapes:[
+    {q:"Oh, il pleut ! Je m'habille pour aller à l'école. Qu'est-ce que je mets sur mes jambes ?", ok:'pantalon', faux:['maillot','gants','casquette'], bravo:"Oui ! Le pantalon va sur les jambes."},
+    {q:"Qu'est-ce que je mets sur mon corps ?", ok:'tshirt', faux:['maillot','gants','chaussettes'], bravo:"Oui ! Le t-shirt va sur mon corps."},
+    {q:"Qu'est-ce que je mets sur mes pieds, avant les bottes ?", ok:'chaussettes', faux:['gants','echarpe','lunettes'], bravo:"Bravo ! Les chaussettes vont sur les pieds."},
+    {q:"Il pleut ! Qu'est-ce que je mets à mes pieds pour sauter dans les flaques ?", ok:'bottes', faux:['tongs','gants','chapeau'], bravo:"Super ! Avec les bottes, mes pieds restent au sec."},
+    {q:"Qu'est-ce que je mets par-dessus pour ne pas être mouillé ?", ok:'manteau', faux:['maillot','short','lunettes'], bravo:"Oui ! Le manteau me protège de la pluie."},
+    {q:"Qu'est-ce que je prends pour me protéger de la pluie ?", ok:'parapluie', faux:['lunettes','tongs','maillot'], bravo:"Bravo ! Le parapluie, pour ne pas avoir la tête mouillée."},
+    {q:"Je suis prêt ! Qu'est-ce que je prends pour aller à l'école ?", ok:'cartable', faux:['maillot','tongs','lunettes'], bravo:"Bravo ! Le cartable, et en route pour l'école !"},
+  ]},
+  chaud: { icone:'☀️', etapes:[
+    {q:"Il fait chaud et il y a du soleil ! Je m'habille pour aller à l'école. Qu'est-ce que je mets sur mon corps ?", ok:'tshirt', faux:['manteau','echarpe','gants'], bravo:"Oui ! Le t-shirt, c'est léger quand il fait chaud."},
+    {q:"Il fait chaud ! Qu'est-ce que je mets sur mes jambes ?", ok:'short', faux:['gants','echarpe','manteau'], bravo:"Bravo ! Le short va sur les jambes."},
+    {q:"Qu'est-ce que je mets sur mes pieds pour courir dans la cour ?", ok:'baskets', faux:['gants','casquette','echarpe'], bravo:"Super ! Avec les baskets, je cours très vite."},
+    {q:"Le soleil tape fort. Qu'est-ce que je mets sur ma tête ?", ok:'casquette', faux:['chaussettes','gants','echarpe'], bravo:"Oui ! La casquette protège ma tête du soleil."},
+    {q:"Le soleil brille. Qu'est-ce que je mets sur mes yeux ?", ok:'lunettes', faux:['gants','chaussettes','manteau'], bravo:"Bravo ! Les lunettes de soleil protègent mes yeux."},
+    {q:"Je suis prêt ! Qu'est-ce que je prends pour aller à l'école ?", ok:'cartable', faux:['maillot','gants','echarpe'], bravo:"Bravo ! Le cartable, et en route pour l'école !"},
+  ]},
+};
+
 const ANGLAIS = [
   {q:"Comment dit-on 'chat' en anglais ?",    audioKey:'anglais_q1_chat',     c:"Cat",     choices:["Cat","Dog","Cow","Rabbit"],          labels:["Cat 🐱","Dog 🐶","Cow 🐮","Rabbit 🐰"],              speak:["cat","dog","cow","rabbit"]},
   {q:"Comment dit-on 'chien' en anglais ?",   audioKey:'anglais_q1_chien',    c:"Dog",     choices:["Dog","Cat","Lion","Sheep"],          labels:["Dog 🐶","Cat 🐱","Lion 🦁","Sheep 🐑"],              speak:["dog","cat","lion","sheep"]},
@@ -2467,7 +2579,8 @@ function buildQ(mod) {
         audioKey: `couleurs_q1_${accord}`,
         correct: c.nom,
         type: 'color',
-        choix: shuffle([c, ...d]).map(x => ({ val: x.nom, label: x.nom, hex: x.hex, tc: x.tc, speak: COULEUR_FEM[x.nom] || x.nom }))
+        // Les réponses sont dites comme écrites sur la carte (voix enregistrées couleur_*.mp3)
+        choix: shuffle([c, ...d]).map(x => ({ val: x.nom, label: x.nom, hex: x.hex, tc: x.tc, speak: x.nom }))
       });
     });
   }
@@ -2493,7 +2606,7 @@ function buildQ(mod) {
       qs.push({
         consigne: `Quel est cet animal ? Indice : ${a.hint}`,
         consigneDisplay: `Quel est cet animal ? Indice : ${a.hint}`,
-        audioKey: 'animaux_quel_animal',
+        audioKey: null,
         correct: a.nom,
         type: 'emoji',
         choix: shuffle([a, ...d1]).map(x => ({ val: x.nom, label: x.nom, emoji: x.e, speak: x.nom }))
@@ -2566,6 +2679,40 @@ function buildQ(mod) {
     });
   }
 
+  if (mod === 'vetements') {
+    const V = id => VETEMENTS.find(v => v.id === id);
+    const carte = v => ({ val: v.id, label: v.nom, emoji: v.e, speak: v.nom });
+    const meteo = pick(Object.keys(HABILLAGE), 1)[0];
+    const histoire = HABILLAGE[meteo];
+    // 1) Vocabulaire : « Montre-moi le pantalon ! » (10 questions en tout)
+    pick(VETEMENTS, 10 - histoire.etapes.length).forEach(v => {
+      qs.push({
+        consigne: `Montre-moi ${v.nom} !`,
+        audioKey: `vet_montre_${v.id}`,
+        correct: v.id,
+        bravo: v.pluriel ? `Oui ! Ce sont ${v.nom} !` : `Oui ! C'est ${v.nom} !`,
+        audioBravo: `vet_cest_${v.id}`,
+        type: 'emoji',
+        choix: shuffle([v, ...pick(VETEMENTS.filter(x => x.id !== v.id), 3)]).map(carte)
+      });
+    });
+    // 2) Histoire : je m'habille pour aller à l'école (dans l'ordre)
+    const tenue = [];
+    histoire.etapes.forEach((et, n) => {
+      qs.push({
+        consigne: et.q,
+        audioKey: `vet_${meteo}_${n + 1}`,
+        correct: et.ok,
+        bravo: et.bravo,
+        audioBravo: `vet_${meteo}_${n + 1}_bravo`,
+        type: 'emoji',
+        tenue: { icone: histoire.icone, habits: tenue.slice() },
+        choix: shuffle([et.ok, ...et.faux].map(id => carte(V(id))))
+      });
+      tenue.push(V(et.ok).e);
+    });
+  }
+
   if (mod === 'anglais') {
     shuffle(ANGLAIS).slice(0, 10).forEach(item => {
       const isEnglishQ = item.q.includes('anglais');
@@ -2586,7 +2733,8 @@ function buildQ(mod) {
   }
   
   // apply difficulty slicing
-  const finalQs = shuffle(qs).slice(0, 10);
+  // « Je m'habille » garde son ordre (vocabulaire puis histoire)
+  const finalQs = mod === 'vetements' ? qs : shuffle(qs).slice(0, 10);
   
   // filter choices size in each question based on difficulty settings
   finalQs.forEach(q => {
@@ -2616,6 +2764,7 @@ const MOD_LABELS = {
   regles: '💛 Vivre ensemble',
   contraires: '↔️ Les contraires',
   anglais: '🇬🇧 Mon premier Anglais',
+  vetements: "👕 Je m'habille",
   memory: '🧠 Jeu de Mémoire'
 };
 
@@ -2737,6 +2886,21 @@ function afficherQ() {
   const grid = document.getElementById('game-answers-grid');
   grid.innerHTML = '';
   
+  // Je m'habille : la tenue se construit au fil des bonnes réponses
+  let bandeau = document.getElementById('game-tenue');
+  if (!bandeau) {
+    bandeau = document.createElement('div');
+    bandeau.id = 'game-tenue';
+    grid.parentNode.insertBefore(bandeau, grid);
+  }
+  if (q.tenue) {
+    bandeau.className = 'flex items-center justify-center gap-2 flex-wrap mx-auto mb-4 px-4 py-2 rounded-2xl bg-white/5 border border-white/10 max-w-md min-h-[56px] text-3xl md:text-4xl';
+    bandeau.innerHTML = `<span title="Météo">${q.tenue.icone}</span><span class="text-white/30 text-xl">|</span>` +
+      (q.tenue.habits.length ? q.tenue.habits.map(e => `<span>${e}</span>`).join('') : '<span class="text-white/50 text-sm font-bold">Ma tenue</span>');
+  } else {
+    bandeau.className = 'hidden';
+  }
+
   // Dynamic grid columns structure based on options size
   const cols = q.choix.length;
   if (cols === 2) {
@@ -2887,7 +3051,7 @@ function validerReponse(val, q) {
       // donc pas besoin de resynthétiser le mot de la réponse.
       direAudio(enc.key, enc.text, 300)
         .then(() => {
-          if (q.audioKey) return direAudio(q.audioKey, q.consigne);
+          return direQ(q);
         })
         .then(() => {
         setTimeout(() => {
@@ -3157,7 +3321,7 @@ function loadUnlockedStampsForCanvas() {
         document.getElementById('btn-rainbow-brush').style.transform = "none";
         
         playSynthSound('pop');
-        dire(`Tampon ${stk.name}`);
+        direAudio(stk.audioKey, stk.voice || stk.name);
       };
     }
     

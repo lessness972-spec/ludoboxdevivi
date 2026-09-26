@@ -1,12 +1,12 @@
-const CACHE_NAME = 'ludobox-vivi-v4';
+const CACHE_NAME = 'ludobox-vivi-v5';
 const ASSETS = [
   './',
   './index.html',
   './manifest.json',
+  './voix.js',
   './icon-192.png',
   './icon-512.png',
   './splash.png',
-  './splash.gif',
   './splash.mp4',
   './iconalphabet.png',
   './iconanglais.png',
