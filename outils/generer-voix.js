@@ -57,8 +57,8 @@ function phrasesDuJeu() {
 
   // Consignes et félicitations (tirages répétés pour tout couvrir)
   X.parentSettings.difficulty = 'hard';
-  for (const mod of ['alphabet', 'chiffres', 'couleurs', 'formes', 'animaux', 'nourriture', 'lecture', 'regles', 'contraires', 'anglais', 'vetements'])
-    for (let i = 0; i < 200; i++)
+  for (const mod of ['alphabet', 'chiffres', 'couleurs', 'formes', 'animaux', 'nourriture', 'lecture', 'regles', 'contraires', 'anglais', 'vetements', 'calendrier', 'heure'])
+    for (let i = 0; i < 600; i++)
       for (const q of X.buildQ(mod)) {
         ajouter(fichierDeCle(q.audioKey), q.consigneDisplay || q.consigne);
         ajouter(fichierDeCle(q.audioBravo), q.bravo);
@@ -76,6 +76,12 @@ function phrasesDuJeu() {
 async function generer(cle, voixId, reglages, texte, en) {
   const corps = { text: texte, model_id: en ? MODELE_ANGLAIS : MODELE, voice_settings: { ...reglages, speed: VITESSE } };
   if (en) corps.language_code = 'en';
+  // Textes courts : sans contexte, le modèle prend souvent un accent anglais (« Baleine » -> « Bye, Laney »).
+  // Ce contexte français n'est pas prononcé, il fixe seulement la langue.
+  else if (texte.split(/\s+/).length <= 3) {
+    corps.previous_text = 'Écoute bien, je vais te dire un mot en français :';
+    corps.next_text = "C'est un mot français.";
+  }
   for (let essai = 1; essai <= 5; essai++) {
     const rep = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voixId}?output_format=mp3_44100_128`, {
       method: 'POST',
@@ -106,6 +112,10 @@ async function generer(cle, voixId, reglages, texte, en) {
   const nbCar = aFaire.reduce((a, [, p]) => a + p.texte.length, 0);
   console.log(`${mascotte} : ${aFaire.length} phrases à générer sur ${phrases.size} (${nbCar} caractères)`);
 
+  if (process.argv.includes('--liste')) {
+    phrases.forEach((p, f) => console.log(`${f}	${p.en ? 'en' : 'fr'}	${p.texte}`));
+    return;
+  }
   if (essai) {
     aFaire.forEach(([f, p]) => console.log(`  ${f}${p.en ? ' [EN]' : ''} : ${p.texte}`));
     return;

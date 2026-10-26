@@ -11,9 +11,10 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Ludobox">
-<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+<!-- Tailwind et polices intégrés localement : aucune requête vers un service tiers -->
+<script src="./tailwind.js"></script>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap');
+@import url('./polices/polices.css');
 
 *, *::before, *::after {
   box-sizing: border-box;
@@ -586,6 +587,18 @@ footer {
               <p class="text-white/60 text-xs">Les vêtements</p>
             </div>
 
+            <div class="mod-btn clay-card p-4 md:p-6 flex flex-col items-center justify-center text-center gap-3 cursor-pointer" data-mod="calendrier">
+              <div class="w-16 h-16 md:w-24 md:h-24 flex items-center justify-center text-5xl md:text-7xl drop-shadow-lg select-none" aria-hidden="true">📅</div>
+              <h3 class="font-black text-sm md:text-lg">Le calendrier</h3>
+              <p class="text-white/60 text-xs">Jours, mois, saisons</p>
+            </div>
+
+            <div class="mod-btn clay-card p-4 md:p-6 flex flex-col items-center justify-center text-center gap-3 cursor-pointer" data-mod="heure">
+              <div class="w-16 h-16 md:w-24 md:h-24 flex items-center justify-center text-5xl md:text-7xl drop-shadow-lg select-none" aria-hidden="true">⏰</div>
+              <h3 class="font-black text-sm md:text-lg">L'heure</h3>
+              <p class="text-white/60 text-xs">Matin, soir et horloge</p>
+            </div>
+
             <!-- NEW MODULES -->
             <div class="mod-btn clay-card p-4 md:p-6 flex flex-col items-center justify-center text-center gap-3 cursor-pointer border-2 border-amber-500/30" data-mod="anglais">
               <img src="./iconanglais.png" class="w-16 h-16 md:w-24 md:h-24 object-contain drop-shadow-lg" alt="Anglais">
@@ -604,6 +617,12 @@ footer {
               <h3 class="font-black text-sm md:text-lg text-emerald-400">Tableau Créatif</h3>
               <p class="text-white/60 text-xs">Dessin et stickers stickers</p>
             </div>
+
+            <div class="mod-btn clay-card p-4 md:p-6 flex flex-col items-center justify-center text-center gap-3 cursor-pointer border-2 border-sky-500/30" data-mod="course">
+              <div class="w-16 h-16 md:w-24 md:h-24 flex items-center justify-center text-5xl md:text-7xl drop-shadow-lg select-none" aria-hidden="true">🏁</div>
+              <h3 class="font-black text-sm md:text-lg text-sky-400">La course</h3>
+              <p class="text-white/60 text-xs">Saute et attrape les étoiles</p>
+            </div>
           </div>
         </div>
 
@@ -621,7 +640,8 @@ footer {
   </div>
 
   <div class="w-full text-center text-white/50 text-xs font-semibold mt-8 pb-4 copyright" id="copyright">
-    La Ludobox de Vivi &copy; 2026
+    La Ludobox de Vivi &copy; 2026 · un produit Dee Kréations · Version de test gratuite ·
+    <button type="button" onclick="ouvrirMentions()" class="underline hover:text-white cursor-pointer">Mentions légales et confidentialité</button>
   </div>
 </div>
 
@@ -700,6 +720,30 @@ footer {
 </div>
 
 <!-- ==================== PAGE: TABLEAU CRÉATIF (DRAWING CANVAS) ==================== -->
+<!-- ==================== LA COURSE (jeu pour s'amuser) ==================== -->
+<div id="page-course" class="page relative z-10" style="padding:12px">
+  <div class="w-full max-w-4xl flex items-center justify-between bg-slate-950/60 backdrop-blur-md rounded-2xl border border-white/10 shadow-xl" style="margin:0 auto 12px;padding:10px 12px">
+    <button onclick="quitterCourse()" class="clay-btn bg-gradient-to-b from-pink-500 to-rose-600 text-white font-black text-xs md:text-sm rounded-xl border-b-4 border-rose-800 cursor-pointer flex items-center gap-2" style="padding:8px 14px">⬅️ Menu</button>
+    <div class="font-black text-sm md:text-xl text-sky-400 uppercase tracking-wide">🏁 La course</div>
+    <div class="flex items-center gap-3">
+      <div id="course-coeurs" class="text-lg md:text-2xl">❤️❤️❤️</div>
+      <div id="course-etoiles" class="clay-btn bg-gradient-to-b from-yellow-400 to-amber-500 text-indigo-950 font-black text-xs md:text-sm rounded-xl border-b-4 border-amber-700" style="padding:6px 12px">⭐ 0</div>
+    </div>
+  </div>
+  <div id="course-zone" class="relative w-full max-w-4xl rounded-3xl overflow-hidden border-4 border-white/10 shadow-2xl" style="margin:0 auto;touch-action:manipulation">
+    <canvas id="course-canvas" class="block w-full select-none" style="cursor:pointer"></canvas>
+    <div id="course-ecran" class="absolute inset-0 flex flex-col items-center justify-center text-center bg-slate-950/70" style="padding:16px;gap:14px">
+      <div id="course-titre" class="text-2xl md:text-4xl font-black text-amber-400">Prêt pour la course ?</div>
+      <div id="course-texte" class="text-white/85 text-sm md:text-lg max-w-md">Tape sur l'écran pour sauter par-dessus les obstacles, et attrape les étoiles ⭐</div>
+      <div class="flex flex-wrap justify-center" style="gap:12px">
+        <button id="course-btn-go" onclick="demarrerCourse()" class="clay-btn bg-gradient-to-b from-emerald-400 to-emerald-600 text-white font-black text-lg md:text-2xl rounded-full border-b-4 border-emerald-800 cursor-pointer" style="padding:12px 32px">▶️ Partez !</button>
+        <button id="course-btn-menu" onclick="quitterCourse()" class="hidden clay-btn bg-gradient-to-b from-pink-500 to-rose-600 text-white font-black text-lg md:text-2xl rounded-full border-b-4 border-rose-800 cursor-pointer" style="padding:12px 28px">🏠 Menu</button>
+      </div>
+    </div>
+  </div>
+  <p class="text-center text-amber-400/80 text-xs md:text-sm font-bold" style="margin-top:12px">Tape sur l'écran (ou appuie sur Espace) pour sauter !</p>
+</div>
+
 <div id="page-draw" class="page relative min-h-screen w-full flex flex-col justify-between p-3 z-10">
   <!-- Header toolbar -->
   <div class="w-full max-w-5xl mx-auto flex items-center justify-between bg-slate-950/60 backdrop-blur-md rounded-2xl p-3 border border-white/10 shadow-xl">
@@ -875,28 +919,24 @@ footer {
 
 <!-- ==================== MODAL: PARENTS CONTROLS GATE ==================== -->
 <div id="parents-gate" class="fixed inset-0 z-[1000] bg-slate-950/80 backdrop-blur-md hidden items-center justify-center p-4">
-  <div class="clay-card w-full max-w-md p-8 flex flex-col gap-6 border-2 border-slate-600/40 bg-slate-950">
+  <div class="clay-card w-full max-w-md p-8 flex flex-col gap-5 border-2 border-slate-600/40 bg-slate-950">
     <div class="text-center">
       <span class="text-4xl">🔐</span>
       <h3 class="font-black text-2xl text-amber-400 mt-2">ESPACE PARENTS</h3>
-      <p class="text-white/70 text-xs md:text-sm mt-1">
-        Pour prouver que vous êtes un adulte, s'il vous plaît résolvez cette équation simple :
-      </p>
+      <p id="parents-gate-consigne" class="text-white/70 text-xs md:text-sm mt-1">Réservé aux adultes.</p>
     </div>
 
-    <!-- Math Puzzle -->
     <div class="bg-slate-900 p-4 rounded-2xl border border-white/5 text-center">
-      <span id="parents-math-challenge" class="text-2xl md:text-3xl font-black text-white tracking-wider">
-        4 + 3 = ?
-      </span>
+      <span id="parents-math-challenge" class="text-xl md:text-2xl font-black text-white tracking-wide"></span>
     </div>
 
-    <!-- Selection grid -->
-    <div class="grid grid-cols-2 gap-3" id="parents-gate-choices">
-      <!-- Filled dynamic options buttons -->
-    </div>
+    <form id="parents-gate-form" class="flex gap-2" autocomplete="off">
+      <input id="parents-gate-input" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" aria-label="Réponse"
+        class="min-w-0 flex-1 rounded-2xl bg-slate-800 px-4 py-3 text-center text-2xl font-black tracking-[0.3em] text-white outline-none focus:ring-2 focus:ring-amber-400">
+      <button class="shrink-0 rounded-2xl bg-amber-400 px-5 font-black text-indigo-950 border-b-4 border-amber-600 cursor-pointer">OK</button>
+    </form>
+    <p id="parents-gate-erreur" class="hidden text-center text-sm font-bold text-pink-400">Ce n'est pas ça. Nouvel essai :</p>
 
-    <!-- Cancel Button -->
     <button onclick="closeParentsGate()" class="w-full py-3 rounded-2xl bg-slate-800 text-white font-bold border-b-4 border-slate-950 hover:bg-slate-700 cursor-pointer">
       Retourner jouer
     </button>
@@ -907,11 +947,27 @@ footer {
 <div id="parents-dashboard" class="fixed inset-0 z-[1000] bg-slate-950/75 backdrop-blur-md hidden items-center justify-center p-4">
   <div class="clay-card w-full max-w-lg p-6 flex flex-col gap-5 bg-slate-900 border border-white/10 max-h-[90vh] overflow-y-auto">
     <div class="flex justify-between items-center border-b border-white/10 pb-3">
-      <h3 class="font-black text-xl text-amber-400 flex items-center gap-2">⚙️ CONFIGURATION DU LION VIVI</h3>
-      <button onclick="closeParentsDashboard()" class="text-white/60 hover:text-white text-2xl font-bold cursor-pointer">✕</button>
+      <h3 class="font-black text-xl text-amber-400 flex items-center gap-2">👨‍👩‍👧 ESPACE PARENTS</h3>
+      <button onclick="closeParentsDashboard()" class="text-white/60 hover:text-white text-2xl font-bold cursor-pointer" aria-label="Fermer">✕</button>
     </div>
 
-    <!-- Play Timer Limit -->
+    <div class="grid grid-cols-3 gap-2" role="tablist">
+      <button onclick="ongletParents('suivi')" data-onglet="suivi" class="onglet-parents py-2 rounded-xl text-xs font-extrabold cursor-pointer">📈 Suivi</button>
+      <button onclick="ongletParents('jeux')" data-onglet="jeux" class="onglet-parents py-2 rounded-xl text-xs font-extrabold cursor-pointer">🎲 Jeux</button>
+      <button onclick="ongletParents('reglages')" data-onglet="reglages" class="onglet-parents py-2 rounded-xl text-xs font-extrabold cursor-pointer">⚙️ Réglages</button>
+    </div>
+
+    <!-- SUIVI -->
+    <div id="parents-panneau-suivi" class="panneau-parents flex flex-col gap-4"></div>
+
+    <!-- JEUX : afficher / masquer, progrès et conseils -->
+    <div id="parents-panneau-jeux" class="panneau-parents hidden flex-col gap-3">
+      <p class="text-xs text-white/60">Touchez « Visible » pour masquer un jeu à l'enfant. Ouvrez « Conseils » pour savoir ce que le jeu travaille et comment prolonger à la maison.</p>
+      <div id="parents-liste-jeux" class="flex flex-col gap-3"></div>
+    </div>
+
+    <!-- RÉGLAGES -->
+    <div id="parents-panneau-reglages" class="panneau-parents hidden flex-col gap-5">
     <div class="flex flex-col gap-1.5">
       <label class="text-xs font-bold text-white/60 uppercase tracking-wider">⏳ Limiter le temps de jeu de l'enfant :</label>
       <div class="grid grid-cols-4 gap-2">
@@ -923,7 +979,6 @@ footer {
       <p id="timer-status-txt" class="text-[10px] text-amber-400 italic mt-0.5"></p>
     </div>
 
-    <!-- Difficulty Level selector -->
     <div class="flex flex-col gap-1.5">
       <label class="text-xs font-bold text-white/60 uppercase tracking-wider">🎯 Niveau de difficulté :</label>
       <div class="grid grid-cols-3 gap-2">
@@ -933,10 +988,20 @@ footer {
       </div>
     </div>
 
-    <!-- TTS Voice adjustments -->
+    <div class="flex flex-col gap-2 bg-slate-950/40 p-3 rounded-2xl border border-white/5">
+      <h4 class="text-xs font-bold text-white/70 uppercase tracking-wider">🔐 Code parent</h4>
+      <p id="parents-code-etat" class="text-[11px] text-white/60"></p>
+      <form id="parents-code-form" class="flex gap-2" autocomplete="off">
+        <input id="parents-code-input" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="4 chiffres" aria-label="Nouveau code parent"
+          class="min-w-0 flex-1 rounded-xl bg-slate-800 px-3 py-2 text-center font-black tracking-[0.3em] text-white outline-none focus:ring-2 focus:ring-amber-400">
+        <button class="shrink-0 rounded-xl bg-amber-400 px-3 text-xs font-extrabold text-indigo-950 cursor-pointer">Enregistrer</button>
+      </form>
+      <button id="parents-code-suppr" onclick="supprimerCodeParent()" class="hidden self-start text-[11px] font-bold text-pink-400 underline cursor-pointer">Supprimer le code (revenir au nombre à écrire)</button>
+    </div>
+
     <div class="flex flex-col gap-3 bg-slate-950/40 p-3 rounded-2xl border border-white/5">
       <h4 class="text-xs font-bold text-white/70 uppercase tracking-wider">🔊 Paramètres de la Synthèse Vocale</h4>
-      
+
       <div class="flex flex-col gap-1">
         <div class="flex justify-between text-xs text-white/70 font-bold">
           <span>Vitesse de lecture :</span>
@@ -954,23 +1019,34 @@ footer {
       </div>
     </div>
 
-    <!-- Clear/Reset stats -->
     <div class="flex flex-col gap-2 border-t border-white/10 pt-3">
-      <div class="flex justify-between items-center">
+      <div class="flex justify-between items-center gap-3">
         <div class="flex flex-col">
           <span class="text-xs font-bold text-white">Réinitialiser la progression</span>
-          <span class="text-[10px] text-white/40">Supprime tous les stickers débloqués</span>
+          <span class="text-[10px] text-white/40">Supprime les autocollants débloqués et le suivi des jeux</span>
         </div>
-        <button onclick="resetChildProgress()" class="py-2 px-4 rounded-xl text-xs font-extrabold bg-rose-600 border-b-4 border-rose-950 hover:bg-rose-700 text-white cursor-pointer">
+        <button onclick="resetChildProgress()" class="shrink-0 py-2 px-4 rounded-xl text-xs font-extrabold bg-rose-600 border-b-4 border-rose-950 hover:bg-rose-700 text-white cursor-pointer">
           Tout Effacer 🚨
         </button>
       </div>
     </div>
+    </div>
 
-    <!-- Close Button -->
     <button onclick="closeParentsDashboard()" class="w-full py-3 rounded-2xl bg-emerald-500 text-white font-extrabold border-b-4 border-emerald-800 hover:bg-emerald-400 cursor-pointer text-sm">
       SAUVEGARDER ET FERMER
     </button>
+  </div>
+</div>
+
+<!-- ==================== MENTIONS LÉGALES ET CONFIDENTIALITÉ ==================== -->
+<div id="mentions-legales" class="fixed inset-0 z-[2500] bg-slate-950/80 backdrop-blur-md hidden items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="mentions-titre">
+  <div class="bg-indigo-950 border border-white/10 rounded-3xl max-w-2xl w-full max-h-[85vh] overflow-y-auto text-white/90 text-sm leading-relaxed shadow-2xl" style="padding:24px 28px">
+    <div class="flex items-start justify-between gap-4" style="margin-bottom:16px">
+      <h2 id="mentions-titre" class="text-xl md:text-2xl font-black text-amber-400">Mentions légales et confidentialité</h2>
+      <button type="button" onclick="fermerMentions()" class="shrink-0 text-2xl leading-none text-white/70 hover:text-white cursor-pointer" aria-label="Fermer">✕</button>
+    </div>
+    <div id="mentions-contenu"></div>
+    <button type="button" onclick="fermerMentions()" class="w-full clay-btn bg-gradient-to-b from-amber-400 to-amber-500 text-indigo-950 font-black rounded-full cursor-pointer" style="margin-top:20px;padding:12px">Fermer</button>
   </div>
 </div>
 
@@ -1052,10 +1128,10 @@ window.addEventListener('error', function(e) {
 
 /* ══════════ MASCOTS IMAGES MAPPING ══════════ */
 const MASCOTS = {
-  lion:     { label: 'Vivi le lion',     entier: 'lionentier.png',     tete: 'lionblanc.png' },
-  girafe:   { label: 'Gigi la girafe',   entier: 'girafeentier.png',   tete: 'girafejaune.png' },
-  panthere: { label: 'Paty la panthere', entier: 'panthereentier.png', tete: 'pantherenoire.png' },
-  koala:    { label: 'Koko le koala',    entier: 'koalaentier.png',    tete: 'koalagris.png' }
+  lion:     { label: 'Vivi le lion',     entier: 'lionentier.png',     tete: 'lionblanc.png',     course: 'courselion.png' },
+  girafe:   { label: 'Gigi la girafe',   entier: 'girafeentier.png',   tete: 'girafejaune.png',   course: 'coursegirafe.png' },
+  panthere: { label: 'Paty la panthere', entier: 'panthereentier.png', tete: 'pantherenoire.png', course: 'coursepanthere.png' },
+  koala:    { label: 'Koko le koala',    entier: 'koalaentier.png',    tete: 'koalagris.png',     course: 'coursekoala.png' }
 };
 
 const MASCOT_QUOTES = {
@@ -2011,90 +2087,295 @@ function handleBubbleTaps(e) {
   }
 }
 
-/* ══════════ PLAY TIMERS & PARENT SECURITY GATE ══════════ */
-let parentsGateCorrectAns = 0;
+/* ══════════ PLAY TIMERS & PARENT SECURITY GATE ══════════
+   Un enfant de 3 à 7 ans résout « 4 + 3 » ou devine parmi 4 boutons.
+   On demande donc soit le code parent (s'il est défini), soit d'écrire en
+   chiffres un nombre donné en toutes lettres : il faut savoir lire. */
+let parentsGateAttendu = '';
+let parentsGateSucces = null;
 
-function triggerParentsGate() {
-  playSynthSound('pop');
-  const a = 2 + Math.floor(Math.random() * 6);
-  const b = 2 + Math.floor(Math.random() * 4);
-  parentsGateCorrectAns = a + b;
-  
-  document.getElementById('parents-math-challenge').textContent = `${a} + ${b} = ?`;
-  
-  const choices = [parentsGateCorrectAns];
-  while (choices.length < 4) {
-    const fake = 4 + Math.floor(Math.random() * 10);
-    if (!choices.includes(fake)) choices.push(fake);
-  }
-  choices.sort(() => Math.random() - 0.5);
-  
-  const grid = document.getElementById('parents-gate-choices');
-  grid.innerHTML = '';
-  choices.forEach(ch => {
-    const btn = document.createElement('button');
-    btn.className = "py-3 rounded-xl bg-slate-800 text-white font-black border-b-4 border-slate-950 text-lg hover:bg-slate-700 cursor-pointer";
-    btn.textContent = ch;
-    btn.onclick = () => {
-      if (ch === parentsGateCorrectAns) {
-        playSynthSound('success');
-        document.getElementById('parents-gate').classList.add('hidden');
-        openParentsDashboard();
-      } else {
-        playSynthSound('error');
-        // Close gate to prevent brute-force
-        document.getElementById('parents-gate').classList.add('hidden');
-      }
-    };
-    grid.appendChild(btn);
-  });
-  
-  document.getElementById('parents-gate').classList.remove('hidden');
+function nombreEnLettres(n) {
+  const unites = ['', 'un', 'deux', 'trois', 'quatre', 'cinq', 'six', 'sept', 'huit', 'neuf'];
+  const dizaines = { 2: 'vingt', 3: 'trente', 4: 'quarante', 5: 'cinquante', 6: 'soixante' };
+  const d = Math.floor(n / 10), u = n % 10;
+  if (u === 0) return dizaines[d];
+  if (u === 1) return `${dizaines[d]}-et-un`;
+  return `${dizaines[d]}-${unites[u]}`;
 }
 
-function closeParentsGate() {
+function nouveauDefiParents() {
+  const consigne = document.getElementById('parents-gate-consigne');
+  const defi = document.getElementById('parents-math-challenge');
+  const input = document.getElementById('parents-gate-input');
+  input.value = '';
+  if (parentSettings.codeParent) {
+    parentsGateAttendu = parentSettings.codeParent;
+    consigne.textContent = 'Entrez votre code parent.';
+    defi.textContent = '• • • •';
+    input.type = 'password';
+  } else {
+    const n = 21 + Math.floor(Math.random() * 49);
+    parentsGateAttendu = String(n);
+    consigne.textContent = 'Pour vérifier que vous êtes un adulte, écrivez ce nombre en chiffres :';
+    defi.textContent = nombreEnLettres(n);
+    input.type = 'text';
+  }
+}
+
+function ouvrirVerrouParents(surSucces) {
   playSynthSound('pop');
-  document.getElementById('parents-gate').classList.add('hidden');
+  parentsGateSucces = surSucces;
+  document.getElementById('parents-gate-erreur').classList.add('hidden');
+  nouveauDefiParents();
+  const gate = document.getElementById('parents-gate');
+  gate.classList.remove('hidden');
+  gate.classList.add('flex');
+  setTimeout(() => document.getElementById('parents-gate-input').focus(), 50);
+}
+
+document.getElementById('parents-gate-form').addEventListener('submit', (event) => {
+  event.preventDefault();
+  const valeur = document.getElementById('parents-gate-input').value.trim();
+  if (valeur === parentsGateAttendu) {
+    playSynthSound('success');
+    closeParentsGate(true);
+    if (parentsGateSucces) parentsGateSucces();
+  } else {
+    playSynthSound('error');
+    document.getElementById('parents-gate-erreur').classList.remove('hidden');
+    nouveauDefiParents();
+  }
+});
+
+function triggerParentsGate() {
+  ouvrirVerrouParents(openParentsDashboard);
+}
+
+function closeParentsGate(silencieux) {
+  if (!silencieux) playSynthSound('pop');
+  const gate = document.getElementById('parents-gate');
+  gate.classList.add('hidden');
+  gate.classList.remove('flex');
 }
 
 function triggerBedtimeUnlock() {
-  const a = 3 + Math.floor(Math.random() * 5);
-  const b = 2 + Math.floor(Math.random() * 5);
-  parentsGateCorrectAns = a + b;
-  
-  document.getElementById('parents-math-challenge').textContent = `${a} + ${b} = ?`;
-  
-  const choices = [parentsGateCorrectAns];
-  while (choices.length < 4) {
-    const fake = 5 + Math.floor(Math.random() * 10);
-    if (!choices.includes(fake)) choices.push(fake);
-  }
-  choices.sort(() => Math.random() - 0.5);
-  
-  const grid = document.getElementById('parents-gate-choices');
-  grid.innerHTML = '';
-  choices.forEach(ch => {
-    const btn = document.createElement('button');
-    btn.className = "py-3 rounded-xl bg-slate-800 text-white font-black border-b-4 border-slate-950 text-lg hover:bg-slate-700 cursor-pointer";
-    btn.textContent = ch;
-    btn.onclick = () => {
-      if (ch === parentsGateCorrectAns) {
-        playSynthSound('success');
-        // Reset timer and dismiss bedtime lock screen
-        document.getElementById('parents-gate').classList.add('hidden');
-        document.getElementById('bedtime-screen').classList.add('hidden');
-        parentSettings.timerMinutes = 0; // set to infinite
-        saveSettings();
-        stopPlayTimer();
-        showPage('page-home');
-      } else {
-        playSynthSound('error');
-        document.getElementById('parents-gate').classList.add('hidden');
-      }
-    };
-    grid.appendChild(btn);
+  ouvrirVerrouParents(() => {
+    document.getElementById('bedtime-screen').classList.add('hidden');
+    parentSettings.timerMinutes = 0;
+    saveSettings();
+    stopPlayTimer();
+    showPage('page-home');
   });
-  document.getElementById('parents-gate').classList.remove('hidden');
+}
+
+function enregistrerCodeParent(event) {
+  event.preventDefault();
+  const input = document.getElementById('parents-code-input');
+  const code = input.value.trim();
+  if (!/^\d{4}$/.test(code)) {
+    alert('Le code doit faire 4 chiffres.');
+    return;
+  }
+  parentSettings.codeParent = code;
+  saveSettings();
+  input.value = '';
+  afficherEtatCodeParent();
+  playSynthSound('success');
+}
+document.getElementById('parents-code-form').addEventListener('submit', enregistrerCodeParent);
+
+function supprimerCodeParent() {
+  if (!confirm('Supprimer le code parent ?')) return;
+  delete parentSettings.codeParent;
+  saveSettings();
+  afficherEtatCodeParent();
+}
+
+function afficherEtatCodeParent() {
+  const actif = Boolean(parentSettings.codeParent);
+  document.getElementById('parents-code-etat').textContent = actif
+    ? 'Un code est actif : il sera demandé pour ouvrir l\'espace parents. Vous pouvez le changer ci-dessous.'
+    : 'Aucun code : on vous demande d\'écrire un nombre en chiffres. Choisissez un code à 4 chiffres pour aller plus vite.';
+  document.getElementById('parents-code-suppr').classList.toggle('hidden', !actif);
+}
+
+/* ══════════ SUIVI DES PROGRÈS (enregistré sur l'appareil uniquement) ══════════ */
+const STATS_CLE = 'ludobox_suivi';
+let suiviJeux = { jours: {}, jeux: {} };
+try { suiviJeux = Object.assign({ jours: {}, jeux: {} }, JSON.parse(localStorage.getItem(STATS_CLE) || '{}')); } catch (e) {}
+
+function sauverSuivi() {
+  try { localStorage.setItem(STATS_CLE, JSON.stringify(suiviJeux)); } catch (e) {}
+}
+
+function jourCle(date = new Date()) {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+}
+
+function suiviDuJeu(mod) {
+  if (!suiviJeux.jeux[mod]) suiviJeux.jeux[mod] = { parties: 0, premierCoup: 0, secondCoup: 0, rates: 0, secondes: 0, dernier: null };
+  return suiviJeux.jeux[mod];
+}
+
+function noterLancement(mod) {
+  const jeu = suiviDuJeu(mod);
+  jeu.parties++;
+  jeu.dernier = new Date().toISOString();
+  sauverSuivi();
+}
+
+// resultat : 'premier' (trouvé du 1er coup), 'second' (au 2e essai), 'rate'
+function noterReponse(mod, resultat) {
+  if (!mod) return;
+  const jeu = suiviDuJeu(mod);
+  if (resultat === 'premier') jeu.premierCoup++;
+  else if (resultat === 'second') jeu.secondCoup++;
+  else jeu.rates++;
+  sauverSuivi();
+}
+
+// Temps de jeu : toutes les 20 s, si l'appli est à l'écran.
+setInterval(() => {
+  if (document.visibilityState !== 'visible') return;
+  const jour = jourCle();
+  suiviJeux.jours[jour] = (suiviJeux.jours[jour] || 0) + 20;
+  const page = document.querySelector('.page.on');
+  if (currentMod && page && page.id !== 'page-home' && page.id !== 'page-stickers') suiviDuJeu(currentMod).secondes += 20;
+  sauverSuivi();
+}, 20000);
+
+function minutesTexte(secondes) {
+  const min = Math.round(secondes / 60);
+  if (min < 60) return `${min} min`;
+  return `${Math.floor(min / 60)} h ${String(min % 60).padStart(2, '0')}`;
+}
+
+/* ══════════ CONSEILS PÉDAGOGIQUES PAR JEU ══════════ */
+const MOD_CONSEILS = {
+  alphabet: { age: '3-6 ans', travaille: 'Reconnaître les lettres et associer chaque lettre à son son.', maison: 'Cherchez ensemble la première lettre de son prénom sur les paquets, les plaques, les livres.' },
+  chiffres: { age: '3-6 ans', travaille: 'Reconnaître les chiffres et associer un chiffre à une quantité.', maison: 'Comptez les marches, les fourchettes à mettre sur la table, les fruits dans le panier.' },
+  couleurs: { age: '2-5 ans', travaille: 'Nommer les couleurs et les reconnaître.', maison: 'Jeu du « je vois quelque chose de rouge » pendant un trajet ; trier le linge par couleur.' },
+  formes: { age: '3-5 ans', travaille: 'Reconnaître rond, carré, triangle… et les repérer autour de soi.', maison: 'Chasse aux formes dans la maison : l\'horloge est ronde, la fenêtre est carrée…' },
+  animaux: { age: '2-6 ans', travaille: 'Vocabulaire des animaux, leurs cris et où ils vivent.', maison: 'Imitez les cris à tour de rôle ; regardez un imagier ou allez voir des animaux à la ferme.' },
+  nourriture: { age: '3-6 ans', travaille: 'Vocabulaire des aliments, fruits et légumes.', maison: 'Faites-lui nommer les aliments pendant les courses ou en rangeant le frigo.' },
+  lecture: { age: '5-7 ans', travaille: 'Premiers mots à lire, association mot et image.', maison: 'Lisez une histoire chaque soir en suivant les mots du doigt ; laissez-le lire les mots qu\'il connaît.' },
+  regles: { age: '3-7 ans', travaille: 'Les règles de vie : politesse, partage, sécurité.', maison: 'Reparlez des situations de la journée : « qu\'est-ce qu\'on dit quand… ? »' },
+  contraires: { age: '4-6 ans', travaille: 'Comprendre les contraires (grand/petit, chaud/froid…) et enrichir le vocabulaire.', maison: 'Jouez au « je dis grand, tu dis… » en mimant les mots.' },
+  anglais: { age: '4-8 ans', travaille: 'Premiers mots d\'anglais à l\'oral : couleurs, animaux, nombres.', maison: 'Chantez une comptine en anglais ; dites quelques mots du quotidien en anglais (apple, dog…).' },
+  vetements: { age: '3-6 ans', travaille: 'S\'habiller dans l\'ordre et choisir selon la météo : autonomie.', maison: 'Le matin, laissez-le préparer ses vêtements la veille en regardant le temps qu\'il fera.' },
+  calendrier: { age: '5-8 ans', travaille: 'Jours de la semaine, mois, saisons : se repérer dans le temps.', maison: 'Chaque matin, dites ensemble quel jour on est et ce qu\'on fera ; affichez un calendrier.' },
+  heure: { age: '5-8 ans', travaille: 'Moments de la journée et lecture de l\'horloge.', maison: 'Montrez l\'horloge aux moments clés : « quand la petite aiguille est sur le 7, on dîne ».' },
+  memory: { age: '3-8 ans', travaille: 'Mémoire et concentration.', maison: 'Jouez à un vrai jeu de mémoire avec des cartes, ou à « j\'ai mis dans mon panier… ».' },
+  tableau: { age: '2-8 ans', travaille: 'Créativité et motricité fine (tenir le doigt ou le stylet, tracer).', maison: 'Proposez feutres, craies et pâte à modeler ; demandez-lui de raconter son dessin.' },
+  course: { age: '3-8 ans', travaille: 'Jeu pour se détendre : réflexes et coordination œil-main.', maison: 'Gardez-le comme récompense après un jeu d\'apprentissage.' },
+};
+
+/* ══════════ JEUX MASQUÉS PAR LES PARENTS ══════════ */
+function appliquerJeuxMasques() {
+  const masques = parentSettings.jeuxMasques || [];
+  document.querySelectorAll('.mod-btn').forEach((btn) => {
+    btn.style.display = masques.includes(btn.dataset.mod) ? 'none' : '';
+  });
+}
+
+function basculerJeuMasque(mod) {
+  const masques = new Set(parentSettings.jeuxMasques || []);
+  if (masques.has(mod)) masques.delete(mod); else masques.add(mod);
+  parentSettings.jeuxMasques = [...masques];
+  saveSettings();
+  appliquerJeuxMasques();
+  afficherListeJeuxParents();
+}
+
+/* ══════════ AFFICHAGE DE L'ESPACE PARENTS ══════════ */
+function ongletParents(nom) {
+  document.querySelectorAll('.onglet-parents').forEach((btn) => {
+    const actif = btn.dataset.onglet === nom;
+    btn.className = `onglet-parents py-2 rounded-xl text-xs font-extrabold cursor-pointer border-b-4 ${actif ? 'bg-amber-400 text-indigo-950 border-amber-600' : 'bg-slate-800 text-white border-slate-950'}`;
+  });
+  document.querySelectorAll('.panneau-parents').forEach((panneau) => {
+    const actif = panneau.id === `parents-panneau-${nom}`;
+    panneau.classList.toggle('hidden', !actif);
+    panneau.classList.toggle('flex', actif);
+  });
+  if (nom === 'suivi') afficherSuiviParents();
+  if (nom === 'jeux') afficherListeJeuxParents();
+  if (nom === 'reglages') afficherEtatCodeParent();
+}
+
+function tauxReussite(jeu) {
+  const total = jeu.premierCoup + jeu.secondCoup + jeu.rates;
+  return total ? Math.round((jeu.premierCoup / total) * 100) : null;
+}
+
+function afficherSuiviParents() {
+  const panneau = document.getElementById('parents-panneau-suivi');
+  const jours = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    jours.push({ cle: jourCle(d), label: ['D', 'L', 'M', 'M', 'J', 'V', 'S'][d.getDay()], secondes: suiviJeux.jours[jourCle(d)] || 0 });
+  }
+  const max = Math.max(60, ...jours.map((j) => j.secondes));
+  const semaine = jours.reduce((sum, j) => sum + j.secondes, 0);
+
+  const joues = Object.keys(MOD_LABELS).filter((mod) => suiviJeux.jeux[mod] && suiviJeux.jeux[mod].parties > 0);
+  const avecReponses = joues.filter((mod) => tauxReussite(suiviJeux.jeux[mod]) !== null);
+  const points = avecReponses.filter((mod) => tauxReussite(suiviJeux.jeux[mod]) >= 75);
+  const aRevoir = avecReponses.filter((mod) => {
+    const jeu = suiviJeux.jeux[mod];
+    return jeu.premierCoup + jeu.secondCoup + jeu.rates >= 5 && tauxReussite(jeu) < 50;
+  });
+  const etiquette = (mod) => `<span class="inline-block rounded-full bg-slate-800 px-2 py-1 text-[11px] font-bold text-white" style="margin:2px">${MOD_LABELS[mod]}</span>`;
+
+  panneau.innerHTML = `
+    <div class="grid grid-cols-2 gap-2">
+      <div class="rounded-2xl bg-slate-950/50 p-3 border border-white/5"><p class="text-[10px] font-bold uppercase text-white/50">Aujourd'hui</p><p class="text-2xl font-black text-amber-400">${minutesTexte(jours[6].secondes)}</p></div>
+      <div class="rounded-2xl bg-slate-950/50 p-3 border border-white/5"><p class="text-[10px] font-bold uppercase text-white/50">7 derniers jours</p><p class="text-2xl font-black text-amber-400">${minutesTexte(semaine)}</p></div>
+    </div>
+    <div class="rounded-2xl bg-slate-950/50 p-3 border border-white/5">
+      <p class="text-[10px] font-bold uppercase text-white/50">Temps de jeu par jour</p>
+      <div class="flex items-end justify-between gap-2" style="height:90px;margin-top:8px">
+        ${jours.map((j) => `<div class="flex flex-1 flex-col items-center justify-end gap-1" style="height:100%" title="${minutesTexte(j.secondes)}">
+          <div class="w-full rounded-t-md bg-amber-400" style="height:${Math.max(2, Math.round((j.secondes / max) * 70))}px"></div>
+          <span class="text-[10px] font-bold text-white/60">${j.label}</span></div>`).join('')}
+      </div>
+    </div>
+    ${joues.length === 0 ? '<p class="rounded-2xl bg-slate-950/50 p-3 text-sm text-white/60">Pas encore de partie enregistrée. Le suivi commence dès que l\'enfant joue.</p>' : `
+    <div class="rounded-2xl bg-emerald-950/40 p-3 border border-emerald-500/20">
+      <p class="text-xs font-black text-emerald-300">🌟 Ce qu'il réussit bien</p>
+      <div style="margin-top:6px">${points.length ? points.map(etiquette).join('') : '<span class="text-xs text-white/60">Il faut encore quelques parties pour le dire.</span>'}</div>
+    </div>
+    <div class="rounded-2xl bg-pink-950/40 p-3 border border-pink-500/20">
+      <p class="text-xs font-black text-pink-300">🤝 À revoir ensemble</p>
+      <div style="margin-top:6px">${aRevoir.length ? aRevoir.map(etiquette).join('') : '<span class="text-xs text-white/60">Rien de difficile repéré pour l\'instant.</span>'}</div>
+      ${aRevoir.length ? '<p class="text-[11px] text-white/60" style="margin-top:6px">Ouvrez l\'onglet 🎲 Jeux pour des idées d\'activités à la maison.</p>' : ''}
+    </div>`}
+    <p class="text-[10px] text-white/40">Ce suivi reste sur cet appareil : il n'est envoyé nulle part.</p>`;
+}
+
+function afficherListeJeuxParents() {
+  const masques = parentSettings.jeuxMasques || [];
+  const liste = document.getElementById('parents-liste-jeux');
+  liste.innerHTML = Object.keys(MOD_LABELS).map((mod) => {
+    const jeu = suiviJeux.jeux[mod];
+    const conseil = MOD_CONSEILS[mod];
+    const visible = !masques.includes(mod);
+    const taux = jeu ? tauxReussite(jeu) : null;
+    const detail = jeu && jeu.parties
+      ? `Joué ${jeu.parties} fois · ${minutesTexte(jeu.secondes)}${taux !== null ? ` · ${taux} % trouvé du 1er coup` : ''} · dernière fois le ${new Date(jeu.dernier).toLocaleDateString('fr-FR')}`
+      : 'Pas encore joué';
+    return `<div class="rounded-2xl p-3 border ${visible ? 'bg-slate-950/50 border-white/5' : 'bg-slate-950/20 border-white/5 opacity-60'}">
+      <div class="flex items-center justify-between gap-2">
+        <span class="text-sm font-black text-white">${MOD_LABELS[mod]}</span>
+        <button onclick="basculerJeuMasque('${mod}')" class="shrink-0 rounded-full px-3 py-1 text-[11px] font-extrabold cursor-pointer ${visible ? 'bg-emerald-500 text-white' : 'bg-slate-700 text-white/70'}">${visible ? '👁 Visible' : '🚫 Masqué'}</button>
+      </div>
+      <p class="text-[11px] text-white/60" style="margin-top:4px">${detail}</p>
+      ${conseil ? `<details style="margin-top:6px"><summary class="cursor-pointer text-[11px] font-bold text-amber-400">💡 Conseils (${conseil.age})</summary>
+        <p class="text-[11px] text-white/80" style="margin-top:6px"><strong>Ce que ça travaille :</strong> ${conseil.travaille}</p>
+        <p class="text-[11px] text-white/80" style="margin-top:4px"><strong>À la maison :</strong> ${conseil.maison}</p></details>` : ''}
+    </div>`;
+  }).join('');
 }
 
 function startPlayTimer(minutes) {
@@ -2140,6 +2421,330 @@ function triggerBedtimeLock() {
   dire("Coucou champion ! C'est l'heure de faire une petite pause. Repose tes yeux et on revient jouer très bientôt ! Bisous !");
 }
 
+/* ══════════ LA COURSE : jeu pour s'amuser ══════════
+   La mascotte choisie court ; on tape pour sauter par-dessus les obstacles
+   et attraper les étoiles. 3 cœurs, la vitesse augmente doucement. */
+const COURSE_OBSTACLES = ['🪨', '🌵', '🍄', '🪵'];
+const COURSE_RECORD_CLE = 'ludobox_course_record';
+const course = { raf: 0, enJeu: false };
+
+function courseRecord() {
+  try { return parseInt(localStorage.getItem(COURSE_RECORD_CLE) || '0', 10) || 0; } catch (e) { return 0; }
+}
+
+function ouvrirCourse() {
+  showPage('page-course');
+  const img = new Image();
+  const masc = MASCOTS[userProgress.activeMascot] || MASCOTS.lion;
+  img.onload = () => dessinerCourse();
+  img.src = assetPath(masc.course || masc.entier);   // image de la mascotte en train de courir
+  course.image = img;
+  dimensionnerCourse();
+  preparerCourse();
+  dessinerCourse();
+  afficherEcranCourse('Prêt pour la course ?',
+    "Tape sur l'écran pour sauter par-dessus les obstacles, et attrape les étoiles ⭐", '▶️ Partez !', false);
+  dire("Tape sur l'écran pour faire sauter ta mascotte ! Saute par-dessus les obstacles et attrape les étoiles !");
+}
+
+function dimensionnerCourse() {
+  const zone = document.getElementById('course-zone');
+  const cv = document.getElementById('course-canvas');
+  const W = zone.clientWidth || 800;
+  // La hauteur ne dépend que de la largeur : sur téléphone, la barre d'adresse qui se cache ne perturbe pas la partie
+  const H = Math.round(Math.min(440, Math.max(230, W * 0.55)));
+  const dpr = window.devicePixelRatio || 1;
+  cv.width = W * dpr; cv.height = H * dpr;
+  cv.style.height = H + 'px';
+  course.ctx = cv.getContext('2d');
+  course.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  course.W = W; course.H = H;
+  course.u = H / 400;                       // unité : tout est proportionnel à la hauteur
+  course.sol = H * 0.84;
+}
+
+function preparerCourse() {
+  const u = course.u;
+  course.taille = 95 * u;                   // hauteur de la mascotte
+  course.x = course.W * 0.14;
+  course.y = 0; course.vy = 0;              // y = hauteur au-dessus du sol
+  course.vitesse = 290 * u;
+  course.distance = 0; course.etoiles = 0; course.coeurs = 3;
+  course.invincible = 0; course.temps = 0;
+  course.obstacles = []; course.bonus = [];
+  course.prochainObstacle = 1.2; course.prochaineEtoile = 0.8;
+  majEnteteCourse();
+}
+
+function majEnteteCourse() {
+  document.getElementById('course-coeurs').textContent = '❤️'.repeat(course.coeurs) + '🖤'.repeat(3 - course.coeurs);
+  document.getElementById('course-etoiles').textContent = '⭐ ' + course.etoiles;
+}
+
+function afficherEcranCourse(titre, texte, bouton, avecMenu) {
+  document.getElementById('course-titre').textContent = titre;
+  document.getElementById('course-texte').innerHTML = texte;
+  document.getElementById('course-btn-go').textContent = bouton;
+  document.getElementById('course-btn-menu').classList.toggle('hidden', !avecMenu);
+  const e = document.getElementById('course-ecran');
+  e.classList.remove('hidden'); e.classList.add('flex');
+}
+
+function demarrerCourse() {
+  initAudio();
+  const e = document.getElementById('course-ecran');
+  e.classList.add('hidden'); e.classList.remove('flex');
+  preparerCourse();
+  course.enJeu = false;
+  course.decompte = 1.6;                    // petite attente pendant « Trois, deux, un, partez ! »
+  dire('Trois, deux, un, partez !');
+  course.dernier = performance.now();
+  cancelAnimationFrame(course.raf);
+  course.raf = requestAnimationFrame(boucleCourse);
+}
+
+function sauterCourse() {
+  if (!document.getElementById('page-course').classList.contains('on')) return;
+  if (!course.enJeu) return;
+  if (course.y <= 0.5) {
+    course.vy = 880 * course.u;
+    playSynthSound('pop');
+  }
+}
+
+function boucleCourse(t) {
+  const dt = Math.min(0.05, (t - course.dernier) / 1000);
+  course.dernier = t;
+  if (course.decompte > 0) {
+    course.decompte -= dt;
+    if (course.decompte <= 0) course.enJeu = true;
+  } else {
+    avancerCourse(dt);
+  }
+  dessinerCourse();
+  if (course.coeurs > 0) course.raf = requestAnimationFrame(boucleCourse);
+}
+
+function avancerCourse(dt) {
+  const u = course.u;
+  course.temps += dt;
+  course.vitesse = Math.min(620 * u, 290 * u + course.temps * 6 * u);
+  const dx = course.vitesse * dt;
+  course.distance += dx;
+
+  // Saut : gravité douce pour laisser le temps aux petits
+  course.vy -= 1950 * u * dt;                // saut long : les mascottes à 4 pattes passent bien l'obstacle
+  course.y = Math.max(0, course.y + course.vy * dt);
+  if (course.y === 0 && course.vy < 0) course.vy = 0;
+
+  // Apparition des obstacles, toujours assez espacés pour pouvoir sauter
+  course.prochainObstacle -= dt;
+  if (course.prochainObstacle <= 0) {
+    const t = (58 + Math.random() * 18) * u;
+    course.obstacles.push({ x: course.W + t, taille: t, e: COURSE_OBSTACLES[Math.floor(Math.random() * COURSE_OBSTACLES.length)] });
+    course.prochainObstacle = 1.1 + Math.random() * 1.2;
+  }
+  course.prochaineEtoile -= dt;
+  if (course.prochaineEtoile <= 0) {
+    course.bonus.push({ x: course.W + 30 * u, h: (40 + Math.random() * 150) * u, taille: 40 * u, prise: false });
+    course.prochaineEtoile = 0.9 + Math.random() * 1.4;
+  }
+  course.obstacles.forEach(o => o.x -= dx);
+  course.bonus.forEach(b => b.x -= dx);
+  course.obstacles = course.obstacles.filter(o => o.x > -o.taille);
+  course.bonus = course.bonus.filter(b => b.x > -b.taille && !b.prise);
+
+  // Collisions (zones réduites pour être indulgent)
+  // Zone de collision au centre du corps, proportionnelle à la largeur réelle de l'image
+  const img = course.image, w = img && img.naturalWidth ? course.taille * img.naturalWidth / img.naturalHeight : course.taille;
+  // Seul le centre du corps compte (pas le bout des pattes ni la queue)
+  const larg = w * 0.28, px = course.x + w * 0.42, py = course.sol - course.y;
+  if (course.invincible > 0) course.invincible -= dt;
+  course.obstacles.forEach(o => {
+    const ox = o.x + o.taille * 0.25, ow = o.taille * 0.5, oh = o.taille * 0.65;
+    if (course.invincible <= 0 && px < ox + ow && px + larg > ox && py > course.sol - oh) {
+      course.coeurs--;
+      course.invincible = 1.6;
+      majEnteteCourse();
+      playSynthSound('error');
+      if (course.coeurs > 0) dire('Aïe ! Attention aux obstacles !');
+      else finCourse();
+    }
+  });
+  course.bonus.forEach(b => {
+    const by = course.sol - b.h;
+    if (!b.prise && px < b.x + b.taille && px + larg > b.x && py - course.taille * 0.9 < by + b.taille * 0.5 && py > by - b.taille * 0.5) {
+      b.prise = true;
+      course.etoiles++;
+      majEnteteCourse();
+      playSynthSound('sparkle');
+    }
+  });
+}
+
+function dessinerCourse() {
+  const c = course.ctx, W = course.W, H = course.H, u = course.u, sol = course.sol;
+  if (!c) return;
+  // Ciel du soir
+  const ciel = c.createLinearGradient(0, 0, 0, sol);
+  ciel.addColorStop(0, '#1e1b4b'); ciel.addColorStop(1, '#7c3aed');
+  c.fillStyle = ciel; c.fillRect(0, 0, W, H);
+  c.fillStyle = 'rgba(255,255,255,0.85)';
+  for (let i = 0; i < 25; i++) {
+    const sx = ((i * 137 - course.distance * 0.05) % W + W) % W, sy = (i * 53) % (sol * 0.6);
+    c.fillRect(sx, sy, 2 * u, 2 * u);
+  }
+  // Collines (deux plans qui défilent à des vitesses différentes)
+  [[0.15, '#4c1d95', 0.55], [0.35, '#5b21b6', 0.7]].forEach(([vit, col, haut]) => {
+    c.fillStyle = col; c.beginPath(); c.moveTo(0, sol);
+    for (let x = 0; x <= W; x += 10) {
+      const d = x + course.distance * vit;
+      c.lineTo(x, sol - H * (0.12 + 0.08 * Math.sin(d / (140 * u)) + 0.05 * Math.sin(d / (60 * u))) * haut / 0.55);
+    }
+    c.lineTo(W, sol); c.fill();
+  });
+  // Sol et herbe
+  c.fillStyle = '#16a34a'; c.fillRect(0, sol, W, H - sol);
+  c.fillStyle = '#15803d';
+  for (let x = -((course.distance) % (40 * u)); x < W; x += 40 * u) c.fillRect(x, sol + 6 * u, 20 * u, 6 * u);
+  c.fillStyle = '#4ade80'; c.fillRect(0, sol, W, 4 * u);
+
+  // Étoiles à attraper
+  c.textAlign = 'center'; c.textBaseline = 'middle';
+  course.bonus.forEach(b => {
+    c.font = `${b.taille}px sans-serif`;
+    c.fillText('⭐', b.x + b.taille / 2, sol - b.h + Math.sin(course.temps * 6 + b.x) * 4 * u);
+  });
+  // Obstacles
+  c.textBaseline = 'bottom';
+  course.obstacles.forEach(o => { c.font = `${o.taille}px sans-serif`; c.fillText(o.e, o.x + o.taille / 2, sol + o.taille * 0.12); });
+
+  // Mascotte (clignote quand elle vient d'être touchée)
+  const img = course.image;
+  if (img && img.complete && img.naturalWidth && !(course.invincible > 0 && Math.floor(course.invincible * 10) % 2)) {
+    const h = course.taille, w = h * img.naturalWidth / img.naturalHeight;
+    const rebond = course.y === 0 && course.enJeu ? Math.abs(Math.sin(course.temps * 14)) * 5 * u : 0;
+    c.save();
+    c.translate(course.x + w / 2, sol - course.y - rebond);
+    if (course.y > 0) c.rotate(-0.12);
+    c.drawImage(img, -w / 2, -h, w, h);
+    c.restore();
+  }
+  // Compteur de distance
+  c.textAlign = 'left'; c.textBaseline = 'top';
+  c.font = `bold ${18 * u}px Fredoka, sans-serif`; c.fillStyle = '#fff';
+  c.fillText(`🏁 ${Math.floor(course.distance / (40 * u))} m`, 12 * u, 10 * u);
+  // Décompte
+  if (course.decompte > 0) {
+    c.textAlign = 'center'; c.textBaseline = 'middle';
+    c.font = `bold ${90 * u}px Fredoka, sans-serif`; c.fillStyle = '#fbbf24';
+    c.fillText(course.decompte > 1.1 ? '3' : course.decompte > 0.6 ? '2' : course.decompte > 0.15 ? '1' : 'GO !', W / 2, H * 0.42);
+  }
+}
+
+function finCourse() {
+  course.enJeu = false;
+  cancelAnimationFrame(course.raf);
+  const metres = Math.floor(course.distance / (40 * course.u));
+  const score = course.etoiles * 10 + metres;
+  const ancien = courseRecord();
+  const record = score > ancien;
+  if (record) { try { localStorage.setItem(COURSE_RECORD_CLE, String(score)); } catch (e) {} }
+  setTimeout(() => {
+    afficherEcranCourse(record ? '🏆 Nouveau record !' : '🎉 Bravo !',
+      `⭐ ${course.etoiles} étoile${course.etoiles > 1 ? 's' : ''} · 🏁 ${metres} m<br><span style="opacity:.75">Score : ${score} · Record : ${Math.max(score, ancien)}</span>`,
+      '🔁 Rejouer', true);
+    confettisAction();
+    playSynthSound('success');
+    dire(record ? 'Nouveau record ! Tu es le champion de la course !' : 'Bravo, quelle belle course !');
+  }, 500);
+}
+
+function quitterCourse() {
+  course.enJeu = false;
+  cancelAnimationFrame(course.raf);
+  stopVoix();
+  showPage('page-home');
+  direAudio('choisis', 'Choisis une activité !', 300);
+}
+
+document.getElementById('course-canvas').addEventListener('pointerdown', e => { e.preventDefault(); sauterCourse(); });
+document.addEventListener('keydown', e => {
+  if ((e.code === 'Space' || e.code === 'ArrowUp') && document.getElementById('page-course').classList.contains('on')) {
+    e.preventDefault();
+    sauterCourse();
+  }
+});
+window.addEventListener('resize', () => {
+  if (!document.getElementById('page-course').classList.contains('on')) return;
+  const largeur = document.getElementById('course-zone').clientWidth;
+  if (largeur === course.W) return;          // rien n'a vraiment changé (ex. barre d'adresse du téléphone)
+  const ancienU = course.u;
+  dimensionnerCourse();
+  // On garde la partie en cours en remettant tout à la nouvelle échelle
+  const k = course.u / ancienU;
+  course.taille *= k; course.y *= k; course.vy *= k; course.vitesse *= k; course.distance *= k;
+  course.x = course.W * 0.14;
+  course.obstacles.forEach(o => { o.x *= k; o.taille *= k; });
+  course.bonus.forEach(b => { b.x *= k; b.h *= k; b.taille *= k; });
+  dessinerCourse();
+});
+
+/* ══════════ MENTIONS LÉGALES ET CONFIDENTIALITÉ ══════════
+   Informations de l'éditeur : à remplir ici (une seule fois).
+   Tant qu'un champ vaut null, la page affiche « à compléter ». */
+const EDITEUR = {
+  nom: 'Dee Kréations',
+  forme: "SASU en cours d'immatriculation",
+  siren: "en cours d'attribution", // remplacer par le numéro dès réception (ex. '123 456 789')
+  adresse: null,        // adresse du siège (celle des statuts)
+  email: 'dee-kreations@dee-kreations.com', // adresse de contact affichée
+  directeur: 'Vanessa Saint-Etienne',
+};
+const HEBERGEUR = 'Cloudflare, Inc., 101 Townsend Street, San Francisco, CA 94107, États-Unis — www.cloudflare.com';
+
+function champ(v) {
+  return v ? escapeHtml(v) : '<span class="font-bold text-amber-400">[à compléter]</span>';
+}
+function escapeHtml(t) {
+  return String(t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+function ouvrirMentions() {
+  const e = EDITEUR;
+  const mail = e.email ? `<a class="underline text-amber-300" href="mailto:${escapeHtml(e.email)}">${escapeHtml(e.email)}</a>` : champ(null);
+  document.getElementById('mentions-contenu').innerHTML = `<style>#mentions-contenu section{margin-bottom:16px}#mentions-contenu h3{margin-bottom:4px}#mentions-contenu p+p{margin-top:8px}</style>
+    <section><h3 class="font-black text-white mb-1">Éditeur</h3>
+      <p>La Ludobox de Vivi est un produit <strong>Dee Kréations</strong>, édité par <strong>${champ(e.nom)}</strong>, ${champ(e.forme)}, SIREN ${champ(e.siren)}.<br>
+      Adresse : ${champ(e.adresse)}<br>Contact : ${mail}<br>Directrice de la publication : ${champ(e.directeur)}</p></section>
+    <section><h3 class="font-black text-white mb-1">Hébergement</h3><p>${escapeHtml(HEBERGEUR)}</p></section>
+    <section><h3 class="font-black text-white mb-1">Version de test</h3>
+      <p>L'application est proposée gratuitement, en version de test, sans garantie de disponibilité ni d'absence d'erreur.
+      C'est un outil de loisir éducatif : il ne remplace pas l'accompagnement d'un enseignant ou d'un professionnel.
+      L'utilisation par un enfant se fait sous la responsabilité d'un adulte.</p></section>
+    <section><h3 class="font-black text-white mb-1">Vos données</h3>
+      <p><strong>Aucune donnée personnelle n'est collectée</strong> : pas de compte, pas de publicité, pas de mesure d'audience, pas de cookie publicitaire.
+      La progression de l'enfant et les réglages de l'espace parents sont enregistrés <strong>uniquement sur votre appareil</strong>
+      (stockage local du navigateur) ; ils ne sont jamais envoyés à l'éditeur. Pour les effacer, utilisez
+      « Réinitialiser » dans l'espace parents ou videz les données du site dans votre navigateur.</p>
+      <p>Comme pour tout site, l'hébergeur Cloudflare traite techniquement l'adresse IP des visiteurs pour acheminer
+      les pages et protéger le service. Les polices et outils d'affichage sont intégrés à l'application : aucune autre requête
+      n'est envoyée à un service tiers.</p>
+      <p>Pour toute question ou pour exercer vos droits (RGPD), écrivez à ${mail}.
+      Vous pouvez aussi saisir la CNIL (www.cnil.fr).</p></section>
+    <section><h3 class="font-black text-white mb-1">Voix et contenus</h3>
+      <p>Les personnages (Vivi, Gigi, Paty, Koko) sont imaginaires. Leurs voix sont <strong>générées par intelligence artificielle</strong>
+      (ElevenLabs) et les illustrations ont été <strong>créées avec l'intelligence artificielle</strong> (ChatGPT).</p>
+      <p>Musique de fond : Pixabay (licence Pixabay). Polices Fredoka et Nunito (licence SIL Open Font License),
+      outil d'affichage Tailwind CSS (licence MIT).
+      Les autres éléments de l'application sont la propriété de ${champ(e.nom)}.</p></section>`;
+  const m = document.getElementById('mentions-legales');
+  m.classList.remove('hidden'); m.classList.add('flex');
+}
+function fermerMentions() {
+  const m = document.getElementById('mentions-legales');
+  m.classList.add('hidden'); m.classList.remove('flex');
+}
+
 /* ══════════ PARENTS DASHBOARD CONTROLS ══════════ */
 function openParentsDashboard() {
   document.getElementById('tts-speed-slider').value = parentSettings.speed;
@@ -2168,13 +2773,18 @@ function openParentsDashboard() {
     }
   });
 
-  document.getElementById('parents-dashboard').classList.remove('hidden');
+  ongletParents('suivi');
+  const dashboard = document.getElementById('parents-dashboard');
+  dashboard.classList.remove('hidden');
+  dashboard.classList.add('flex');
 }
 
 function closeParentsDashboard() {
   playSynthSound('pop');
   saveSettings();
-  document.getElementById('parents-dashboard').classList.add('hidden');
+  const dashboard = document.getElementById('parents-dashboard');
+  dashboard.classList.add('hidden');
+  dashboard.classList.remove('flex');
 }
 
 function setPlayTimerLimit(mins, btn) {
@@ -2222,10 +2832,12 @@ function adjustTtsParams() {
 }
 
 function resetChildProgress() {
-  if (confirm("Voulez-vous vraiment réinitialiser tout l'album d'autocollants ?")) {
+  if (confirm("Voulez-vous vraiment effacer l'album d'autocollants et le suivi des jeux ?")) {
     playSynthSound('error');
     userProgress.unlockedStickers = ['vivi'];
     saveProgress();
+    suiviJeux = { jours: {}, jeux: {} };
+    sauverSuivi();
     closeParentsDashboard();
     showPage('page-home');
     dire(" Progression réinitialisée.");
@@ -2485,6 +3097,52 @@ const HABILLAGE = {
   ]},
 };
 
+/* ── Le temps : moments, saisons, jours, mois, heures ── */
+const MOMENTS = [
+  {id:'matin',      nom:'le matin',       e:'🌅', indices:["Le soleil se lève et je prends mon petit-déjeuner.", "Je me réveille et je me prépare pour aller à l'école.", "Le coq chante et je sors de mon lit."]},
+  {id:'midi',       nom:'le midi',        e:'☀️', indices:["Je mange à la cantine avec mes copains.", "C'est l'heure du déjeuner, le soleil est haut dans le ciel.", "J'ai très faim, c'est l'heure de manger à table."]},
+  {id:'apresmidi',  nom:"l'après-midi",   e:'🧃', indices:["Après la sieste, je prends mon goûter.", "Après le déjeuner, je retourne jouer dans la cour.", "Je sors de l'école et je vais jouer au parc."]},
+  {id:'soir',       nom:'le soir',        e:'🌇', indices:["Le soleil se couche, je prends mon bain.", "Toute la famille dîne ensemble avant d'aller au lit.", "Je mets mon pyjama et on me lit une histoire."]},
+  {id:'nuit',       nom:'la nuit',        e:'🌙', indices:["Il fait tout noir, la lune et les étoiles brillent.", "Je dors dans mon lit avec mon doudou.", "Tout le monde dort dans la maison, même le chat."]},
+];
+// Ce que je fais à chaque moment de la journée
+const ACTIVITES = [
+  {id:'petitdej', nom:'le petit-déjeuner', e:'🥐', moment:'matin',     bravo:"Oui ! Le matin, je prends mon petit-déjeuner !"},
+  {id:'dejeuner', nom:'le déjeuner',       e:'🍽️', moment:'midi',      bravo:"Oui ! Le midi, je mange mon déjeuner !"},
+  {id:'gouter',   nom:'le goûter',         e:'🍪', moment:'apresmidi', bravo:"Oui ! L'après-midi, je prends mon goûter !"},
+  {id:'bain',     nom:'le bain',           e:'🛁', moment:'soir',      bravo:"Oui ! Le soir, je prends mon bain !"},
+  {id:'dormir',   nom:'dormir',            e:'😴', moment:'nuit',      bravo:"Oui ! La nuit, je dors !"},
+];
+const SAISONS = [
+  {id:'hiver',     nom:"l'hiver",      e:'⛄', indices:["Il fait très froid et il neige. Je fais un bonhomme de neige.", "C'est Noël, je mets mon manteau et mes gants.", "Je fais de la luge dans la neige."]},
+  {id:'printemps', nom:'le printemps', e:'🌸', indices:["Les fleurs poussent et les oiseaux chantent.", "Les arbres ont de nouvelles feuilles toutes vertes.", "Je vois des papillons et des abeilles dans le jardin."]},
+  {id:'ete',       nom:"l'été",        e:'🏖️', indices:["Il fait très chaud, je vais à la plage.", "Ce sont les grandes vacances, je mange une glace au soleil.", "Je me baigne dans la piscine."]},
+  {id:'automne',   nom:"l'automne",    e:'🍂', indices:["Les feuilles des arbres tombent, elles sont jaunes et orange.", "Je ramasse des marrons et des champignons dans la forêt.", "C'est la rentrée des classes et il y a du vent."]},
+];
+const WEEKENDS = ['samedi et dimanche', 'lundi et mardi', 'mercredi et jeudi', 'jeudi et vendredi'];
+const JOURS = ['lundi','mardi','mercredi','jeudi','vendredi','samedi','dimanche'];
+const MOIS = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+const NOMBRES_TEMPS = {3:'trois', 4:'quatre', 5:'cinq', 7:'sept', 10:'dix', 12:'douze'};
+const HEURES_MOTS = ['', 'une heure', 'deux heures', 'trois heures', 'quatre heures', 'cinq heures', 'six heures',
+  'sept heures', 'huit heures', 'neuf heures', 'dix heures', 'onze heures', 'douze heures'];
+
+// Petite horloge à aiguilles, qui indique h heures pile
+function horlogeSVG(h, grande = false) {
+  let chiffres = '';
+  for (let i = 1; i <= 12; i++) {
+    const a = i * Math.PI / 6;
+    chiffres += `<text x="${(50 + 34 * Math.sin(a)).toFixed(1)}" y="${(50 - 34 * Math.cos(a) + 4).toFixed(1)}" text-anchor="middle" font-size="11" font-weight="700" fill="#1e1b4b">${i}</text>`;
+  }
+  const angle = (h % 12) * 30;
+  const taille = grande ? 'width:170px;height:170px' : 'width:96px;height:96px';
+  return `<svg viewBox="0 0 100 100" style="${taille}" class="drop-shadow-md select-none pointer-events-none">
+    <circle cx="50" cy="50" r="46" fill="#ffffff" stroke="#f59e0b" stroke-width="5"/>
+    <line x1="50" y1="50" x2="50" y2="20" stroke="#e11d48" stroke-width="3" stroke-linecap="round" opacity="0.8"/>
+    <line x1="50" y1="50" x2="50" y2="29" stroke="#1e1b4b" stroke-width="6" stroke-linecap="round" transform="rotate(${angle} 50 50)"/>
+    <circle cx="50" cy="50" r="4" fill="#1e1b4b"/>${chiffres}</svg>`;
+}
+const cleTemps = t => t.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z]/gi, '').toLowerCase();
+
 const ANGLAIS = [
   {q:"Comment dit-on 'chat' en anglais ?",    audioKey:'anglais_q1_chat',     c:"Cat",     choices:["Cat","Dog","Cow","Rabbit"],          labels:["Cat 🐱","Dog 🐶","Cow 🐮","Rabbit 🐰"],              speak:["cat","dog","cow","rabbit"]},
   {q:"Comment dit-on 'chien' en anglais ?",   audioKey:'anglais_q1_chien',    c:"Dog",     choices:["Dog","Cat","Lion","Sheep"],          labels:["Dog 🐶","Cat 🐱","Lion 🦁","Sheep 🐑"],              speak:["dog","cat","lion","sheep"]},
@@ -2713,6 +3371,113 @@ function buildQ(mod) {
     });
   }
 
+  // Deux jeux : « Le calendrier » (saisons, jours, mois) et « L'heure » (moments de la journée, horloges).
+  // Chaque partie tire des TYPES de questions différents pour ne pas répéter la même tournure.
+  if (mod === 'calendrier' || mod === 'heure') {
+    const unDe = arr => arr[Math.floor(Math.random() * arr.length)];
+    const texte = x => ({ val: x, label: x, speak: x });
+    const nombre = n => ({ val: String(n), label: String(n), speak: NOMBRES_TEMPS[n] });
+    const carteEmoji = x => ({ val: x.id, label: x.nom, emoji: x.e, speak: x.nom });
+    const suivantDe = (liste, i) => liste[(i + 1) % liste.length];
+    const precedentDe = (liste, i) => liste[(i + liste.length - 1) % liste.length];
+    const avecAutres = (bonne, liste) => shuffle([bonne, ...pick(liste.filter(y => y !== bonne), 3)]);
+
+    if (mod === 'calendrier') {
+      // Saisons : 2 devinettes (saisons différentes) + 1 question d'ordre ou de nombre
+      pick(SAISONS, 2).forEach(sa => {
+        const n = Math.floor(Math.random() * sa.indices.length);
+        qs.push({ consigne: `${sa.indices[n]} Quelle est la saison ?`, audioKey: `temps_saison_${sa.id}_${n + 1}`,
+          correct: sa.id, bravo: `Oui ! C'est ${sa.nom} !`, audioBravo: `temps_saison_${sa.id}_bravo`,
+          type: 'emoji', choix: shuffle(SAISONS.slice()).map(carteEmoji) });
+      });
+      const ordreSaisons = SAISONS.map((sa, i) => {
+        const apres = suivantDe(SAISONS, i);
+        return { consigne: `Quelle saison vient après ${sa.nom} ?`, audioKey: `temps_saison_apres_${sa.id}`,
+          correct: apres.id, bravo: `Oui ! Après ${sa.nom}, vient ${apres.nom} !`, audioBravo: `temps_saison_apres_${sa.id}_bravo`,
+          type: 'emoji', choix: shuffle(SAISONS.slice()).map(carteEmoji) };
+      });
+      ordreSaisons.push({ consigne: "Combien y a-t-il de saisons dans une année ?", audioKey: 'temps_saisons_nb', correct: '4',
+        bravo: "Oui ! Il y a quatre saisons : l'hiver, le printemps, l'été et l'automne !", audioBravo: 'temps_saisons_nb_bravo',
+        type: 'text', choix: shuffle([4, 3, 5, 7]).map(nombre) });
+      qs.push(unDe(ordreSaisons));
+
+      // Jours : 4 types différents parmi après / avant / demain / hier / questions sur la semaine
+      const familleJours = {
+        apres: JOURS.map((j, i) => { const r = suivantDe(JOURS, i); return { consigne: `Quel jour vient après ${j} ?`, audioKey: `temps_jour_apres_${j}`, correct: r,
+          bravo: `Oui ! Après ${j}, c'est ${r} !`, audioBravo: `temps_jour_apres_${j}_bravo`, type: 'text', choix: avecAutres(r, JOURS).map(texte) }; }),
+        avant: JOURS.map((j, i) => { const r = precedentDe(JOURS, i); return { consigne: `Quel jour vient avant ${j} ?`, audioKey: `temps_jour_avant_${j}`, correct: r,
+          bravo: `Oui ! Avant ${j}, c'est ${r} !`, audioBravo: `temps_jour_avant_${j}_bravo`, type: 'text', choix: avecAutres(r, JOURS).map(texte) }; }),
+        demain: JOURS.map((j, i) => { const r = suivantDe(JOURS, i); return { consigne: `Si aujourd'hui c'est ${j}, demain c'est quel jour ?`, audioKey: `temps_jour_demain_${j}`, correct: r,
+          bravo: `Oui ! Demain, ce sera ${r} !`, audioBravo: `temps_jour_demain_${r}_bravo`, type: 'text', choix: avecAutres(r, JOURS).map(texte) }; }),
+        hier: JOURS.map((j, i) => { const r = precedentDe(JOURS, i); return { consigne: `Si aujourd'hui c'est ${j}, hier c'était quel jour ?`, audioKey: `temps_jour_hier_${j}`, correct: r,
+          bravo: `Oui ! Hier, c'était ${r} !`, audioBravo: `temps_jour_hier_${r}_bravo`, type: 'text', choix: avecAutres(r, JOURS).map(texte) }; }),
+        semaine: [
+          { consigne: "Combien y a-t-il de jours dans une semaine ?", audioKey: 'temps_semaine_nb', correct: '7',
+            bravo: "Oui ! Il y a sept jours dans une semaine !", audioBravo: 'temps_semaine_nb_bravo', type: 'text', choix: shuffle([7, 5, 10, 3]).map(nombre) },
+          { consigne: "Quel est le premier jour de la semaine ?", audioKey: 'temps_semaine_premier', correct: 'lundi',
+            bravo: "Oui ! La semaine commence le lundi !", audioBravo: 'temps_semaine_premier_bravo', type: 'text', choix: avecAutres('lundi', JOURS).map(texte) },
+          { consigne: "Quel est le dernier jour de la semaine ?", audioKey: 'temps_semaine_dernier', correct: 'dimanche',
+            bravo: "Oui ! La semaine se termine le dimanche !", audioBravo: 'temps_semaine_dernier_bravo', type: 'text', choix: avecAutres('dimanche', JOURS).map(texte) },
+          { consigne: "Quels sont les jours du week-end ?", audioKey: 'temps_weekend', correct: WEEKENDS[0],
+            bravo: "Oui ! Le week-end, c'est samedi et dimanche !", audioBravo: 'temps_weekend_bravo', type: 'text', choix: shuffle(WEEKENDS.slice()).map(texte) },
+        ],
+      };
+      pick(Object.keys(familleJours), 4).forEach(f => qs.push(unDe(familleJours[f])));
+
+      // Mois : 3 types différents (après / avant / questions sur l'année)
+      const familleMois = {
+        apres: MOIS.map((m, i) => { const r = suivantDe(MOIS, i); return { consigne: `Quel mois vient après ${m} ?`, audioKey: `temps_mois_apres_${cleTemps(m)}`, correct: r,
+          bravo: `Oui ! Après ${m}, c'est ${r} !`, audioBravo: `temps_mois_apres_${cleTemps(m)}_bravo`, type: 'text', choix: avecAutres(r, MOIS).map(texte) }; }),
+        avant: MOIS.map((m, i) => { const r = precedentDe(MOIS, i); return { consigne: `Quel mois vient avant ${m} ?`, audioKey: `temps_mois_avant_${cleTemps(m)}`, correct: r,
+          bravo: `Oui ! Avant ${m}, c'est ${r} !`, audioBravo: `temps_mois_avant_${cleTemps(m)}_bravo`, type: 'text', choix: avecAutres(r, MOIS).map(texte) }; }),
+        annee: [
+          { consigne: "Combien y a-t-il de mois dans une année ?", audioKey: 'temps_annee_nb', correct: '12',
+            bravo: "Oui ! Il y a douze mois dans une année !", audioBravo: 'temps_annee_nb_bravo', type: 'text', choix: shuffle([12, 7, 10, 4]).map(nombre) },
+          { consigne: "Quel est le premier mois de l'année ?", audioKey: 'temps_mois_premier', correct: 'janvier',
+            bravo: "Oui ! L'année commence en janvier !", audioBravo: 'temps_mois_premier_bravo', type: 'text', choix: avecAutres('janvier', MOIS).map(texte) },
+          { consigne: "Quel est le dernier mois de l'année ?", audioKey: 'temps_mois_dernier', correct: 'décembre',
+            bravo: "Oui ! L'année se termine en décembre !", audioBravo: 'temps_mois_dernier_bravo', type: 'text', choix: avecAutres('décembre', MOIS).map(texte) },
+          { consigne: "Noël, c'est en quel mois ?", audioKey: 'temps_noel', correct: 'décembre',
+            bravo: "Oui ! Noël, c'est en décembre !", audioBravo: 'temps_noel_bravo', type: 'text', choix: avecAutres('décembre', MOIS).map(texte) },
+        ],
+      };
+      Object.keys(familleMois).forEach(f => qs.push(unDe(familleMois[f])));
+    }
+
+    if (mod === 'heure') {
+      // 3 devinettes sur des moments différents
+      pick(MOMENTS, 3).forEach(m => {
+        const n = Math.floor(Math.random() * m.indices.length);
+        qs.push({ consigne: `${m.indices[n]} C'est quel moment de la journée ?`, audioKey: `temps_moment_${m.id}_${n + 1}`,
+          correct: m.id, bravo: `Oui ! C'est ${m.nom} !`, audioBravo: `temps_moment_${m.id}_bravo`,
+          type: 'emoji', choix: avecAutres(m, MOMENTS).map(carteEmoji) });
+      });
+      // Ce que je fais à ce moment-là
+      const act = unDe(ACTIVITES), momentAct = MOMENTS.find(m => m.id === act.moment);
+      qs.push({ consigne: `Qu'est-ce que je fais ${momentAct.nom} ?`, audioKey: `temps_activite_${act.moment}`,
+        correct: act.id, bravo: act.bravo, audioBravo: `temps_activite_${act.moment}_bravo`,
+        type: 'emoji', choix: avecAutres(act, ACTIVITES).map(carteEmoji) });
+      // L'ordre des moments
+      const i = Math.floor(Math.random() * MOMENTS.length), m = MOMENTS[i], apres = suivantDe(MOMENTS, i);
+      qs.push({ consigne: `Qu'est-ce qui vient après ${m.nom} ?`, audioKey: `temps_moment_apres_${m.id}`,
+        correct: apres.id, bravo: `Oui ! Après ${m.nom}, vient ${apres.nom} !`, audioBravo: `temps_moment_apres_${m.id}_bravo`,
+        type: 'emoji', choix: avecAutres(apres, MOMENTS).map(carteEmoji) });
+      // 5 heures différentes : 2 « montre l'horloge », 3 « quelle heure est-il ? »
+      const heures = pick([1,2,3,4,5,6,7,8,9,10,11,12], 5);
+      heures.forEach((h, k) => {
+        const autres = pick([1,2,3,4,5,6,7,8,9,10,11,12].filter(x => x !== h), 3);
+        const base = { correct: String(h), bravo: `Oui ! Il est ${HEURES_MOTS[h]} !`, audioBravo: `temps_heure_${h}_bravo` };
+        if (k < 2) {
+          qs.push({ ...base, consigne: `Montre l'horloge qui indique ${HEURES_MOTS[h]} !`, audioKey: `temps_heure_${h}`, type: 'clock',
+            choix: shuffle([h, ...autres]).map(x => ({ val: String(x), label: HEURES_MOTS[x], speak: HEURES_MOTS[x], svg: horlogeSVG(x) })) });
+        } else {
+          qs.push({ ...base, consigne: 'Quelle heure est-il ?', audioKey: 'temps_quelle_heure', type: 'text', visuel: horlogeSVG(h, true),
+            choix: shuffle([h, ...autres]).map(x => ({ val: String(x), label: HEURES_MOTS[x], speak: HEURES_MOTS[x] })) });
+        }
+      });
+    }
+  }
+
   if (mod === 'anglais') {
     shuffle(ANGLAIS).slice(0, 10).forEach(item => {
       const isEnglishQ = item.q.includes('anglais');
@@ -2734,7 +3499,7 @@ function buildQ(mod) {
   
   // apply difficulty slicing
   // « Je m'habille » garde son ordre (vocabulaire puis histoire)
-  const finalQs = mod === 'vetements' ? qs : shuffle(qs).slice(0, 10);
+  const finalQs = ['vetements', 'calendrier', 'heure'].includes(mod) ? qs : shuffle(qs).slice(0, 10);
   
   // filter choices size in each question based on difficulty settings
   finalQs.forEach(q => {
@@ -2765,6 +3530,9 @@ const MOD_LABELS = {
   contraires: '↔️ Les contraires',
   anglais: '🇬🇧 Mon premier Anglais',
   vetements: "👕 Je m'habille",
+  calendrier: '📅 Le calendrier',
+  heure: "⏰ L'heure",
+  course: '🏁 La course',
   memory: '🧠 Jeu de Mémoire'
 };
 
@@ -2804,6 +3572,7 @@ function bravoAlea() {
 function lancerModule(mod) {
   initAudio();
   currentMod = mod;
+  noterLancement(mod);
   locked = false;
   enoncant = false;
   
@@ -2814,6 +3583,11 @@ function lancerModule(mod) {
   
   if (mod === 'memory') {
     lancerMemoryMatchGame();
+    return;
+  }
+
+  if (mod === 'course') {
+    ouvrirCourse();
     return;
   }
   
@@ -2893,7 +3667,11 @@ function afficherQ() {
     bandeau.id = 'game-tenue';
     grid.parentNode.insertBefore(bandeau, grid);
   }
-  if (q.tenue) {
+  bandeau.style.marginBottom = (q.tenue || q.visuel) ? '16px' : '';
+  if (q.visuel) {
+    bandeau.className = 'flex justify-center mx-auto';
+    bandeau.innerHTML = q.visuel;
+  } else if (q.tenue) {
     bandeau.className = 'flex items-center justify-center gap-2 flex-wrap mx-auto mb-4 px-4 py-2 rounded-2xl bg-white/5 border border-white/10 max-w-md min-h-[56px] text-3xl md:text-4xl';
     bandeau.innerHTML = `<span title="Météo">${q.tenue.icone}</span><span class="text-white/30 text-xl">|</span>` +
       (q.tenue.habits.length ? q.tenue.habits.map(e => `<span>${e}</span>`).join('') : '<span class="text-white/50 text-sm font-bold">Ma tenue</span>');
@@ -2903,6 +3681,9 @@ function afficherQ() {
 
   // Dynamic grid columns structure based on options size
   const cols = q.choix.length;
+  // Centrage explicite : la remise à zéro générale des marges annule « mx-auto »
+  grid.style.marginLeft = 'auto';
+  grid.style.marginRight = 'auto';
   if (cols === 2) {
     grid.className = "answers-grid grid grid-cols-2 gap-4 max-w-md mx-auto";
   } else if (cols === 3) {
@@ -2924,6 +3705,8 @@ function afficherQ() {
       card.innerHTML = `<div class="font-extrabold text-lg drop-shadow-md">${ch.label}</div>`;
       card.classList.remove('clay-card');
       card.classList.add('rounded-2xl', 'border-4', 'border-white/20', 'shadow-xl', 'text-center');
+    } else if (q.type === 'clock') {
+      card.innerHTML = ch.svg;
     } else if (q.type === 'shape') {
       const coloredSvg = ch.svg.replace('__COL__', ch.col);
       card.innerHTML = `
@@ -2987,6 +3770,7 @@ function validerReponse(val, q) {
     }
     
     score++;
+    noterReponse(currentMod, chancesRestantes === 2 ? 'premier' : 'second');
     document.getElementById('game-score').textContent = '⭐ ' + score;
     playSynthSound('success');
     
@@ -3030,6 +3814,7 @@ function validerReponse(val, q) {
       }
     } else {
       locked = true;
+      noterReponse(currentMod, 'rate');
       // reveal correct answer card
       const goodCard = grid.querySelector(`[data-val="${CSS.escape(q.correct)}"]`);
       if (goodCard) goodCard.classList.add('border-4', 'border-emerald-400');
@@ -3814,6 +4599,7 @@ function confettisAction() {
 /* ══════════ MAIN BOOTSTRAP EVENT HANDLERS ══════════ */
 window.addEventListener('DOMContentLoaded', () => {
   loadProgressAndSettings();
+  appliquerJeuxMasques();
   
   // setup initial splash image
   updateMascotRendering('splash-mascot-container', userProgress.activeMascot, 'neutral', 320);

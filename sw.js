@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ludobox-vivi-v5';
+const CACHE_NAME = 'ludobox-vivi-v8';
 const ASSETS = [
   './',
   './index.html',
@@ -28,8 +28,17 @@ const ASSETS = [
   './lionentier.png',
   './panthereentier.png',
   './pantherenoire.png',
-  'https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4',
-  'https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap'
+  './courselion.png',
+  './coursegirafe.png',
+  './coursepanthere.png',
+  './coursekoala.png',
+  './tailwind.js',
+  './polices/polices.css',
+  './polices/fredoka-latin-1.woff2',
+  './polices/fredoka-latin-ext-0.woff2',
+  './polices/fredokaone-latin-2.woff2',
+  './polices/nunito-latin-4.woff2',
+  './polices/nunito-latin-ext-3.woff2'
 ];
 
 self.addEventListener('install', e => {
