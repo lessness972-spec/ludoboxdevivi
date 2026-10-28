@@ -4490,8 +4490,9 @@ let lastEarnedStickerId = null;
 function afficherBravo() {
   stopVoix();
   
-  // check score ratio to see if reward applies
-  const isWinSuccess = (score >= 7 || currentMod === 'memory');
+  // Autocollant gagné à partir de 70 % de bonnes réponses (certains jeux
+  // n'ont que 6 ou 8 questions : un seuil fixe de 7 les rendait impossibles).
+  const isWinSuccess = (score >= Math.ceil(questions.length * 0.7) || currentMod === 'memory');
   
   document.getElementById('bravo-stars').textContent = '⭐'.repeat(Math.max(3, Math.min(score, 10)));
   document.getElementById('bravo-info').textContent = `Tu as eu ${score} bonne${score > 1 ? 's' : ''} réponse${score > 1 ? 's' : ''} !`;
@@ -4525,10 +4526,10 @@ function afficherBravo() {
   confettisAction();
   
   let msg, audioKey;
-  if (score >= 8) {
+  if (score >= Math.ceil(questions.length * 0.8)) {
     msg = "Bravo champion ! Tu es vraiment fort !";
     audioKey = 'fin_super';
-  } else if (score >= 5) {
+  } else if (score >= Math.ceil(questions.length * 0.5)) {
     msg = "Très bien ! Continue à t'entraîner !";
     audioKey = 'fin_bien';
   } else {

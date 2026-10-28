@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ludobox-vivi-v8';
+const CACHE_NAME = 'ludobox-vivi-v9';
 const ASSETS = [
   './',
   './index.html',
